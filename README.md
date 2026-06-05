@@ -83,16 +83,33 @@ This parser is also **as CommonMark/GFM-correct as `league`**: visible text matc
 
 ---
 
-## Install & build
+## Install
 
-Requires **PHP 8.5+** with `ext-ffi`, plus a C compiler (`cc`/`clang`/`gcc`).
+Requires **PHP 8.5+** with `ext-ffi`. **No C compiler needed** — prebuilt native libraries ship in [`lib/`](lib/) for every supported platform:
+
+| Platform | Artifact |
+|---|---|
+| macOS (Apple Silicon + Intel) | `lib/darwin/libmd4cshim.dylib` (universal) |
+| Linux x86-64 (glibc) | `lib/linux-x86_64/libmd4cshim.so` |
+| Linux aarch64 (glibc) | `lib/linux-aarch64/libmd4cshim.so` |
+| Windows x64 | `lib/windows-x86_64/md4cshim.dll` |
 
 ```bash
-composer install        # PHP deps (the contenders + phpbench + phpunit)
-composer build          # compile the native md4c shim for your platform
+composer install   # that's it — the right binary is picked at runtime
 ```
 
-`composer build` runs [`native/build.sh`](native/build.sh), which produces `libmd4cshim.dylib` (macOS), `libmd4cshim.so` (Linux), or `md4cshim.dll` (Windows/mingw) and regenerates the FFI scope header with the right absolute path. `FfiParser::libPath()` resolves the correct artifact per OS at runtime.
+`FfiParser::libPath()` resolves the correct artifact for your OS + architecture (override with the `MARKDOWN_FFI_LIB` env var). Every shipped binary is verified on its real platform in [CI](.github/workflows/ci.yml) — Linux x64/arm64, macOS arm64/x64, and Windows x64.
+
+### Building it yourself
+
+For an unshipped target (musl/Alpine, FreeBSD, …) or to hack on the C:
+
+```bash
+composer build       # native/build.sh — compile for THIS platform into native/
+composer build:all   # native/build-all.sh — cross-compile EVERY platform into lib/
+```
+
+`build:all` builds the macOS universal slice with `clang -arch arm64 -arch x86_64` and cross-compiles the Linux/Windows targets with [`zig cc`](https://ziglang.org) — so all four libraries come out of a single host. The C shim is Windows-safe (the batch path falls back to single-threaded where pthreads is absent) and exports its symbols via `__declspec(dllexport)`.
 
 ## Use it as a library
 
@@ -111,6 +128,7 @@ $htmls = (new FfiBatchParser())->toHtmlBatch($arrayOfMarkdownStrings);
 | Command | What it does |
 |---|---|
 | `composer build` | Compile the native shim for this platform (`.dylib`/`.so`/`.dll`) |
+| `composer build:all` | Cross-compile shipped libraries for every platform into `lib/` (needs zig) |
 | `composer test` | Run the PHPUnit suite (`tests/`) |
 | `composer check` | Run the CI correctness gate (render parity + GFM + speed sanity) |
 | `composer bench` | Full head-to-head benchmark across the corpus → `results/` |
@@ -140,7 +158,7 @@ The suite (35 tests, ~300 assertions) covers CommonMark + all four GFM extension
 
 ## Caveats & honest take
 
-- **Portability is on you.** The native artifact is per-platform; the C is portable, the binary isn't. `composer build` handles each OS, but you ship a `.so`/`.dylib`/`.dll` per target — that's the FFI tax.
+- **It ships a binary per platform.** Prebuilt libraries for macOS/Linux/Windows are committed in `lib/` and verified in CI, so most users need no compiler — but you're trusting (and shipping) a native blob. The C is portable; the binaries are not. That's the FFI tax, prepaid.
 - **It's a stunt with a real core.** md4c is mature, fuzzed, and widely deployed; the shim is small and audited (zero leaks, zero segfaults on hostile input, binary-safe); the output is as correct as league's GFM. *If* you have a PHP service rendering a lot of Markdown and *can* ship a native artifact, this is a legitimate ~13–59× speedup. Most people can't and shouldn't — use `league/commonmark`.
 - **An AI wrote all of it.** Including this sentence. Review accordingly before trusting any of it.
 

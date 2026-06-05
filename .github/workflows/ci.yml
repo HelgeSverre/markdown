@@ -7,16 +7,50 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: PHP 8.5 · ${{ matrix.os }}
+  # Validate the PREBUILT libraries we ship — each on its real OS + architecture.
+  shipped:
+    name: shipped · ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        include:
+          - { os: ubuntu-latest,    label: linux-x86_64 }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64 }
+          - { os: macos-latest,     label: darwin-arm64 }
+          - { os: macos-13,         label: darwin-x86_64 }
+          - { os: windows-latest,   label: windows-x86_64, experimental: true }
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      - name: Set up PHP 8.5 (FFI + opcache)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi, opcache
+          ini-values: opcache.enable_cli=1, ffi.enable=1
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Which library resolves on this runner?
+        run: php -r "require 'vendor/autoload.php'; echo HelgeSverre\\Markdown\\FfiParser::libPath(), PHP_EOL;"
+
+      - name: Test suite (against the shipped binary)
+        run: composer test
+
+      - name: Correctness gate
+        run: php bench/ci_check.php
+
+  # Validate building from source (native/build.sh) and the opcache-preload fast path.
+  from-source:
+    name: build from source · ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
 
       - name: Set up PHP 8.5 (FFI + opcache + tracing JIT)
         uses: shivammathur/setup-php@v2
@@ -33,15 +67,14 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Build the native md4c shim (.so / .dylib)
-        run: bash native/build.sh
+      - name: Build the native shim from source
+        run: composer build
 
-      - name: Correctness gate (render parity + GFM + speed sanity)
+      - name: Correctness gate via the opcache-preload fast path
+        env:
+          MARKDOWN_FFI_LIB: ${{ github.workspace }}/native/libmd4cshim.so
         run: >-
           php -d opcache.enable_cli=1
           -d opcache.preload=bench/preload.php
           -d ffi.enable=1
           bench/ci_check.php
-
-      - name: Benchmark — small + medium corpora (smoke)
-        run: php bench/run.php corpus/ci-manifest.json || true

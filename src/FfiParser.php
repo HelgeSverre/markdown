@@ -43,16 +43,53 @@ final class FfiParser implements MarkdownParser
         $this->flags = $this->ffi->md2html_dialect_github();
     }
 
-    /** Resolve the compiled shared library for the current platform. */
+    /**
+     * Resolve the shared library for the current OS + architecture.
+     *
+     * Resolution order:
+     *   1. $MARKDOWN_FFI_LIB env var (explicit override, for C development)
+     *   2. the prebuilt library shipped in lib/<platform>/ (what users get)
+     *   3. a local dev build in native/ (e.g. `composer build` on an unshipped
+     *      platform such as musl/Alpine or FreeBSD)
+     */
     public static function libPath(): string
     {
-        $dir = dirname(__DIR__) . '/native/';
+        $override = getenv('MARKDOWN_FFI_LIB');
+        if (is_string($override) && $override !== '' && is_file($override)) {
+            return $override;
+        }
 
-        return match (PHP_OS_FAMILY) {
-            'Darwin'  => $dir . 'libmd4cshim.dylib',
-            'Windows' => $dir . 'md4cshim.dll',
-            default   => $dir . 'libmd4cshim.so',
+        $root = dirname(__DIR__);
+        $arch = strtolower(php_uname('m'));
+        $isArm = str_contains($arch, 'aarch64') || str_contains($arch, 'arm');
+
+        $candidates = match (PHP_OS_FAMILY) {
+            'Darwin' => [
+                $root . '/lib/darwin/libmd4cshim.dylib',   // universal: arm64 + x86_64
+                $root . '/native/libmd4cshim.dylib',
+            ],
+            'Windows' => [
+                $root . '/lib/windows-x86_64/md4cshim.dll',
+                $root . '/native/md4cshim.dll',
+            ],
+            default => $isArm ? [
+                $root . '/lib/linux-aarch64/libmd4cshim.so',
+                $root . '/native/libmd4cshim.so',
+            ] : [
+                $root . '/lib/linux-x86_64/libmd4cshim.so',
+                $root . '/native/libmd4cshim.so',
+            ],
         };
+
+        foreach ($candidates as $path) {
+            if (is_file($path)) {
+                return $path;
+            }
+        }
+
+        // Nothing found: return the canonical dev path so the FFI failure names
+        // a real, buildable location (run `composer build`).
+        return $candidates[array_key_last($candidates)];
     }
 
     public function toHtml(string $markdown): string

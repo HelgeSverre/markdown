@@ -34,9 +34,9 @@ echo "==> Compiling $LIBNAME  ($CC -O3 -flto -pthread)"
 
 echo "==> Symbols:"
 if command -v nm >/dev/null 2>&1; then
-  # ' T _?md2html' matches defined text symbols on both BSD/macOS and GNU nm
-  # (macOS prefixes an underscore). $NF is the symbol name.
-  nm -g "$LIBNAME" 2>/dev/null | awk '/ T _?md2html/{print "      "$NF}' | sort -u || true
+  # Defined text symbols print as "<addr> T <name>" on both BSD/macOS and GNU
+  # nm (macOS prefixes an underscore). Undefined refs have only two fields.
+  nm "$LIBNAME" 2>/dev/null | awk '$2=="T" && $3 ~ /md2html/ {print "      "$3}' | sort -u || true
 fi
 
 # Regenerate the FFI scope header with THIS machine's absolute lib path.

@@ -17,6 +17,12 @@ native/*.a
 # Generated FFI scope header (build.sh writes it with a machine-specific path)
 native/md4cshim.h
 
+# Prebuilt platform libraries under lib/ ARE committed and shipped, but never
+# their build by-products:
+lib/**/*.pdb
+lib/**/*.lib
+lib/**/*.exp
+
 # Example output
 /examples/output/
 

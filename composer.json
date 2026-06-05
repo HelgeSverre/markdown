@@ -31,6 +31,7 @@
     },
     "scripts": {
         "build": "bash native/build.sh",
+        "build:all": "bash native/build-all.sh",
         "test": "phpunit",
         "check": "@php -d opcache.enable_cli=1 -d opcache.preload=bench/preload.php -d ffi.enable=1 bench/ci_check.php",
         "bench": "@php bench/run.php",
@@ -44,6 +45,7 @@
     },
     "scripts-descriptions": {
         "build": "Compile the native md4c FFI shim for this platform (.dylib/.so/.dll)",
+        "build:all": "Cross-compile shipped libraries for all platforms into lib/ (needs zig)",
         "test": "Run the PHPUnit test suite",
         "check": "Run the CI correctness gate (render parity + GFM + speed sanity)",
         "bench": "Run the full head-to-head benchmark across the corpus",

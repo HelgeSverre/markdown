@@ -10,8 +10,18 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#if !defined(_WIN32)
 #include <pthread.h>
+#define MDF_THREADS 1   /* POSIX: real OS thread pool for the batch path */
+#endif
 #include "md4c/md4c-html.h"
+
+/* Make sure the public entry points are exported from a Windows DLL. */
+#if defined(_WIN32)
+#define MDF_EXPORT __declspec(dllexport)
+#else
+#define MDF_EXPORT
+#endif
 
 typedef struct {
     char*  data;
@@ -95,7 +105,7 @@ static size_t collapse_nested_anchors(char* s, size_t n) {
  * (excluding the NUL) to *out_len. Caller MUST free via md2html_free().
  * Returns NULL on failure.
  */
-char* md2html(const char* input, size_t input_len, size_t* out_len,
+MDF_EXPORT char* md2html(const char* input, size_t input_len, size_t* out_len,
               unsigned int parser_flags, unsigned int renderer_flags) {
     membuf b = {0, 0, 0};
     int rc = md_html(input, (MD_SIZE)input_len, membuf_append, &b,
@@ -113,12 +123,12 @@ char* md2html(const char* input, size_t input_len, size_t* out_len,
     return b.data;
 }
 
-void md2html_free(char* p) {
+MDF_EXPORT void md2html_free(char* p) {
     free(p);
 }
 
 /* Expose the GitHub dialect flag value so PHP doesn't hardcode it. */
-unsigned int md2html_dialect_github(void) {
+MDF_EXPORT unsigned int md2html_dialect_github(void) {
     return MD_DIALECT_GITHUB;
 }
 
@@ -163,6 +173,7 @@ static void batch_render_one(batch_ctx* c, size_t i) {
     c->ok[i] = (rc == 0) ? 1 : 0;
 }
 
+#if defined(MDF_THREADS)
 static void* batch_worker(void* arg) {
     batch_ctx* c = (batch_ctx*)arg;
     /* Strided assignment keeps load balanced for uneven doc sizes. */
@@ -171,6 +182,7 @@ static void* batch_worker(void* arg) {
     }
     return NULL;
 }
+#endif
 
 /*
  * Parse n documents (concatenated in `packed`, delimited by in_offsets[n+1])
@@ -180,7 +192,7 @@ static void* batch_worker(void* arg) {
  * Returns NULL on any failure (allocation, or any doc failing to parse).
  * threads<=1 runs sequentially in-thread.
  */
-char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n,
+MDF_EXPORT char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n,
                     size_t* out_offsets, unsigned int parser_flags,
                     unsigned int renderer_flags, int threads) {
     if (out_offsets == NULL) return NULL;
@@ -200,13 +212,21 @@ char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n,
         return NULL;
     }
 
-    if (threads <= 1) {
+    int use_threads = 0;
+#if defined(MDF_THREADS)
+    use_threads = (threads > 1);
+#endif
+
+    if (!use_threads) {
+        /* Sequential (also the only path on platforms without pthreads). */
         batch_ctx c = {0};
         c.packed = packed; c.in_offsets = in_offsets; c.n = n;
         c.results = results; c.ok = ok;
         c.parser_flags = parser_flags; c.renderer_flags = renderer_flags;
         for (size_t i = 0; i < n; i++) batch_render_one(&c, i);
-    } else {
+    }
+#if defined(MDF_THREADS)
+    else {
         /* Never spawn more threads than documents. */
         if ((size_t)threads > n) threads = (int)n;
 
@@ -237,6 +257,7 @@ char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n,
         }
         free(tids); free(ctxs);
     }
+#endif
 
     /* Verify every doc parsed and tally the total output size. */
     size_t total = 0;
