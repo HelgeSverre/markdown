@@ -45,6 +45,7 @@ if ($xml === false) {
 /** Throughput subject -> friendly parser id. */
 $THROUGHPUT_IDS = [
     'benchHelgesverre' => 'helgesverre/markdown',
+    'benchHelgesverreParse' => 'helgesverre/markdown (parse)',
     'benchTempest' => 'tempest',
     'benchLeagueGfm' => 'league-gfm',
     'benchLeagueStrict' => 'league-strict',
@@ -53,9 +54,10 @@ $THROUGHPUT_IDS = [
 /** Front-matter subject -> {label, rendersBody, note}. */
 $FRONTMATTER_DESC = [
     'benchSymfonyYaml' => ['label' => 'symfony/yaml (floor)', 'rendersBody' => false, 'note' => 'raw YAML only — no Markdown involved'],
-    'benchOursExtract' => ['label' => 'helgesverre/markdown (extract)', 'rendersBody' => false, 'note' => 'dedicated extractor: regex split + symfony/yaml'],
+    'benchOursExtract' => ['label' => 'helgesverre/markdown (extract)', 'rendersBody' => false, 'note' => 'dedicated extractor: regex split + libyaml FFI'],
     'benchLeagueFrontmatter' => ['label' => 'league/commonmark (frontmatter-only)', 'rendersBody' => false, 'note' => 'FrontMatterParser — skips rendering the body'],
-    'benchTempestFull' => ['label' => 'tempest/markdown (full parse)', 'rendersBody' => true, 'note' => 'no front-matter-only API — renders the whole document'],
+    'benchTempestFull' => ['label' => 'tempest/markdown (full parse)', 'rendersBody' => true, 'note' => 'no dedicated front-matter API; full parse is the idiomatic path'],
+    'benchTempestLex' => ['label' => 'tempest/markdown (lex, no render)', 'rendersBody' => false, 'note' => 'no dedicated API; lex() tokenizes without rendering (FrontMatterToken->data)'],
     'benchOursFull' => ['label' => 'helgesverre/markdown (full parse)', 'rendersBody' => true, 'note' => 'parse(): front matter + HTML + table of contents'],
 ];
 
@@ -211,7 +213,7 @@ $md[] = '## Methodology';
 $md[] = '';
 $md[] = '- One measurement engine: [PHPBench](https://phpbench.readthedocs.io). Run the whole suite with `composer bench`.';
 $md[] = '- Every parser runs with **identical PHP flags** (`opcache.enable_cli`, tracing JIT, `ffi.enable`, `opcache.preload=bench/preload.php`). The preload only warms *our* FFI handle; for the pure-PHP parsers it is inert. Same env for everyone — our parser wins on merit plus a legitimately-preloaded handle.';
-$md[] = '- Cadence: **2 warmup, 50 revolutions × 10 iterations**, retry threshold 2.0 (PHPBench re-runs iterations until variance settles). Each iteration runs in its own process; reported time is the `mode` µs/rev.';
+$md[] = '- Cadence: front matter runs **2 warmup, 50 revolutions × 10 iterations** for µs-scale precision; HTML throughput runs a lighter **1 warmup, 10 revolutions × 5 iterations** (the pure-PHP parsers cost tens of ms per parse on the larger tiers, so more samples buy no accuracy). Retry threshold 2.0; each iteration runs in its own process; reported time is the `mode` µs/rev.';
 $md[] = '- Parser instances are constructed **once** (in `setUp`/the registry), outside the timed revolutions. Corpus documents are read during warmup, not inside the measured revs.';
 $md[] = '';
 $md[] = '> **Memory caveat (honest):** `helgesverre/markdown` renders its HTML onto the **C heap** (md4c `malloc`), which PHP\'s memory metrics do **not** count — so its `peak MB` is real-RSS-favorable (it undercounts the transient, immediately-freed C output buffer). Pure-PHP parsers keep all work on the Zend heap, so their `peak MB` is a complete accounting. The `peak MB` column also includes PHPBench\'s own per-process runner overhead, so read it as directional, not absolute.';

@@ -1,17 +1,5 @@
 [
   {
-    "path": "commonmark-spec.md",
-    "bytes": 206108,
-    "label": "CommonMark spec source (canonical markdown benchmark input)",
-    "source": "real"
-  },
-  {
-    "path": "tempest-docs.md",
-    "bytes": 258770,
-    "label": "Real Tempest project website markdown (tempestphp/tempest-docs blog articles + homepage code samples, the source benchmarked by the Tempest Markdown blog post)",
-    "source": "real"
-  },
-  {
     "path": "synthetic/doc-2kb.md",
     "bytes": 3708,
     "label": "Synthetic feature-rich markdown, ~2KB scale tier",
@@ -30,15 +18,15 @@
     "source": "synthetic"
   },
   {
-    "path": "synthetic/doc-1mb.md",
-    "bytes": 1049890,
-    "label": "Synthetic feature-rich markdown, ~1MB scale tier",
-    "source": "synthetic"
+    "path": "commonmark-spec.md",
+    "bytes": 206108,
+    "label": "CommonMark spec source (canonical markdown benchmark input)",
+    "source": "real"
   },
   {
-    "path": "synthetic/doc-8mb.md",
-    "bytes": 8389954,
-    "label": "Synthetic feature-rich markdown, ~8MB scale tier",
-    "source": "synthetic"
+    "path": "tempest-docs.md",
+    "bytes": 258770,
+    "label": "Real Tempest project website markdown (tempestphp/tempest-docs blog articles + homepage code samples, the source benchmarked by the Tempest Markdown blog post)",
+    "source": "real"
   }
 ]

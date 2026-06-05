@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown;
 
-use Symfony\Component\Yaml\Yaml;
-use Throwable;
-
 /**
  * Splits a leading YAML front-matter block from a Markdown document.
  *
@@ -16,6 +13,13 @@ use Throwable;
  *
  * md4c has no concept of front matter (it would render `---` as a thematic
  * break), so this runs in PHP before the document reaches the parser.
+ *
+ * The YAML body is decoded entirely by the vendored-libyaml FFI path
+ * ({@see Ffi\Yaml::decode}): parsed to JSON in C, then json_decode'd. There is
+ * no symfony/yaml fallback — anything that path declines (anchors/aliases, `<<`
+ * merge keys, parse errors, or FFI being unavailable) degrades to an empty
+ * array, the same as malformed YAML. Bare dates are kept as strings rather than
+ * coerced to integer timestamps — see the README.
  */
 final class FrontMatter
 {
@@ -32,18 +36,10 @@ final class FrontMatter
         $body = substr($markdown, strlen($m[0]));
         $yaml = $m[1];
 
-        if (trim($yaml) === '' || ! class_exists(Yaml::class)) {
+        if (trim($yaml) === '') {
             return [[], $body];
         }
 
-        try {
-            $parsed = Yaml::parse($yaml);
-        } catch (Throwable) {
-            // Malformed YAML: treat the document as having no front matter
-            // rather than throwing (tempest/markdown throws here; we don't).
-            return [[], $body];
-        }
-
-        return [is_array($parsed) ? $parsed : [], $body];
+        return [Ffi\Yaml::decode($yaml), $body];
     }
 }

@@ -49,3 +49,8 @@ lib/**/*.exp
 /results/profile.sample.txt
 
 profile.json.gz
+# Throwaway real-world doc corpora (cloned for ad-hoc benchmarking, not committed)
+/corpus/realworld/
+
+# WIP integration experiments (cloned real apps, not committed)
+/wip/

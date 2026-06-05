@@ -1,0 +1,14 @@
+[
+  {
+    "path": "synthetic/doc-1mb.md",
+    "bytes": 1049890,
+    "label": "Synthetic feature-rich markdown, ~1MB scale tier",
+    "source": "synthetic"
+  },
+  {
+    "path": "synthetic/doc-8mb.md",
+    "bytes": 8389954,
+    "label": "Synthetic feature-rich markdown, ~8MB scale tier",
+    "source": "synthetic"
+  }
+]

@@ -95,6 +95,10 @@ $result->toc;         // [['level' => 1, 'text' => 'Introduction', 'slug' => 'in
 
 Malformed front matter degrades to an empty array. Heading ids are lower-cased, ASCII-folded, and de-duplicated with suffixes like `intro-1`.
 
+Front matter is decoded by a vendored [libyaml](https://github.com/yaml/libyaml) FFI path (parsed to JSON in C, then `json_decode`d) — no pure-PHP YAML parser is involved. Inputs libyaml's walker does not support — anchors/aliases and `<<` merge keys — degrade to an empty array, the same as malformed YAML.
+
+> **Date scalars are strings.** A bare `date: 2026-06-05` in front matter is returned as the string `"2026-06-05"` (matching PECL `yaml`, spyc, and dallgoot). This differs from `symfony/yaml`'s default, which resolves it to an integer Unix timestamp. Quote or post-process if you need a different type.
+
 ### Options
 
 ```php
@@ -118,27 +122,34 @@ Run the full suite with:
 composer bench
 ```
 
-Fresh run from this checkout: PHP 8.5.5, Darwin arm64, PHPBench, opcache + tracing JIT + FFI preload. Full generated tables live in [`results/RESULTS.md`](results/RESULTS.md), with machine-readable rows in [`results/results.json`](results/results.json). This run included locally generated 1 MB and 8 MB synthetic tiers; run `composer corpus` before benchmarking if they are absent.
+Fresh run from this checkout: PHP 8.5.5, Darwin arm64, PHPBench, opcache + tracing JIT + FFI preload. Full generated tables live in [`results/RESULTS.md`](results/RESULTS.md), with machine-readable rows in [`results/results.json`](results/results.json). The default corpus caps at ~256 KB (realistic document sizes plus two real-world corpora); the 1 MB and 8 MB scaling tiers are opt-in via `composer bench:stress` (run `composer corpus` first to generate them).
 
 ### HTML Throughput Snapshot
 
+`toHtml()` (render only) against the default corpus:
+
 | Corpus | helgesverre/markdown | league/commonmark GFM | tempest/markdown |
 | --- | ---: | ---: | ---: |
-| `tempest-docs.md` (252 KB) | **0.90 ms** / 286 MB/s | 23.80 ms / 10.8 MB/s | 43.25 ms / 6.0 MB/s |
-| `doc-1mb.md` (1 MB) | **5.95 ms** / 176.6 MB/s | 347.61 ms / 3.0 MB/s | 84.50 ms / 12.4 MB/s |
-| `doc-8mb.md` (8 MB) | **48.50 ms** / 173.0 MB/s | threw during parse | 646.15 ms / 13.0 MB/s |
+| `doc-128kb.md` (135 KB) | **0.71 ms** / 195 MB/s | 40.21 ms / 3.4 MB/s | 10.78 ms / 12.8 MB/s |
+| `commonmark-spec.md` (165 KB) | **0.86 ms** / 197 MB/s | 27.73 ms / 6.1 MB/s | — (threw) |
+| `tempest-docs.md` (252 KB) | **0.83 ms** / 313 MB/s | 23.74 ms / 10.9 MB/s | 24.22 ms / 10.7 MB/s |
 
-On the 252 KB Tempest docs corpus, this parser measured about 26x faster than `league/commonmark` GFM and about 48x faster than `tempest/markdown`. On the 1 MB synthetic corpus, it measured about 58x faster than `league/commonmark` GFM and about 14x faster than `tempest/markdown`.
+On the 252 KB Tempest docs corpus, the render fast path measured about 29x faster than `league/commonmark` GFM and about 29x faster than `tempest/markdown`. The full `parse()` pipeline (front matter + render + heading anchors + TOC) is benchmarked too — on that corpus it runs in ~1.13 ms (229 MB/s), still ~21x faster than either.
 
 ### Front Matter
 
-| Approach | Mean |
-| --- | ---: |
-| `symfony/yaml` floor | 352.25 us |
-| `helgesverre/markdown` extract only | 362.96 us |
-| `helgesverre/markdown` full parse | 372.75 us |
-| `league/commonmark` front matter only | 400.97 us |
-| `tempest/markdown` full parse | 1,014.39 us |
+`extract()` pulls the YAML front matter without rendering the body (vendored libyaml in C → JSON → `json_decode`):
+
+| Approach | Mean | Renders body? |
+| --- | ---: | :---: |
+| `helgesverre/markdown` extract only | **6.39 us** | no |
+| `helgesverre/markdown` full parse | 32.04 us | yes |
+| `symfony/yaml` floor | 334.67 us | no |
+| `league/commonmark` front matter only | 380.96 us | no |
+| `tempest/markdown` lex (no render) | 455.11 us | no |
+| `tempest/markdown` full parse | 1,012.87 us | yes |
+
+Front-matter extraction measured about 52x faster than the `symfony/yaml` floor and about 60x faster than `league/commonmark`'s dedicated front-matter parser. (`tempest/markdown` has no dedicated front-matter API — `lex()` is its cheapest path, full `parse()` its idiomatic one.)
 
 Memory numbers in the benchmark output need context: this parser renders into a short-lived C heap buffer before copying HTML back into PHP, so PHP's memory metrics undercount part of its transient native allocation. Pure-PHP parsers keep their work on the Zend heap.
 
@@ -153,6 +164,8 @@ void  md2html_free(char* p);
 ```
 
 md4c renders through callbacks internally, but those callbacks stay in C. PHP passes a byte string in, receives one allocated HTML buffer back, copies it with `FFI::string()`, and frees it.
+
+Front matter uses the same one-call shape: `yaml2json()` walks [libyaml](https://github.com/yaml/libyaml)'s event stream into a single JSON string in C, which PHP `json_decode`s — no per-node FFI crossings. libyaml is vendored and statically linked into the shim, so the shipped binaries carry no external runtime dependency.
 
 For production, `bench/preload.php` can warm an `FFI::load()` scope through opcache preload. Without preload, the library falls back to `FFI::cdef()` automatically.
 
@@ -176,6 +189,7 @@ composer build:all   # all shipped platforms -> lib/
 | `composer test` | Run PHPUnit |
 | `composer check` | Run the CI correctness smoke gate |
 | `composer bench` | Run PHPBench and regenerate `results/` |
+| `composer bench:stress` | Run the throughput bench against the 1 MB / 8 MB tiers |
 | `composer examples` | Run every example script |
 | `composer build` | Build the native shim for this platform |
 | `composer build:all` | Cross-build shipped libraries |
@@ -199,4 +213,4 @@ CI runs the shipped binaries on Linux and macOS, keeps an experimental Windows s
 
 ## License
 
-MIT. md4c is copyright Martin Mitas and licensed under MIT.
+MIT. Bundled under their own MIT licenses: [md4c](https://github.com/mity/md4c) (Martin Mitáš) for Markdown parsing and [libyaml](https://github.com/yaml/libyaml) (Kirill Simonov et al.) for front-matter YAML — see [`THIRD_PARTY.md`](THIRD_PARTY.md).

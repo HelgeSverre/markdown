@@ -51,4 +51,27 @@ final class ShippedLibrariesTest extends TestCase
 
         $this->assertSame(0x0F0C, $ffi->md2html_dialect_github());
     }
+
+    #[Test]
+    public function the_resolved_library_actually_binds_and_exports_yaml2json(): void
+    {
+        $ffi = FFI::cdef(
+            <<<'C'
+                char* yaml2json(const char* yaml, size_t yaml_len, size_t* out_len);
+                void md2html_free(char* p);
+                C,
+            Library::path(),
+        );
+
+        $len = $ffi->new('size_t');
+        $ptr = $ffi->yaml2json("title: Hi\n", strlen("title: Hi\n"), FFI::addr($len));
+
+        $this->assertNotNull($ptr);
+
+        try {
+            $this->assertSame('{"title":"Hi"}', FFI::string($ptr, $len->cdata));
+        } finally {
+            $ffi->md2html_free($ptr);
+        }
+    }
 }

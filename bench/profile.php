@@ -43,11 +43,18 @@ if ($rc !== 0) {
 
 // --- 1. ensure the profiling lib (build on demand) -------------------------
 $profLib = $root . '/native/libmd4cshim.prof.dylib';
-if (! is_file($profLib)) {
-    fwrite(STDERR, "profile: profiling lib missing — building it (composer profile:build)…\n");
-    exec('bash ' . escapeshellarg($root . '/native/build.sh') . ' profile 2>&1', $_b, $rcb);
+if (profile_lib_needs_rebuild($root, $profLib)) {
+    fwrite(STDERR, "profile: profiling lib missing/stale — building it (composer profile:build)…\n");
+    exec('bash ' . escapeshellarg($root . '/native/build.sh') . ' profile 2>&1', $buildOutput, $rcb);
     if ($rcb !== 0 || ! is_file($profLib)) {
-        $die('failed to build the profiling lib; run `composer profile:build` and inspect the output.');
+        $die("failed to build the profiling lib:\n" . implode("\n", $buildOutput));
+    }
+}
+if (! profile_lib_exports_runtime_symbols($profLib)) {
+    fwrite(STDERR, "profile: profiling lib does not export the current FFI symbols — rebuilding…\n");
+    exec('bash ' . escapeshellarg($root . '/native/build.sh') . ' profile 2>&1', $rebuildOutput, $rcr);
+    if ($rcr !== 0 || ! is_file($profLib) || ! profile_lib_exports_runtime_symbols($profLib)) {
+        $die("profiling lib still does not export the current FFI symbols after rebuild:\n" . implode("\n", $rebuildOutput));
     }
 }
 
@@ -71,10 +78,14 @@ $bytes = preg_match('/\((\d+) bytes\)/', $timing, $m) ? (int) $m[1] : 0;
 if (str_contains($timing, 'bound=yes')) {
     $die('FFI::scope is bound (opcache.preload active) — it is shadowing the profiling lib. This should not happen via this script; check your php.ini.');
 }
+if ($usPerOp === null || str_contains($timing, 'Fatal error')) {
+    $die("profile target timing pass failed; refusing to write a stale report:\n{$timing}");
+}
 
 // --- 3. sampling pass ------------------------------------------------------
 $sampleOut = $root . '/results/profile.sample.txt';
 fwrite(STDERR, "profile: sampling {$mode} on {$corpus} for {$seconds}s…\n");
+@unlink($sampleOut);
 
 // Launch the hot loop with a huge iteration count so it outlives the sampler;
 // we terminate it once `sample` returns.
@@ -85,12 +96,15 @@ fclose($pipes[0]);
 
 $pid = proc_get_status($proc)['pid'];
 usleep(600_000); // let it warm up and reach steady state before sampling
-exec(sprintf('sample %d %d -file %s 2>/dev/null', $pid, $seconds, escapeshellarg($sampleOut)));
+$sampleStartedAt = time();
+exec(sprintf('sample %d %d -file %s 2>/dev/null', $pid, $seconds, escapeshellarg($sampleOut)), $_sampleOutput, $sampleRc);
 
 proc_terminate($proc);
 proc_close($proc);
 
-is_file($sampleOut) || $die('sample produced no output.');
+if ($sampleRc !== 0 || ! is_file($sampleOut) || filemtime($sampleOut) < $sampleStartedAt) {
+    $die('sample failed or produced no fresh output.');
+}
 
 // --- 4. parse the self-time ("top of stack") table -------------------------
 $rows = parse_sample_self_time(file_get_contents($sampleOut));
@@ -202,6 +216,47 @@ function run_capture(array $cmd, string $cwd, array $env): string
     proc_close($proc);
 
     return $out;
+}
+
+function profile_lib_needs_rebuild(string $root, string $profLib): bool
+{
+    if (! is_file($profLib)) {
+        return true;
+    }
+
+    $nativeFiles = array_merge(
+        glob($root . '/native/*.c') ?: [],
+        glob($root . '/native/*.h') ?: [],
+        glob($root . '/native/*.sh') ?: [],
+        glob($root . '/native/md4c/*.{c,h}', GLOB_BRACE) ?: [],
+        glob($root . '/native/libyaml/src/*.{c,h}', GLOB_BRACE) ?: [],
+        glob($root . '/native/libyaml/include/*.h') ?: [],
+    );
+
+    $newestSource = 0;
+    foreach ($nativeFiles as $file) {
+        $newestSource = max($newestSource, filemtime($file) ?: 0);
+    }
+
+    return filemtime($profLib) < $newestSource;
+}
+
+function profile_lib_exports_runtime_symbols(string $profLib): bool
+{
+    try {
+        FFI::cdef(
+            <<<'C'
+                char* md2html(const char* input, size_t input_len, size_t* out_len, unsigned int parser_flags, unsigned int renderer_flags);
+                char* yaml2json(const char* yaml, size_t yaml_len, size_t* out_len);
+                void md2html_free(char* p);
+                C,
+            $profLib,
+        );
+
+        return true;
+    } catch (Throwable) {
+        return false;
+    }
 }
 
 /**

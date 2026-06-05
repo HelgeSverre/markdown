@@ -71,6 +71,15 @@ return (static function (): array {
                 );
             };
         }
+
+        // Full document pipeline (front matter strip via libyaml + render +
+        // heading anchors + TOC) — the realistic "serve a docs page" path, as
+        // opposed to the toHtml() render-only fast path registered above.
+        if (method_exists($ours, 'parse')) {
+            $registry['helgesverre/markdown (parse)'] = static function (string $md) use ($ours): string {
+                return (string) $ours->parse($md)->html;
+            };
+        }
     } else {
         $registry['helgesverre/markdown'] = static function (string $md): string {
             throw new RuntimeException('HelgeSverre\Markdown\Parser not found — run `composer install` (and `composer build` on an unshipped platform).');

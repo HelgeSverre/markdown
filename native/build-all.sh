@@ -21,16 +21,36 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$DIR/.." && pwd)"
 cd "$DIR"
 
-SOURCES=(shim.c md4c/md4c.c md4c/md4c-html.c md4c/entity.c)
+SOURCES=(shim.c yaml_shim.c md4c/md4c.c md4c/md4c-html.c md4c/entity.c \
+  libyaml/src/api.c libyaml/src/reader.c libyaml/src/scanner.c libyaml/src/parser.c \
+  libyaml/src/loader.c libyaml/src/writer.c libyaml/src/emitter.c libyaml/src/dumper.c)
 LIBDIR="$ROOT/lib"
 
+# Flags for the vendored libyaml translation units (see native/build.sh). The
+# 0.2.5 tarball reads YAML_VERSION_* from config.h via HAVE_CONFIG_H.
+YAML_FLAGS=(-DHAVE_CONFIG_H -Ilibyaml/include -Ilibyaml/src)
+
 symbols() {
-  # Portable "did the 4 entry points make it in?" check.
+  # Portable "did the runtime entry points make it in?" check.
   local f="$1"
+  local pattern='(md2html(_free|_dialect_github|_batch|_anchor)?|yaml2json)$'
   if command -v nm >/dev/null 2>&1; then
     local n
-    n=$(nm "$f" 2>/dev/null | grep -c -E 'md2html(_free|_dialect_github|_batch|_anchor)?$' || true)
-    echo "      $n md2html* symbols"
+    n=$(
+      {
+        nm "$f" 2>/dev/null || true
+        nm -D "$f" 2>/dev/null || true
+      } | grep -c -E "$pattern" || true
+    )
+    if [ "$n" -gt 0 ]; then
+      echo "      $n exported shim symbols"
+      return
+    fi
+  fi
+  if command -v objdump >/dev/null 2>&1; then
+    local n
+    n=$(objdump -p "$f" 2>/dev/null | grep -c -E "$pattern" || true)
+    echo "      $n exported shim symbols"
   fi
 }
 
@@ -40,6 +60,7 @@ build_macos_universal() {
   echo "==> macOS universal (arm64+x86_64) via clang"
   clang -O3 -fPIC -shared -DNDEBUG -pthread \
     -arch arm64 -arch x86_64 \
+    "${YAML_FLAGS[@]}" \
     -o "$out" "${SOURCES[@]}"
   command -v lipo >/dev/null 2>&1 && echo "      arches: $(lipo -archs "$out")"
   symbols "$out"
@@ -52,7 +73,7 @@ build_zig() {
   local target="$1" out="$2"; shift 2
   mkdir -p "$(dirname "$out")"
   echo "==> $target via zig cc -> ${out#"$ROOT"/}"
-  zig cc -target "$target" -O3 -fPIC -shared -DNDEBUG -Wl,-s "$@" \
+  zig cc -target "$target" -O3 -fPIC -shared -DNDEBUG -Wl,-s "${YAML_FLAGS[@]}" "$@" \
     -o "$out" "${SOURCES[@]}"
   symbols "$out"
 }

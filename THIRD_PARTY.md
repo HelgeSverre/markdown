@@ -14,3 +14,15 @@ This project bundles and redistributes third-party code — in source form under
 
 The MIT license requires its copyright notice travel with redistributions, which
 is why md4c's source and `LICENSE.md` ship in this repository.
+
+## libyaml
+
+- **Author:** Kirill Simonov and contributors
+- **License:** MIT — see [`native/libyaml/LICENSE`](native/libyaml/LICENSE)
+- **Upstream:** <https://github.com/yaml/libyaml> (release 0.2.5 tarball)
+- **Role:** the YAML parser behind front-matter extraction.
+  [`native/yaml_shim.c`](native/yaml_shim.c) walks its event stream into JSON
+  (the `yaml2json` symbol), and every shipped `lib/**` binary statically links
+  it — so installs need no system libyaml. `native/libyaml/src/config.h` is a
+  hand-written stand-in for the upstream autotools-generated file (version
+  macros only).

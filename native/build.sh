@@ -33,12 +33,20 @@ case "$(uname -s)" in
   *)                    LIBNAME="libmd4cshim.so" ;;
 esac
 
-SOURCES=(shim.c md4c/md4c.c md4c/md4c-html.c md4c/entity.c)
+SOURCES=(shim.c yaml_shim.c md4c/md4c.c md4c/md4c-html.c md4c/entity.c \
+  libyaml/src/api.c libyaml/src/reader.c libyaml/src/scanner.c libyaml/src/parser.c \
+  libyaml/src/loader.c libyaml/src/writer.c libyaml/src/emitter.c libyaml/src/dumper.c)
+
+# Flags for the vendored libyaml translation units (yaml_shim.c + libyaml/src/*).
+# This 0.2.5 tarball pulls its YAML_VERSION_* macros from config.h via
+# HAVE_CONFIG_H; native/libyaml/src/config.h supplies them. Harmless for the
+# md4c/shim sources (none of them include config.h).
+YAML_FLAGS=(-DHAVE_CONFIG_H -Ilibyaml/include -Ilibyaml/src)
 
 if [ "$MODE" = profile ]; then
   # libmd4cshim.dylib -> libmd4cshim.prof.dylib  (keep the original extension)
   LIBNAME="${LIBNAME%.*}.prof.${LIBNAME##*.}"
-  PROFFLAGS=(-O2 -g -fno-omit-frame-pointer -fPIC -DNDEBUG -pthread)
+  PROFFLAGS=(-O2 -g -fno-omit-frame-pointer -fPIC -DNDEBUG -pthread "${YAML_FLAGS[@]}")
   # -O2 -g -fno-omit-frame-pointer: optimized, but symbolicated and unwindable.
   # Intentionally NO -flto (it inlines md4c into the shim and collapses the very
   # frames you want to read) and NO -Wl,-s strip.
@@ -61,14 +69,14 @@ if [ "$MODE" = profile ]; then
   rm -f "${OBJS[@]}"
 else
   echo "==> Compiling $LIBNAME  ($CC -O3 -flto -pthread)"
-  "$CC" -O3 -flto -fPIC -shared -DNDEBUG -pthread -o "$LIBNAME" "${SOURCES[@]}"
+  "$CC" -O3 -flto -fPIC -shared -DNDEBUG -pthread "${YAML_FLAGS[@]}" -o "$LIBNAME" "${SOURCES[@]}"
 fi
 
 echo "==> Symbols:"
 if command -v nm >/dev/null 2>&1; then
   # Defined text symbols print as "<addr> T <name>" on both BSD/macOS and GNU
   # nm (macOS prefixes an underscore). Undefined refs have only two fields.
-  nm "$LIBNAME" 2>/dev/null | awk '$2=="T" && $3 ~ /md2html/ {print "      "$3}' | sort -u || true
+  nm "$LIBNAME" 2>/dev/null | awk '$2=="T" && $3 ~ /(md2html|yaml2json)/ {print "      "$3}' | sort -u || true
 fi
 
 if [ "$MODE" = profile ]; then
@@ -95,6 +103,7 @@ char* md2html_anchor(const char* html, size_t html_len, size_t* out_len, char** 
 void md2html_free(char* p);
 unsigned int md2html_dialect_github(void);
 char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n, size_t* out_offsets, unsigned int parser_flags, unsigned int renderer_flags, int threads);
+char* yaml2json(const char* yaml, size_t yaml_len, size_t* out_len);
 EOF
 
 echo "==> Wrote md4cshim.h  (FFI_LIB=$DIR/$LIBNAME)"

@@ -10,6 +10,7 @@ use PhpBench\Attributes as Bench;
 use function basename;
 use function dirname;
 use function file_get_contents;
+use function getenv;
 use function is_array;
 use function is_file;
 use function json_decode;
@@ -26,12 +27,18 @@ use function str_starts_with;
  * param would serialize multi-MB strings into phpbench's generated remote
  * script and into the XML dump. Instead each subject memoizes the file read on
  * first call — which lands in the @Warmup revs, so the read is amortized OUT of
- * the measured revs. Absent tiers (the uncommitted 1MB/8MB synthetic docs) are
- * skipped, matching the old run.php behavior.
+ * the measured revs. Absent tiers are skipped.
  *
- * Cadence comes from phpbench.json (warmup 2, revs 50, iterations 10, retry
- * threshold 2.0); restated here as attributes so running this file directly
- * (vendor/bin/phpbench run bench/ThroughputBench.php) behaves identically.
+ * The default corpus (corpus/manifest.json) caps at ~256KB — realistic document
+ * sizes plus the two real corpora. The 1MB/8MB scaling tiers live in
+ * corpus/stress-manifest.json; select it with MARKDOWN_BENCH_MANIFEST (see the
+ * `bench:stress` composer script). Run `composer corpus` first to generate them.
+ *
+ * Throughput cadence (warmup 1, revs 10, iterations 5) is intentionally lighter
+ * than the global phpbench.json default: pure-PHP parsers take tens of ms per
+ * parse on the larger tiers, so 500 samples/cell would push the run into minutes
+ * for no statistical gain (rstdev stays <2%). The front-matter bench keeps the
+ * higher cadence for its µs-scale precision.
  *
  * MEMORY CAVEAT (honest, do not delete): our FFI parser renders HTML onto the C
  * heap (md4c malloc), which PHP's memory metrics do NOT count — only the
@@ -41,9 +48,9 @@ use function str_starts_with;
  * a complete accounting. Read the memory column with that asymmetry in mind.
  */
 #[Bench\BeforeMethods('setUp')]
-#[Bench\Warmup(2)]
-#[Bench\Revs(50)]
-#[Bench\Iterations(10)]
+#[Bench\Warmup(1)]
+#[Bench\Revs(10)]
+#[Bench\Iterations(5)]
 #[Bench\RetryThreshold(2.0)]
 final class ThroughputBench
 {
@@ -72,7 +79,13 @@ final class ThroughputBench
     public function provideCorpus(): Generator
     {
         $corpusDir = dirname(__DIR__) . '/corpus';
-        $manifestPath = $corpusDir . '/manifest.json';
+        // Default to the ~256KB manifest; MARKDOWN_BENCH_MANIFEST selects another
+        // (e.g. stress-manifest.json for the 1MB/8MB scaling tiers).
+        $manifestName = getenv('MARKDOWN_BENCH_MANIFEST');
+        if (! is_string($manifestName) || $manifestName === '') {
+            $manifestName = 'manifest.json';
+        }
+        $manifestPath = $corpusDir . '/' . $manifestName;
 
         $items = [];
         if (is_file($manifestPath)) {
@@ -115,6 +128,19 @@ final class ThroughputBench
     public function benchHelgesverre(array $params): void
     {
         $this->parsers['helgesverre/markdown']($this->doc($params['path']));
+    }
+
+    /**
+     * Full document pipeline: front matter (libyaml) + render + heading anchors
+     * + TOC. The realistic "serve a docs page" workload — what you actually pay
+     * in production — versus benchHelgesverre()'s render-only fast path.
+     */
+    #[Bench\Subject]
+    #[Bench\Groups(['throughput'])]
+    #[Bench\ParamProviders('provideCorpus')]
+    public function benchHelgesverreParse(array $params): void
+    {
+        $this->parsers['helgesverre/markdown (parse)']($this->doc($params['path']));
     }
 
     #[Bench\Subject]
