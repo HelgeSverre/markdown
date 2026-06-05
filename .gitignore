@@ -23,6 +23,11 @@ lib/**/*.pdb
 lib/**/*.lib
 lib/**/*.exp
 
+# Large synthetic corpus tiers (regenerate with `composer corpus`).
+# The small tiers (2kb/16kb/128kb) stay committed; these two would bloat clones.
+/corpus/synthetic/doc-1mb.md
+/corpus/synthetic/doc-8mb.md
+
 # Example output
 /examples/output/
 

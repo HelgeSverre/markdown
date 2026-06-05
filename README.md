@@ -1,5 +1,7 @@
 # helgesverre/markdown
 
+[![CI](https://github.com/HelgeSverre/markdown/actions/workflows/ci.yml/badge.svg)](https://github.com/HelgeSverre/markdown/actions/workflows/ci.yml)
+
 A fast PHP Markdown parser that binds to the [md4c](https://github.com/mity/md4c) C library over FFI.
 
 > **What this is:** a Claude Code "ultracode" experiment — built by an agent fleet in a single session — whose goal was to beat the `tempest/markdown` and `league/commonmark` benchmarks by any means necessary. It works: ~13–59× faster on the same input. But it's PHP calling C, not a faster PHP parser. The numbers are real and reproducible; for production work, [use a real PHP parser](#use-a-real-parser-instead).
@@ -33,18 +35,22 @@ That's it. Prebuilt shared libraries ship in [`lib/`](lib/) and the right one is
 ## Usage
 
 ```php
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Markdown;
 
-$html = (new FfiParser())->toHtml("# Hello\n\n- a\n- b\n");   // GFM dialect
+$html  = Markdown::toHtml("# Hello\n\n- a\n- b\n");        // one document → GFM HTML
+$htmls = Markdown::toHtmlBatch($arrayOfMarkdownStrings);  // many, across CPU cores in C
 ```
 
-Render many documents in one call — packed into a single buffer and parsed across an OS thread pool in C, returned in order:
+The facade reuses a single parser instance under the hood. For explicit lifecycle control, construct [`FfiParser`](src/FfiParser.php) / [`FfiBatchParser`](src/FfiBatchParser.php) directly:
 
 ```php
-use HelgeSverre\Markdown\FfiBatchParser;
+use HelgeSverre\Markdown\FfiParser;
 
-$htmls = (new FfiBatchParser())->toHtmlBatch($arrayOfMarkdownStrings);
+$parser = new FfiParser();
+$html = $parser->toHtml("# Hello\n");
 ```
+
+`toHtmlBatch` packs all documents into a single buffer and parses them across an OS thread pool in C, returning HTML in order.
 
 ## Build from source (optional)
 
@@ -87,7 +93,7 @@ php examples/04-compare-parsers.php        # this vs league vs tempest, head to 
 
 ## Benchmarks
 
-Reproducible on this machine (PHP 8.5.5, Apple arm64) via `composer bench`. Each parser runs in its own process, instances reused, warmed up, timed over a ~1 s wall-clock budget. Full tables in [`results/RESULTS.md`](results/RESULTS.md).
+Reproducible on this machine (PHP 8.5.5, Apple arm64) via `composer bench`. Each parser runs in its own process, instances reused, warmed up, timed over a ~1 s wall-clock budget. Full tables in [`results/RESULTS.md`](results/RESULTS.md). (The 1 MB and 8 MB scaling tiers aren't committed — run `composer corpus` to regenerate them; the benchmark skips any corpus file that's absent.)
 
 **Real Tempest docs corpus** — 252.7 KB, the same input the [Tempest blog post](https://tempestphp.com/blog/tempest-markdown) benchmarked:
 

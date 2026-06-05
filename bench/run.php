@@ -107,6 +107,13 @@ function load_corpus(string $manifestPath): array
             $resolved = $base . '/' . $path;
             $path = is_file($resolved) ? $resolved : $path;
         }
+        // Skip absent corpus files instead of erroring. The large synthetic
+        // tiers (doc-1mb, doc-8mb) aren't committed — run `composer corpus`
+        // to regenerate them and they'll be picked up automatically.
+        if (!is_file($path)) {
+            fwrite(STDERR, "skipping {$path} (not found; run `composer corpus` to regenerate)\n");
+            continue;
+        }
         if ($label === '') {
             $label = basename($path);
         }

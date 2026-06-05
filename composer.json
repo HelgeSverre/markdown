@@ -36,6 +36,10 @@
         "check": "@php -d opcache.enable_cli=1 -d opcache.preload=bench/preload.php -d ffi.enable=1 bench/ci_check.php",
         "bench": "@php bench/run.php",
         "bench:phpbench": "phpbench run bench/MarkdownBench.php --report=default",
+        "corpus": [
+            "@php corpus/gen_synthetic.php 1048576 corpus/synthetic/doc-1mb.md",
+            "@php corpus/gen_synthetic.php 8388608 corpus/synthetic/doc-8mb.md"
+        ],
         "examples": [
             "@php examples/01-basic.php",
             "@php examples/02-render-file.php",
@@ -50,6 +54,7 @@
         "check": "Run the CI correctness gate (render parity + GFM + speed sanity)",
         "bench": "Run the full head-to-head benchmark across the corpus",
         "bench:phpbench": "Run the phpbench parity benchmark (the Tempest blog's methodology)",
+        "corpus": "Regenerate the large synthetic corpus tiers (doc-1mb/doc-8mb, not committed)",
         "examples": "Run every examples/*.php acid-test script in order"
     },
     "minimum-stability": "stable",
