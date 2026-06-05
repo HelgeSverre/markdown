@@ -1,77 +1,87 @@
 # helgesverre/markdown — benchmark results
 
-_Generated 2026-06-05 14:58:23 · PHP 8.5.5 · Darwin arm64 · measured with PHPBench_
+_Generated 2026-06-05 17:55:11 · PHP 8.5.5 · Darwin arm64 · measured with PHPBench_
 
 ## Methodology
 
 - One measurement engine: [PHPBench](https://phpbench.readthedocs.io). Run the whole suite with `composer bench`.
-- Every parser runs with **identical PHP flags** (`opcache.enable_cli`, tracing JIT, `ffi.enable`,
-  `opcache.preload=bench/preload.php`). The preload only warms _our_ FFI handle; for the pure-PHP parsers it is inert.
-  Same env for everyone — our parser wins on merit plus a legitimately-preloaded handle.
-- Cadence: **2 warmup, 50 revolutions × 10 iterations**, retry threshold 2.0 (PHPBench re-runs iterations until variance
-  settles). Each iteration runs in its own process; reported time is the `mode` µs/rev.
-- Parser instances are constructed **once** (in `setUp`/the registry), outside the timed revolutions. Corpus documents
-  are read during warmup, not inside the measured revs.
+- Every parser runs with **identical PHP flags** (`opcache.enable_cli`, tracing JIT, `ffi.enable`, `opcache.preload=bench/preload.php`). The preload only warms *our* FFI handle; for the pure-PHP parsers it is inert. Same env for everyone — our parser wins on merit plus a legitimately-preloaded handle.
+- Cadence: **2 warmup, 50 revolutions × 10 iterations**, retry threshold 2.0 (PHPBench re-runs iterations until variance settles). Each iteration runs in its own process; reported time is the `mode` µs/rev.
+- Parser instances are constructed **once** (in `setUp`/the registry), outside the timed revolutions. Corpus documents are read during warmup, not inside the measured revs.
 
-> **Memory caveat (honest):** `helgesverre/markdown` renders its HTML onto the **C heap** (md4c `malloc`), which PHP's
-> memory metrics do **not** count — so its `peak MB` is real-RSS-favorable (it undercounts the transient,
-> immediately-freed C output buffer). Pure-PHP parsers keep all work on the Zend heap, so their `peak MB` is a complete
-> accounting. The `peak MB` column also includes PHPBench's own per-process runner overhead, so read it as directional,
-> not absolute.
+> **Memory caveat (honest):** `helgesverre/markdown` renders its HTML onto the **C heap** (md4c `malloc`), which PHP's memory metrics do **not** count — so its `peak MB` is real-RSS-favorable (it undercounts the transient, immediately-freed C output buffer). Pure-PHP parsers keep all work on the Zend heap, so their `peak MB` is a complete accounting. The `peak MB` column also includes PHPBench's own per-process runner overhead, so read it as directional, not absolute.
 
 ## HTML throughput
 
-### commonmark-spec.md (201.3 KB)
+### commonmark-spec.md  (165.3 KB)
 
-| Parser                      | ops/sec |   MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
-| --------------------------- | ------: | -----: | ------: | ------: | ---------: | ------------: | --------------------- |
-| **helgesverre/markdown** 🏆 |     982 | 202.46 |  1.0180 |    3.22 |          — |        27.79× |
-| **league-strict**           |      38 |   7.83 | 26.3218 |  113.75 |          — |         1.07× |
-| **league-gfm**              |      35 |   7.29 | 28.2902 |  113.91 |          — |         1.00× |
-| **tempest**                 |       — |      — |       — |       — |          — |             — | ⚠️ threw during parse |
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 1,045 | 177.01 | 0.9565 | 3.22 | — | 28.34× |
+| **league-strict** | 39 | 6.67 | 25.3823 | 113.63 | — | 1.07× |
+| **league-gfm** | 37 | 6.25 | 27.1032 | 113.79 | — | 1.00× |
+| **tempest** | — | — | — | — | — | — |  ⚠️ threw during parse
 
-### tempest-docs.md (252.7 KB)
+### tempest-docs.md  (252.0 KB)
 
-| Parser                      | ops/sec |   MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
-| --------------------------- | ------: | -----: | ------: | ------: | ---------: | ------------: |
-| **helgesverre/markdown** 🏆 |     998 | 258.30 |  1.0018 |    3.22 |     43.46× |        25.78× |
-| **league-strict**           |      50 |  12.94 | 19.9933 |   85.45 |      2.18× |         1.29× |
-| **league-gfm**              |      39 |  10.02 | 25.8228 |   86.23 |      1.69× |         1.00× |
-| **tempest**                 |      23 |   5.94 | 43.5383 |    4.21 |      1.00× |         0.59× |
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 1,109 | 286.15 | 0.9019 | 3.22 | 47.95× | 26.39× |
+| **league-strict** | 51 | 13.20 | 19.5524 | 85.85 | 2.21× | 1.22× |
+| **league-gfm** | 42 | 10.84 | 23.8030 | 86.63 | 1.82× | 1.00× |
+| **tempest** | 23 | 5.97 | 43.2510 | 4.22 | 1.00× | 0.55× |
 
-### doc-2kb.md (3.6 KB)
+### doc-2kb.md  (3.8 KB)
 
-| Parser                      | ops/sec |   MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
-| --------------------------- | ------: | -----: | ------: | ------: | ---------: | ------------: |
-| **helgesverre/markdown** 🏆 |  45,371 | 168.23 |  0.0220 |    3.22 |     33.26× |       120.42× |
-| **tempest**                 |   1,364 |   5.06 |  0.7331 |    3.22 |      1.00× |         3.62× |
-| **league-strict**           |     488 |   1.81 |  2.0508 |    6.75 |      0.36× |         1.29× |
-| **league-gfm**              |     377 |   1.40 |  2.6542 |    8.22 |      0.28× |         1.00× |
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 47,131 | 183.29 | 0.0212 | 3.22 | 38.46× | 113.90× |
+| **tempest** | 1,225 | 4.77 | 0.8160 | 3.22 | 1.00× | 2.96× |
+| **league-strict** | 515 | 2.00 | 1.9418 | 6.84 | 0.42× | 1.24× |
+| **league-gfm** | 414 | 1.61 | 2.4166 | 8.06 | 0.34× | 1.00× |
 
-### doc-16kb.md (17.2 KB)
+### doc-16kb.md  (18.1 KB)
 
-| Parser                      | ops/sec |   MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
-| --------------------------- | ------: | -----: | ------: | ------: | ---------: | ------------: |
-| **helgesverre/markdown** 🏆 |   9,817 | 173.02 |  0.1019 |    3.22 |     17.83× |        63.84× |
-| **tempest**                 |     551 |   9.70 |  1.8164 |    3.22 |      1.00× |         3.58× |
-| **league-strict**           |     190 |   3.35 |  5.2674 |   25.31 |      0.34× |         1.23× |
-| **league-gfm**              |     154 |   2.71 |  6.5033 |   29.99 |      0.28× |         1.00× |
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 9,971 | 184.73 | 0.1003 | 3.22 | 16.81× | 64.95× |
+| **tempest** | 593 | 10.99 | 1.6862 | 3.22 | 1.00× | 3.86× |
+| **league-strict** | 193 | 3.57 | 5.1897 | 25.39 | 0.32× | 1.26× |
+| **league-gfm** | 154 | 2.84 | 6.5139 | 29.99 | 0.26× | 1.00× |
 
-### doc-128kb.md (128.5 KB)
+### doc-128kb.md  (135.1 KB)
 
-| Parser                      | ops/sec |   MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
-| --------------------------- | ------: | -----: | ------: | ------: | ---------: | ------------: |
-| **helgesverre/markdown** 🏆 |   1,323 | 174.00 |  0.7560 |    3.22 |     13.40× |        57.88× |
-| **tempest**                 |      99 |  12.98 | 10.1315 |    3.24 |      1.00× |         4.32× |
-| **league-strict**           |      29 |   3.76 | 34.9510 |  175.88 |      0.29× |         1.25× |
-| **league-gfm**              |      23 |   3.01 | 43.7592 |  209.96 |      0.23× |         1.00× |
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 1,345 | 186.00 | 0.7436 | 3.22 | 13.75× | 56.54× |
+| **tempest** | 98 | 13.53 | 10.2251 | 3.22 | 1.00× | 4.11× |
+| **league-strict** | 29 | 4.05 | 34.1398 | 176.44 | 0.30× | 1.23× |
+| **league-gfm** | 24 | 3.29 | 42.0421 | 209.98 | 0.24× | 1.00× |
+
+### doc-1mb.md  (1.00 MB)
+
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 168 | 176.55 | 5.9466 | 4.23 | 14.21× | 58.45× |
+| **tempest** | 12 | 12.42 | 84.4999 | 9.89 | 1.00× | 4.11× |
+| **league-strict** | 4 | 3.77 | 278.4909 | 1,382.97 | 0.30× | 1.25× |
+| **league-gfm** | 3 | 3.02 | 347.6060 | 1,652.72 | 0.24× | 1.00× |
+
+### doc-8mb.md  (8.00 MB)
+
+| Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
+|---|--:|--:|--:|--:|--:|--:|
+| **helgesverre/markdown** 🏆 | 21 | 172.98 | 48.5036 | 23.10 | 13.32× | — |
+| **tempest** | 2 | 12.98 | 646.1485 | 64.42 | 1.00× | — |
+| **league-gfm** | — | — | — | — | — | — |  ⚠️ threw during parse
+| **league-strict** | — | — | — | — | — | — |  ⚠️ threw during parse
 
 ## Front-matter extraction
 
-| Approach                             |  mean µs | ops/sec | renders body? | vs fastest |
-| ------------------------------------ | -------: | ------: | :-----------: | ---------: |
-| helgesverre/markdown (extract)       |   341.18 |   2,931 |      no       |      1.00× |
-| symfony/yaml (floor)                 |   342.16 |   2,923 |      no       |      1.00× |
-| league/commonmark (frontmatter-only) |   377.58 |   2,648 |      no       |      0.90× |
-| helgesverre/markdown (full parse)    |   390.86 |   2,558 |      yes      |      0.87× |
-| tempest/markdown (full parse)        | 1,032.72 |     968 |      yes      |      0.33× |
+| Approach | mean µs | ops/sec | renders body? | vs fastest |
+|---|--:|--:|:--:|--:|
+| symfony/yaml (floor) | 352.25 | 2,839 | no | 1.00× |
+| helgesverre/markdown (extract) | 362.96 | 2,755 | no | 0.97× |
+| helgesverre/markdown (full parse) | 372.75 | 2,683 | yes | 0.95× |
+| league/commonmark (frontmatter-only) | 400.97 | 2,494 | no | 0.88× |
+| tempest/markdown (full parse) | 1,014.39 | 986 | yes | 0.35× |
