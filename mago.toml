@@ -4,7 +4,7 @@
 php-version = "8.5.0"
 
 [source]
-paths = ["src", "tests", "bench", "examples"]
+paths = ["src", "tests", "examples"]
 
 [formatter]
 # Formatting style mirrors Tempest's own mago.toml.
