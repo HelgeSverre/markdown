@@ -12,6 +12,7 @@
         "opcache.enable_cli": "1",
         "opcache.jit_buffer_size": "64M",
         "opcache.jit": "tracing",
-        "ffi.enable": "1"
+        "ffi.enable": "1",
+        "opcache.preload": "bench/preload.php"
     }
 }

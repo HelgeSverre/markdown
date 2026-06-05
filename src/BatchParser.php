@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace HelgeSverre\Markdown;
 
 use FFI;
+use FFI\Exception as FFIException;
+use HelgeSverre\Markdown\Data\Dialect;
+use HelgeSverre\Markdown\Ffi\Library;
 use RuntimeException;
-use Throwable;
 
 /**
  * Batch markdown renderer that fans a set of documents out across a native
@@ -17,53 +19,32 @@ use Throwable;
  * back one flat HTML buffer plus an output offset table. PHP slices the result
  * with substr — one FFI call for the whole batch.
  *
- * If the native batch symbol is unavailable (e.g. an older lib), we fall back
- * to a pure-PHP sequential loop over FfiParser so callers always get an answer.
+ * If the native md2html_batch symbol isn't present (an older or hand-built shim
+ * that predates the batch path), toHtmlBatch() transparently falls back to
+ * rendering each document sequentially, so output is identical either way.
  */
-final class FfiBatchParser implements MarkdownParser
+final class BatchParser
 {
-    private const CDEF = <<<'C'
-        char* md2html(const char* input, size_t input_len, size_t* out_len, unsigned int parser_flags, unsigned int renderer_flags);
-        void md2html_free(char* p);
-        unsigned int md2html_dialect_github(void);
-        char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n, size_t* out_offsets, unsigned int parser_flags, unsigned int renderer_flags, int threads);
-        C;
-
     private FFI $ffi;
 
     private int $flags;
 
     private int $rendererFlags;
 
-    private bool $hasBatch;
+    private Parser $sequential;
 
-    private FfiParser $sequential;
+    /** Tri-state cache of whether this build exposes md2html_batch (null = untried). */
+    private ?bool $batchAvailable = null;
 
     public function __construct(
         Dialect $dialect = Dialect::GitHub,
         bool $safe = false,
         bool $xhtml = false,
     ) {
-        try {
-            $this->ffi = FFI::scope('MD4C');
-        } catch (Throwable) {
-            $this->ffi = FFI::cdef(self::CDEF, FfiParser::libPath());
-        }
-
-        $this->flags = FfiParser::resolveParserFlags($this->ffi, $dialect, $safe);
-        $this->rendererFlags = $xhtml ? FfiParser::MD_HTML_FLAG_XHTML : 0;
-
-        // Probe for the batch symbol once. Accessing an undefined C function on
-        // the binding throws, so this is a reliable availability check.
-        try {
-            $probe = $this->ffi->md2html_batch;
-            unset($probe);
-            $this->hasBatch = true;
-        } catch (Throwable) {
-            $this->hasBatch = false;
-        }
-
-        $this->sequential = new FfiParser($dialect, $safe, $xhtml);
+        $this->ffi = Library::bind();
+        $this->flags = Library::parserFlags($this->ffi, $dialect, $safe);
+        $this->rendererFlags = Library::rendererFlags($xhtml);
+        $this->sequential = new Parser($dialect, $safe, $xhtml);
     }
 
     public function toHtml(string $markdown): string
@@ -84,12 +65,14 @@ final class FfiBatchParser implements MarkdownParser
             return [];
         }
 
-        if (! $this->hasBatch) {
-            return $this->sequentialBatch($docs);
-        }
-
         // Re-index to a dense 0..n-1 list so offset math is straightforward.
         $list = array_values($docs);
+
+        // A prior call already proved this build has no md2html_batch symbol:
+        // skip the packing work and render sequentially.
+        if ($this->batchAvailable === false) {
+            return $this->renderEachSequentially($list);
+        }
 
         // Pack all docs into one contiguous buffer + an (n+1) offset table.
         $packed = '';
@@ -106,15 +89,25 @@ final class FfiBatchParser implements MarkdownParser
 
         $threads = $this->workerCount($n);
 
-        $ptr = $this->ffi->md2html_batch(
-            $packed,
-            $inOffsets,
-            $n,
-            $outOffsets,
-            $this->flags,
-            $this->rendererFlags,
-            $threads,
-        );
+        try {
+            $ptr = $this->ffi->md2html_batch(
+                $packed,
+                $inOffsets,
+                $n,
+                $outOffsets,
+                $this->flags,
+                $this->rendererFlags,
+                $threads,
+            );
+        } catch (FFIException) {
+            // The batch entry point isn't in this library. Remember it so later
+            // calls skip straight to the sequential path, and fall back now.
+            $this->batchAvailable = false;
+
+            return $this->renderEachSequentially($list);
+        }
+
+        $this->batchAvailable = true;
 
         if ($ptr === null) {
             throw new RuntimeException('md4c batch render failed.');
@@ -138,21 +131,17 @@ final class FfiBatchParser implements MarkdownParser
         return $out;
     }
 
-    public function name(): string
-    {
-        return 'helgesverre/markdown (FFI→md4c, batch)';
-    }
-
     /**
-     * Pure-PHP sequential fallback: just loop the single-doc parser.
+     * Render each document on its own through the sequential parser,
+     * index-aligned — the fallback when the native batch path is unavailable.
      *
-     * @param array<int,string> $docs
+     * @param  list<string>  $docs
      * @return array<int,string>
      */
-    private function sequentialBatch(array $docs): array
+    private function renderEachSequentially(array $docs): array
     {
         $out = [];
-        foreach (array_values($docs) as $i => $doc) {
+        foreach ($docs as $i => $doc) {
             $out[$i] = $this->sequential->toHtml($doc);
         }
 

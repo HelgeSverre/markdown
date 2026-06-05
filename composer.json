@@ -29,11 +29,13 @@
         "allow-plugins": {
             "tempest/*": true
         },
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "process-timeout": 0
     },
     "scripts": {
         "build": "bash native/build.sh",
         "build:all": "bash native/build-all.sh",
+        "profile:build": "bash native/build.sh profile",
         "test": "phpunit",
         "format": "mago fmt",
         "format:check": "mago fmt --check",
@@ -44,9 +46,15 @@
             "@lint:fix"
         ],
         "check": "@php -d opcache.enable_cli=1 -d opcache.preload=bench/preload.php -d ffi.enable=1 bench/ci_check.php",
-        "bench": "@php bench/run.php",
-        "bench:frontmatter": "@php bench/frontmatter.php",
-        "bench:phpbench": "phpbench run bench/MarkdownBench.php --report=default",
+        "bench": [
+            "phpbench run --dump-file=results/raw.xml --progress=none --tolerate-failure || true",
+            "@php bench/format.php results/raw.xml"
+        ],
+        "profile": "@php bench/profile.php",
+        "profile:flamegraph": [
+            "@profile:build",
+            "MARKDOWN_FFI_LIB=\"$PWD/native/libmd4cshim.prof.dylib\" samply record -- php -d opcache.preload= -d ffi.enable=1 bench/profile_target.php commonmark-spec.md 5000 html"
+        ],
         "corpus": [
             "@php corpus/gen_synthetic.php 1048576 corpus/synthetic/doc-1mb.md",
             "@php corpus/gen_synthetic.php 8388608 corpus/synthetic/doc-8mb.md"
@@ -55,12 +63,14 @@
             "@php examples/01-basic.php",
             "@php examples/02-render-file.php",
             "@php examples/03-batch-multicore.php",
-            "@php examples/04-compare-parsers.php"
+            "@php examples/04-compare-parsers.php",
+            "@php examples/05-parse-document.php"
         ]
     },
     "scripts-descriptions": {
         "build": "Compile the native md4c FFI shim for this platform (.dylib/.so/.dll)",
         "build:all": "Cross-compile shipped libraries for all platforms into lib/ (needs zig)",
+        "profile:build": "Build the symbol-rich profiling lib (libmd4cshim.prof.*) for native profilers — see docs/profiling.md",
         "test": "Run the PHPUnit test suite",
         "format": "Format all PHP code with Mago (same formatter Tempest uses)",
         "format:check": "Verify formatting without writing changes (CI gate)",
@@ -68,9 +78,9 @@
         "lint:fix": "Auto-fix safe lint issues, then reformat",
         "style": "Format + auto-fix everything in one go (format then lint:fix)",
         "check": "Run the CI correctness gate (render parity + GFM + speed sanity)",
-        "bench": "Run the full head-to-head benchmark across the corpus",
-        "bench:frontmatter": "Benchmark front-matter extraction vs tempest, league, and raw symfony/yaml",
-        "bench:phpbench": "Run the phpbench parity benchmark (the Tempest blog's methodology)",
+        "bench": "Run the full PHPBench suite (HTML throughput + front matter) and write results/RESULTS.md",
+        "profile": "Profile the native hot path with macOS `sample` and write results/PROFILE.md (auto-builds the profiling lib). Args: [corpus] [mode] [seconds]",
+        "profile:flamegraph": "Profile with samply and open an interactive flamegraph in the browser (macOS/samply)",
         "corpus": "Regenerate the large synthetic corpus tiers (doc-1mb/doc-8mb, not committed)",
         "examples": "Run every examples/*.php acid-test script in order"
     },

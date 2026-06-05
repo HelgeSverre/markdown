@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Parser;
 
 $root = dirname(__DIR__);
 $input = $argv[1] ?? $root . '/corpus/tempest-docs.md';
@@ -26,7 +26,7 @@ if (! is_file($input)) {
 $markdown = (string) file_get_contents($input);
 
 $start = hrtime(true);
-$body = new FfiParser()->toHtml($markdown);
+$body = new Parser()->toHtml($markdown);
 $ms = (hrtime(true) - $start) / 1e6;
 
 $outDir = $root . '/examples/output';

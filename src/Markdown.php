@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown;
 
+use HelgeSverre\Markdown\Data\ParsedMarkdown;
+
 /**
  * Convenience facade for the common case.
  *
  *   Markdown::toHtml("# Hi");
  *
- * The underlying FFI parser is created once and reused, so repeated calls don't
- * re-bind the library. For explicit lifecycle control, use FfiParser /
- * FfiBatchParser directly.
+ * The underlying parser is created once and reused, so repeated calls don't
+ * re-bind the library. For explicit lifecycle control, use Parser /
+ * BatchParser directly.
  */
 final class Markdown
 {
-    private static ?FfiParser $parser = null;
+    private static ?Parser $parser = null;
 
-    private static ?FfiBatchParser $batch = null;
+    private static ?BatchParser $batch = null;
 
     /** Render one Markdown string to GFM HTML. */
     public static function toHtml(string $markdown): string
     {
-        return (self::$parser ??= new FfiParser())->toHtml($markdown);
+        return (self::$parser ??= new Parser())->toHtml($markdown);
     }
 
     /**
@@ -33,7 +35,7 @@ final class Markdown
      */
     public static function toHtmlBatch(array $documents): array
     {
-        return (self::$batch ??= new FfiBatchParser())->toHtmlBatch($documents);
+        return (self::$batch ??= new BatchParser())->toHtmlBatch($documents);
     }
 
     /**
@@ -42,6 +44,6 @@ final class Markdown
      */
     public static function parse(string $markdown): ParsedMarkdown
     {
-        return (self::$parser ??= new FfiParser())->parse($markdown);
+        return (self::$parser ??= new Parser())->parse($markdown);
     }
 }

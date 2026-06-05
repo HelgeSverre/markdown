@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Parser;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Tempest\Markdown\Markdown as TempestMarkdown;
 
@@ -22,9 +22,9 @@ $label = is_file($arg) ? basename($arg) : 'inline string';
 $bytes = strlen($markdown);
 
 // Construct each parser ONCE, outside the timed loop — same steady-state,
-// instance-reuse methodology as the real benchmark (bench/run.php). Building a
-// fresh parser every call would time construction, not parsing.
-$ours = new FfiParser();
+// instance-reuse methodology as the real benchmark (`composer bench`). Building
+// a fresh parser every call would time construction, not parsing.
+$ours = new Parser();
 $league = new GithubFlavoredMarkdownConverter();
 $tempest = new TempestMarkdown();
 

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown\Tests;
 
-use HelgeSverre\Markdown\Dialect;
-use HelgeSverre\Markdown\FfiParser;
-use HelgeSverre\Markdown\ParsedMarkdown;
+use HelgeSverre\Markdown\Data\Dialect;
+use HelgeSverre\Markdown\Data\ParsedMarkdown;
+use HelgeSverre\Markdown\Parser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -16,11 +17,11 @@ use PHPUnit\Framework\TestCase;
  */
 final class ParseTest extends TestCase
 {
-    private FfiParser $parser;
+    private Parser $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new FfiParser();
+        $this->parser = new Parser();
     }
 
     #[Test]
@@ -97,7 +98,7 @@ final class ParseTest extends TestCase
     #[Test]
     public function commonmark_dialect_disables_gfm_extensions(): void
     {
-        $parser = new FfiParser(Dialect::CommonMark);
+        $parser = new Parser(Dialect::CommonMark);
 
         $this->assertStringNotContainsString('<del>', $parser->toHtml("~~x~~\n"));
         $this->assertStringNotContainsString('<table>', $parser->toHtml("| a | b |\n|---|---|\n| 1 | 2 |\n"));
@@ -106,7 +107,7 @@ final class ParseTest extends TestCase
     #[Test]
     public function safe_mode_neutralizes_raw_html(): void
     {
-        $parser = new FfiParser(safe: true);
+        $parser = new Parser(safe: true);
         $html = $parser->toHtml("<script>alert(1)</script>\n");
 
         $this->assertStringNotContainsString('<script>', $html);
@@ -116,8 +117,53 @@ final class ParseTest extends TestCase
     #[Test]
     public function xhtml_mode_emits_self_closing_tags(): void
     {
-        $parser = new FfiParser(xhtml: true);
+        $parser = new Parser(xhtml: true);
 
         $this->assertStringContainsString('<hr />', $parser->toHtml("***\n"));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function slugEdgeCases(): iterable
+    {
+        yield 'only punctuation falls back to "section"' => ['!!!', 'section'];
+        yield 'trailing punctuation is trimmed' => ['Sub-Section!', 'sub-section'];
+        yield 'separator runs collapse to one hyphen' => ['a   ---   b', 'a-b'];
+        yield 'non-ascii letters are folded out' => ['Café Crème', 'caf-cr-me'];
+    }
+
+    #[Test]
+    #[DataProvider('slugEdgeCases')]
+    public function it_slugifies_heading_edge_cases(string $heading, string $expectedSlug): void
+    {
+        $toc = $this->parser->parse("# {$heading}\n")->toc;
+
+        $this->assertSame($expectedSlug, $toc[0]['slug']);
+    }
+
+    #[Test]
+    public function toc_text_strips_tags_and_decodes_entities_but_the_slug_uses_neither(): void
+    {
+        $toc = $this->parser->parse("# A <em>B</em> & C\n")->toc;
+
+        $this->assertSame('A B & C', $toc[0]['text']);
+        $this->assertSame('a-b-c', $toc[0]['slug']);
+    }
+
+    #[Test]
+    public function many_identical_headings_dedupe_in_linear_time(): void
+    {
+        // Guards the native hashmap de-dup: thousands of identical headings must
+        // produce sequential suffixes quickly, not blow up super-linearly.
+        $start = hrtime(true);
+        $toc = $this->parser->parse(str_repeat("## Dup\n\n", 20_000))->toc;
+        $elapsedMs = (hrtime(true) - $start) / 1e6;
+
+        $this->assertCount(20_000, $toc);
+        $this->assertSame('dup', $toc[0]['slug']);
+        $this->assertSame('dup-1', $toc[1]['slug']);
+        $this->assertSame('dup-19999', $toc[19_999]['slug']);
+        $this->assertLessThan(2000, $elapsedMs, 'native de-dup is not linear');
     }
 }

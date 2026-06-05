@@ -10,6 +10,8 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdio.h>
 #if !defined(_WIN32)
 #include <pthread.h>
 #define MDF_THREADS 1   /* POSIX: real OS thread pool for the batch path */
@@ -130,6 +132,268 @@ MDF_EXPORT void md2html_free(char* p) {
 /* Expose the GitHub dialect flag value so PHP doesn't hardcode it. */
 MDF_EXPORT unsigned int md2html_dialect_github(void) {
     return MD_DIALECT_GITHUB;
+}
+
+/* ------------------------------------------------------------------------- *
+ * Heading anchoring + table of contents (for Parser::parse()).
+ *
+ * md4c-html emits bare "<h1>".."<h6>" with no id. This pass rewrites the
+ * rendered HTML once in C — injecting GitHub-style id="slug" into every heading
+ * and emitting a TOC — instead of the PHP regex+per-heading pass it replaces.
+ * It mirrors src/HeadingAnchors.php byte-for-byte (verified by a parity test).
+ * ------------------------------------------------------------------------- */
+
+/* Small open-addressing string->int map for O(n) slug de-duplication. */
+typedef struct { char* key; size_t klen; int val; } hm_slot;
+typedef struct { hm_slot* slots; size_t cap; size_t len; } hashmap;
+
+static uint64_t fnv1a(const char* s, size_t n) {
+    uint64_t h = 1469598103934665603ULL;
+    for (size_t i = 0; i < n; i++) { h ^= (unsigned char)s[i]; h *= 1099511628211ULL; }
+    return h;
+}
+static void hm_init(hashmap* m) { m->cap = 64; m->len = 0; m->slots = (hm_slot*)calloc(m->cap, sizeof(hm_slot)); }
+static void hm_free(hashmap* m) { for (size_t i = 0; i < m->cap; i++) free(m->slots[i].key); free(m->slots); }
+static hm_slot* hm_slot_for(hm_slot* slots, size_t cap, const char* key, size_t klen, uint64_t h) {
+    size_t mask = cap - 1, idx = (size_t)h & mask;
+    for (;;) {
+        hm_slot* s = &slots[idx];
+        if (s->key == NULL) return s;
+        if (s->klen == klen && memcmp(s->key, key, klen) == 0) return s;
+        idx = (idx + 1) & mask;
+    }
+}
+static void hm_resize(hashmap* m) {
+    size_t newcap = m->cap * 2;
+    hm_slot* ns = (hm_slot*)calloc(newcap, sizeof(hm_slot));
+    for (size_t i = 0; i < m->cap; i++) {
+        if (m->slots[i].key) {
+            hm_slot* s = hm_slot_for(ns, newcap, m->slots[i].key, m->slots[i].klen, fnv1a(m->slots[i].key, m->slots[i].klen));
+            *s = m->slots[i];
+        }
+    }
+    free(m->slots); m->slots = ns; m->cap = newcap;
+}
+static hm_slot* hm_get(hashmap* m, const char* key, size_t klen) {
+    hm_slot* s = hm_slot_for(m->slots, m->cap, key, klen, fnv1a(key, klen));
+    return s->key ? s : NULL;
+}
+static void hm_put(hashmap* m, const char* key, size_t klen, int val) {
+    if ((m->len + 1) * 10 >= m->cap * 7) hm_resize(m);
+    hm_slot* s = hm_slot_for(m->slots, m->cap, key, klen, fnv1a(key, klen));
+    if (s->key == NULL) { s->key = (char*)malloc(klen ? klen : 1); memcpy(s->key, key, klen); s->klen = klen; s->val = val; m->len++; }
+    else { s->val = val; }
+}
+
+/* Mirror of HeadingAnchors::slugify. Returns a malloc'd slug, length in *out. */
+static char* anchor_slugify(const char* inner, size_t len, size_t* out) {
+    char* o = (char*)malloc(len + 1);
+    size_t w = 0, i = 0;
+    int prev_hyphen = 1;
+    while (i < len) {
+        char c = inner[i];
+        if (c == '<') { while (i < len && inner[i] != '>') i++; if (i < len) i++; continue; }
+        if (c == '&') {
+            while (i < len && inner[i] != ';') i++;
+            if (i < len) i++;
+            if (!prev_hyphen) { o[w++] = '-'; prev_hyphen = 1; }
+            continue;
+        }
+        unsigned char b = (unsigned char)c;
+        if (b >= 65 && b <= 90) { o[w++] = (char)(b + 32); prev_hyphen = 0; }
+        else if ((b >= 97 && b <= 122) || (b >= 48 && b <= 57)) { o[w++] = c; prev_hyphen = 0; }
+        else if (!prev_hyphen) { o[w++] = '-'; prev_hyphen = 1; }
+        i++;
+    }
+    while (w > 0 && o[w - 1] == '-') w--;
+    if (w == 0) { free(o); o = (char*)malloc(8); memcpy(o, "section", 7); w = 7; }
+    o[w] = '\0';
+    *out = w;
+    return o;
+}
+
+/* GitHub-style de-dup, mirror of HeadingAnchors::unique. Returns malloc'd slug. */
+static char* anchor_unique(hashmap* m, const char* base, size_t blen, size_t* out) {
+    if (hm_get(m, base, blen) == NULL) {
+        hm_put(m, base, blen, 0);
+        char* s = (char*)malloc(blen + 1);
+        memcpy(s, base, blen); s[blen] = '\0';
+        *out = blen;
+        return s;
+    }
+    for (;;) {
+        hm_slot* bs = hm_get(m, base, blen);
+        int v = ++bs->val;
+        char num[16];
+        int nl = snprintf(num, sizeof num, "%d", v);
+        size_t clen = blen + 1 + (size_t)nl;
+        char* cand = (char*)malloc(clen + 1);
+        memcpy(cand, base, blen); cand[blen] = '-'; memcpy(cand + blen + 1, num, (size_t)nl); cand[clen] = '\0';
+        if (hm_get(m, cand, clen) == NULL) { hm_put(m, cand, clen, 0); *out = clen; return cand; }
+        free(cand);
+    }
+}
+
+static int is_trim_byte(char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\0' || c == '\x0B'; }
+
+static int utf8_encode(unsigned int cp, char* dst) {
+    if (cp <= 0x7F) { dst[0] = (char)cp; return 1; }
+    if (cp <= 0x7FF) { dst[0] = (char)(0xC0 | (cp >> 6)); dst[1] = (char)(0x80 | (cp & 0x3F)); return 2; }
+    if (cp <= 0xFFFF) { dst[0] = (char)(0xE0 | (cp >> 12)); dst[1] = (char)(0x80 | ((cp >> 6) & 0x3F)); dst[2] = (char)(0x80 | (cp & 0x3F)); return 3; }
+    if (cp <= 0x10FFFF) { dst[0] = (char)(0xF0 | (cp >> 18)); dst[1] = (char)(0x80 | ((cp >> 12) & 0x3F)); dst[2] = (char)(0x80 | ((cp >> 6) & 0x3F)); dst[3] = (char)(0x80 | (cp & 0x3F)); return 4; }
+    return 0;
+}
+
+/* Decode one entity NAME (between & and ;). Returns bytes written, or -1. md4c
+ * only emits &amp;/&lt;/&gt; in text; we cover the named set + numeric refs so
+ * the TOC text matches PHP's html_entity_decode for everything md4c produces. */
+static int decode_entity(const char* name, size_t len, char* dst) {
+    if (len == 0) return -1;
+    if (name[0] == '#') {
+        unsigned int cp = 0;
+        if (len >= 2 && (name[1] == 'x' || name[1] == 'X')) {
+            if (len == 2) return -1;
+            for (size_t i = 2; i < len; i++) {
+                char c = name[i]; int d;
+                if (c >= '0' && c <= '9') d = c - '0';
+                else if (c >= 'a' && c <= 'f') d = c - 'a' + 10;
+                else if (c >= 'A' && c <= 'F') d = c - 'A' + 10;
+                else return -1;
+                cp = cp * 16 + (unsigned)d;
+                if (cp > 0x10FFFF) return -1;
+            }
+        } else {
+            if (len == 1) return -1;
+            for (size_t i = 1; i < len; i++) {
+                char c = name[i];
+                if (c < '0' || c > '9') return -1;
+                cp = cp * 10 + (unsigned)(c - '0');
+                if (cp > 0x10FFFF) return -1;
+            }
+        }
+        int w = utf8_encode(cp, dst);
+        return w == 0 ? -1 : w;
+    }
+    if (len == 3 && memcmp(name, "amp", 3) == 0) { dst[0] = '&'; return 1; }
+    if (len == 2 && memcmp(name, "lt", 2) == 0) { dst[0] = '<'; return 1; }
+    if (len == 2 && memcmp(name, "gt", 2) == 0) { dst[0] = '>'; return 1; }
+    if (len == 4 && memcmp(name, "quot", 4) == 0) { dst[0] = '"'; return 1; }
+    if (len == 4 && memcmp(name, "apos", 4) == 0) { dst[0] = '\''; return 1; }
+    return -1;
+}
+
+/* Mirror of HeadingAnchors::plainText: strip tags, decode entities, trim. */
+static char* anchor_text(const char* inner, size_t len, size_t* out) {
+    char* o = (char*)malloc(len + 1);
+    size_t w = 0, i = 0;
+    while (i < len) {
+        char c = inner[i];
+        if (c == '<') { while (i < len && inner[i] != '>') i++; if (i < len) i++; continue; }
+        if (c == '&') {
+            size_t j = i + 1;
+            while (j < len && inner[j] != ';' && (j - i) <= 12) j++;
+            if (j < len && inner[j] == ';') {
+                char buf[8];
+                int dw = decode_entity(inner + i + 1, j - (i + 1), buf);
+                if (dw > 0) { memcpy(o + w, buf, (size_t)dw); w += (size_t)dw; i = j + 1; continue; }
+            }
+            o[w++] = c; i++;
+            continue;
+        }
+        o[w++] = c; i++;
+    }
+    size_t s = 0, e = w;
+    while (s < e && is_trim_byte(o[s])) s++;
+    while (e > s && is_trim_byte(o[e - 1])) e--;
+    if (s > 0) memmove(o, o + s, e - s);
+    *out = e - s;
+    o[*out] = '\0';
+    return o;
+}
+
+static void append_u32le(membuf* b, uint32_t v) {
+    unsigned char t[4] = { (unsigned char)v, (unsigned char)(v >> 8), (unsigned char)(v >> 16), (unsigned char)(v >> 24) };
+    membuf_append((const char*)t, 4, b);
+}
+
+/*
+ * Anchor headings in `html` and build a table of contents.
+ *
+ * Returns rewritten HTML (malloc'd, NUL-terminated; *out_len set). The TOC is
+ * allocated into *toc_out as a little-endian, length-prefixed blob — one record
+ * per heading: [u8 level][u32 slug_len][slug][u32 text_len][text] — with its
+ * byte length in *toc_len_out. Caller frees BOTH the return value and *toc_out
+ * via md2html_free(). Never returns NULL.
+ */
+MDF_EXPORT char* md2html_anchor(const char* html, size_t html_len, size_t* out_len,
+                                char** toc_out, size_t* toc_len_out) {
+    membuf out = {0, 0, 0};
+    membuf toc = {0, 0, 0};
+    hashmap map;
+    hm_init(&map);
+
+    size_t i = 0, run_start = 0;
+    while (i < html_len) {
+        if (html[i] == '<' && i + 3 < html_len && html[i + 1] == 'h'
+            && html[i + 2] >= '1' && html[i + 2] <= '6' && html[i + 3] == '>') {
+            char lvl = html[i + 2];
+            size_t inner_start = i + 4, j = inner_start;
+            int found = 0;
+            while (j + 4 < html_len) {
+                if (html[j] == '<' && html[j + 1] == '/' && html[j + 2] == 'h'
+                    && html[j + 3] == lvl && html[j + 4] == '>') { found = 1; break; }
+                j++;
+            }
+            if (found) {
+                if (i > run_start) membuf_append(html + run_start, (MD_SIZE)(i - run_start), &out);
+
+                const char* inner = html + inner_start;
+                size_t inner_len = j - inner_start, base_len, slug_len, text_len;
+                char* base = anchor_slugify(inner, inner_len, &base_len);
+                char* slug = anchor_unique(&map, base, base_len, &slug_len);
+                free(base);
+                char* text = anchor_text(inner, inner_len, &text_len);
+
+                char open[8] = {'<', 'h', lvl, ' ', 'i', 'd', '=', '"'};
+                membuf_append(open, 8, &out);
+                if (slug_len) membuf_append(slug, (MD_SIZE)slug_len, &out);
+                membuf_append("\">", 2, &out);
+                if (inner_len) membuf_append(inner, (MD_SIZE)inner_len, &out);
+                char close[4] = {'<', '/', 'h', lvl};
+                membuf_append(close, 4, &out);
+                membuf_append(">", 1, &out);
+
+                unsigned char lv = (unsigned char)(lvl - '0');
+                membuf_append((const char*)&lv, 1, &toc);
+                append_u32le(&toc, (uint32_t)slug_len);
+                if (slug_len) membuf_append(slug, (MD_SIZE)slug_len, &toc);
+                append_u32le(&toc, (uint32_t)text_len);
+                if (text_len) membuf_append(text, (MD_SIZE)text_len, &toc);
+
+                free(slug);
+                free(text);
+                i = j + 5;
+                run_start = i;
+                continue;
+            }
+            /* unmatched <hN>: leave it in the run, like the PHP regex does */
+        }
+        i++;
+    }
+    if (html_len > run_start) membuf_append(html + run_start, (MD_SIZE)(html_len - run_start), &out);
+
+    hm_free(&map);
+
+    if (out.cap == 0) { out.data = (char*)malloc(1); out.cap = 1; }
+    out.data[out.size] = '\0';
+    if (out_len) *out_len = out.size;
+
+    if (toc.cap == 0) { toc.data = (char*)malloc(1); toc.cap = 1; }
+    toc.data[toc.size] = '\0';
+    if (toc_out) *toc_out = toc.data;
+    if (toc_len_out) *toc_len_out = toc.size;
+
+    return out.data;
 }
 
 /* ------------------------------------------------------------------------- *

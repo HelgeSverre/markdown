@@ -27,7 +27,7 @@ try {
         FFI::load($header);
     } catch (Throwable $e) {
         // Never fatal the preload over a missing/blocked lib; the runtime
-        // FfiParser fallback (FFI::cdef) still works without the scope.
+        // Parser fallback (FFI::cdef) still works without the scope.
         fwrite(STDERR, 'preload: FFI::load failed: ' . $e->getMessage() . PHP_EOL);
     }
 }

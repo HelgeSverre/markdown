@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Parser;
 
 $markdown = <<<MD
     # Hello from helgesverre/markdown
@@ -34,8 +34,8 @@ $markdown = <<<MD
     > A blockquote, then a bare autolink: visit www.example.com
 
     ```php
-    echo (new FfiParser())->toHtml('# hi');
+    echo (new Parser())->toHtml('# hi');
     ```
     MD;
 
-echo new FfiParser()->toHtml($markdown);
+echo new Parser()->toHtml($markdown);

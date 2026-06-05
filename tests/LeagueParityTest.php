@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown\Tests;
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Parser;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,7 +34,7 @@ final class LeagueParityTest extends TestCase
     #[DataProvider('samples')]
     public function visible_text_matches_league_gfm(string $markdown): void
     {
-        $ours = new FfiParser()->toHtml($markdown);
+        $ours = new Parser()->toHtml($markdown);
         $league = (string) new GithubFlavoredMarkdownConverter()
             ->convert($markdown)
             ->getContent();
@@ -47,7 +47,7 @@ final class LeagueParityTest extends TestCase
     {
         $markdown = '[a](http://a.com) and [b](http://b.com), bare https://c.com, ' . "and [https://d.com/x](https://d.com/x).\n";
 
-        $ours = new FfiParser()->toHtml($markdown);
+        $ours = new Parser()->toHtml($markdown);
         $league = (string) new GithubFlavoredMarkdownConverter()
             ->convert($markdown)
             ->getContent();

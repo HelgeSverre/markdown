@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace HelgeSverre\Markdown;
+namespace HelgeSverre\Markdown\Data;
 
 use Stringable;
 
 /**
- * The result of FfiParser::parse() — rendered HTML plus the document metadata
+ * The result of Parser::parse() — rendered HTML plus the document metadata
  * md4c alone doesn't give you: parsed front matter and a heading table of
  * contents. Casting to string yields the HTML, so it drops into templates.
  */

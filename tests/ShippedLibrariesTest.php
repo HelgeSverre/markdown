@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace HelgeSverre\Markdown\Tests;
 
 use FFI;
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Ffi\Library;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +36,7 @@ final class ShippedLibrariesTest extends TestCase
     #[Test]
     public function libpath_resolves_to_an_existing_file_for_this_platform(): void
     {
-        $this->assertFileExists(FfiParser::libPath());
+        $this->assertFileExists(Library::path());
     }
 
     #[Test]
@@ -46,7 +46,7 @@ final class ShippedLibrariesTest extends TestCase
         // entry points are really callable — this is what FFI does at runtime.
         $ffi = FFI::cdef(
             'unsigned int md2html_dialect_github(void);',
-            FfiParser::libPath(),
+            Library::path(),
         );
 
         $this->assertSame(0x0F0C, $ffi->md2html_dialect_github());

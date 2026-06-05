@@ -6,7 +6,7 @@ Generated feature-rich markdown for parser benchmarking. Contains headings, emph
 
 ## Section 1: the streaming buffer
 
-This is paragraph **number 1** describing a *streaming* buffer. It runs in `O(n)` time and handles [external links](https://example.com/page/43) alongside ~~deprecated~~ APIs. We measured a **91% speedup** over the baseline implementation, with a tail latency of *37.3ms* per document.
+This is paragraph **number 1** describing a _streaming_ buffer. It runs in `O(n)` time and handles [external links](https://example.com/page/43) alongside ~~deprecated~~ APIs. We measured a **91% speedup** over the baseline implementation, with a tail latency of _37.3ms_ per document.
 
 > Blockquote 1: "Performance is a feature." The buffer processed 43 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -15,7 +15,7 @@ This is paragraph **number 1** describing a *streaming* buffer. It runs in `O(n)
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/1)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the buffer
   - Another nested point at 91% coverage
@@ -40,11 +40,11 @@ This is paragraph **number 1** describing a *streaming* buffer. It runs in `O(n)
 
 ### Benchmark table 1
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 805 | 5.2 | yes |
-| league GFM | 22 | 47 | yes |
-| tempest | 22 | 43 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               805 |     5.2     |   yes   |
+| league GFM |                22 |     47      |   yes   |
+| tempest    |                22 |     43      | partial |
 
 Here is a fenced code block in `diff`:
 
@@ -56,9 +56,10 @@ run --threads 43 --target 91
 A final paragraph with an autolink <https://autolink.test/1> and a footnote-ish aside. Inline `code spans` survive 43 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 2: the vectorized pipeline
 
-This is paragraph **number 2** describing a *vectorized* pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/71) alongside ~~deprecated~~ APIs. We measured a **82% speedup** over the baseline implementation, with a tail latency of *55.1ms* per document.
+This is paragraph **number 2** describing a _vectorized_ pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/71) alongside ~~deprecated~~ APIs. We measured a **82% speedup** over the baseline implementation, with a tail latency of _55.1ms_ per document.
 
 > Blockquote 2: "Performance is a feature." The pipeline processed 71 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -67,7 +68,7 @@ This is paragraph **number 2** describing a *vectorized* pipeline. It runs in `O
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/2)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the pipeline
   - Another nested point at 82% coverage
@@ -92,11 +93,11 @@ This is paragraph **number 2** describing a *vectorized* pipeline. It runs in `O
 
 ### Benchmark table 2
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 648 | 4 | yes |
-| league GFM | 52 | 31 | yes |
-| tempest | 28 | 42 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               648 |      4      |   yes   |
+| league GFM |                52 |     31      |   yes   |
+| tempest    |                28 |     42      | partial |
 
 Here is a fenced code block in `bash`:
 

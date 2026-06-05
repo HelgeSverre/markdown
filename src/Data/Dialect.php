@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace HelgeSverre\Markdown;
+namespace HelgeSverre\Markdown\Data;
 
 /**
  * Which Markdown dialect md4c parses.

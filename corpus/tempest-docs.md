@@ -4,15 +4,15 @@ Real-world markdown harvested from the Tempest project website repository (tempe
 
 ---
 
-
-
 <!-- source: src/Web/Blog/articles/2024-10-02-alpha-2.md -->
 
 ---
+
 title: Tempest alpha 2
 description: Tempest alpha 2 is released with auth support, caching, and more!
 author: brent
 tag: Release
+
 ---
 
 It's been three weeks since we released the first alpha version of Tempest, and since then, many people have joined and contributed to the project. It's been great seeing so many people excited about Tempest, on [Reddit](https://www.reddit.com/r/PHP/comments/1fi2dny/introducing_tempest_the_framework_that_gets_out/), [Twitter](https://x.com/LukeDowning19/status/1836083961174397420), [Discord](https://tempestphp.com/discord), and on [GitHub](https://github.com/tempestphp/tempest-framework).
@@ -137,17 +137,17 @@ Until next time
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2024-10-31-alpha-3.md -->
 
 ---
+
 title: Tempest alpha 3
 description: Tempest alpha 3 is released with deferred tasks support, installers, a refactored view engine, and more!
 author: brent
 tag: Release
+
 ---
 
 It's been a month since the previous alpha release of Tempest. Since then, we've merged [over 60 pull requests, created by 13 contributors](https://github.com/tempestphp/tempest-framework/pulls?q=is%3Apr+is%3Amerged+) and our [Discord server](https://tempestphp.com/discord) now has over 200 members.
@@ -166,21 +166,17 @@ One of the most significant refactors I've worked on since the dawn of Tempest: 
 
 ```html
 <x-base title="Home">
-    <x-post :foreach="$this->posts as $post">
-        {!! $post->title !!}
+  <x-post :foreach="$this->posts as $post">
+    {!! $post->title !!}
 
-        <span :if="$this->showDate($post)">
-            {{ $post->date }}
-        </span>
-        <span :else>
-            -
-        </span>
-    </x-post>
-    <div :forelse>
-        <p>It's quite empty here…</p>
-    </div>
+    <span :if="$this->showDate($post)"> {{ $post->date }} </span>
+    <span :else> - </span>
+  </x-post>
+  <div :forelse>
+    <p>It's quite empty here…</p>
+  </div>
 
-    <x-footer />
+  <x-footer />
 </x-base>
 ```
 
@@ -399,17 +395,17 @@ Until next time!
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2024-11-08-unfair-advantage.md -->
 
 ---
+
 title: Unfair advantage
 author: brent
 description: Why Tempest instead of Symfony or Laravel?
 tag: Thoughts
+
 ---
 
 Someone asked me: [_why Tempest_](https://bsky.app/profile/laueist.bsky.social/post/3l7y5v3bm772y)? What areas do I expect Tempest to be better in than Laravel or Symfony? What gives me certainty that Laravel or Symfony won't just be able to copy what makes Tempest currently unique? What is Tempest's _unfair advantage_ compared to existing PHP frameworks?
@@ -601,17 +597,17 @@ All of that to say, my uncertainty about Tempest becoming _a thing_ or not, is q
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2024-11-15-exit-codes-fallacy.md -->
 
 ---
+
 title: Exit code fallacy
 author: brent
 description: Was I wrong about exit codes?
 tag: Thoughts
+
 ---
 
 Last week I wrote [a blog post](https://tempestphp.com/blog/unfair-advantage/) comparing Symfony,
@@ -831,17 +827,17 @@ I hope to see you there, and be able to settle this question once and for all!
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2024-11-25-alpha-4.md -->
 
 ---
+
 title: Tempest alpha 4
 description: Tempest alpha 4 is released with support for asynchronous commands, the new filesystem component, partial discovery cache, and more!
 author: brent
 tag: Release
+
 ---
 
 Once again a month has passed, and we're tagging a new alpha release of Tempest. This time we have over 70 merged pull requests by 12 contributors. We've also created a [backlog of issues](https://github.com/tempestphp/tempest-framework/milestone/12) to tackle before 1.0, it's a fast-shrinking list!
@@ -1088,17 +1084,17 @@ Until next time!
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-01-16-start-with-the-customer-experience.md -->
 
 ---
+
 title: Start with developer experience
 description: Everything else is secondary.
 author: brent
 tag: Thoughts
+
 ---
 
 Within the PhpStorm team, we're preparing a blog post that digests the results of our 2024 dev ecosystem survey, and I was asked to pitch in and comment on Laravel's success. I had more thoughts than what fit into that blog post, so I decided to write them down here.
@@ -1123,17 +1119,17 @@ Now, I could conclude this post by explaining how Tempest has that same mindset 
 
 If anything, please [watch that full talk by Steve Jobs](https://www.youtube.com/watch?v=XcG6CpxKFnU), it's _really_ inspiring!
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-01-22-alpha-5.md -->
 
 ---
+
 title: Tempest alpha 5
 description: Tempest alpha 5 is released with PHP 8.4 support, a major console overhaul, and more!
 author: brent
 tag: Release
+
 ---
 
 It took a bit longer than anticipated, but Tempest alpha 5 is out. This release gets us an important step closer towards Tempest 1.0: support for PHP 8.4! Apart from that, {gh:innocenzi} has made a significant effort to improve our console component, and many, many other things have been added, fixed, and changed; this time by a total of 14 contributors.
@@ -1251,21 +1247,17 @@ Here's a short snippet of what `{tempest/view`} looks like:
 
 ```html
 <x-base title="Home">
-    <x-post :foreach="$this->posts as $post">
-        {!! $post->title !!}
+  <x-post :foreach="$this->posts as $post">
+    {!! $post->title !!}
 
-        <span :if="$this->showDate($post)">
-            {{ $post->date }}
-        </span>
-        <span :else>
-            -
-        </span>
-    </x-post>
-    <div :forelse>
-        <p>It's quite empty here…</p>
-    </div>
+    <span :if="$this->showDate($post)"> {{ $post->date }} </span>
+    <span :else> - </span>
+  </x-post>
+  <div :forelse>
+    <p>It's quite empty here…</p>
+  </div>
 
-    <x-footer />
+  <x-footer />
 </x-base>
 ```
 
@@ -1300,17 +1292,17 @@ All of that lead to little time and energy to work on Tempest. I was really move
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-02-02-chasing-bugs-down-rabbit-holes.md -->
 
 ---
+
 title: Chasing bugs down rabbit holes
 description: I had to debug the most interesting bug in Tempest to date.
 author: brent
 tag: Thoughts
+
 ---
 
 It all started with me noticing the favicon of this website (the blog you're reading right now) was missing. My first thought was that the favicon file somehow got removed from the server, but a quick network inspection told me that wasn't the case: it showed no favicon request at all.
@@ -1320,22 +1312,32 @@ It all started with me noticing the favicon of this website (the blog you're rea
 So, next option: it's probably a bug in `tempest/view`. But where exactly? I inspected the source of the page — the compiled output of `tempest/view` — and discovered that the favicon was actually there:
 
 ```html
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="32x32"
+  href="/favicon/favicon-32x32.png"
+/>
 ```
 
 So why wasn't it rendering? A closer inspection of the page source made it clear: _somehow_ the `{html}<link>` tag ended up in the `{html}<body>` of the HTML document:
 
 ```html
 <html>
-    <head>
-        <title>Chasing Bugs down Rabbit Holes</title>
+  <head>
+    <title>Chasing Bugs down Rabbit Holes</title>
 
-        <!-- … -->
-    </head>
-    <body>
-        <!-- This shouldn't be here… -->
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
-    </body>
+    <!-- … -->
+  </head>
+  <body>
+    <!-- This shouldn't be here… -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon/favicon-32x32.png"
+    />
+  </body>
 </html>
 ```
 
@@ -1343,29 +1345,32 @@ Well, that's not good. Why does a tag that clearly belongs in `{html}<head>`, en
 
 ```html
 <x-component name="x-base">
-    <html lang="en">
+  <html lang="en">
+    <head>
+      <title :if="$title ?? null">{{ $title }} | Tempest</title>
+      <title :else>Tempest</title>
 
-        <head>
-            <title :if="$title ?? null">{{ $title }} | Tempest</title>
-            <title :else>Tempest</title>
+      <link href="/main.css" rel="stylesheet" />
 
-            <link href="/main.css" rel="stylesheet"/>
+      <x-slot name="styles" />
 
-            <x-slot name="styles"/>
+      <!-- Clearly in head: -->
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon/favicon-32x32.png"
+      />
 
-            <!-- Clearly in head: -->
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
+      <x-slot name="head" />
+    </head>
 
-            <x-slot name="head" />
-        </head>
+    <body>
+      <x-slot />
 
-        <body>
-            <x-slot/>
-
-            <x-slot name="scripts" />
-        </body>
-
-    </html>
+      <x-slot name="scripts" />
+    </body>
+  </html>
 </x-component>
 ```
 
@@ -1377,19 +1382,24 @@ So let's comment out a little less. Back and forth and back and forth; a little 
 
 ```html
 <x-component name="x-base">
-    <html lang="en">
-        <head>
-            <!-- … -->
+  <html lang="en">
+    <head>
+      <!-- … -->
 
-            <!-- Removing this slot solves the issue: -->
-            <!-- <x-slot name="styles"/> -->
+      <!-- Removing this slot solves the issue: -->
+      <!-- <x-slot name="styles"/> -->
 
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon/favicon-32x32.png"
+      />
 
-            <!-- Moving it downstairs also solved it: -->
-            <x-slot name="styles"/>
-        </head>
-    </html>
+      <!-- Moving it downstairs also solved it: -->
+      <x-slot name="styles" />
+    </head>
+  </html>
 </x-component>
 ```
 
@@ -1399,17 +1409,17 @@ This is the worst case scenario: apparently there's something wrong with slot re
 <!-- home.view.php -->
 
 <x-base>
-    Just some normal content ending up in body
+  Just some normal content ending up in body
 
-    <x-slot name="styles">
-        <!-- Additional styles injected into the parent's slot: -->
+  <x-slot name="styles">
+    <!-- Additional styles injected into the parent's slot: -->
 
-        <style>
-            body {
-                background: red;
-            }
-        </style>
-    </x-slot>
+    <style>
+      body {
+        background: red;
+      }
+    </style>
+  </x-slot>
 </x-base>
 ```
 
@@ -1423,12 +1433,17 @@ I made this component in Tempest:
 
 ```html
 <x-component name="x-base">
-    <html lang="en">
+  <html lang="en">
     <head>
-        <x-slot name="styles" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
+      <x-slot name="styles" />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon/favicon-32x32.png"
+      />
     </head>
-    </html>
+  </html>
 </x-component>
 ```
 
@@ -1465,12 +1480,16 @@ I noticed that `Styles` caused the parsing to break somehow, because the parsed 
 
 ```html
 <html lang="en">
-<head>
-</head>
-<body>
+  <head> </head>
+  <body>
     Styles
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
-</body>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon/favicon-32x32.png"
+    />
+  </body>
 </html>
 ```
 
@@ -1478,12 +1497,17 @@ This is when I realized: the DOM parser _probably_ only allows HTML tags in the 
 
 ```html
 <html lang="en">
-<head>
+  <head>
     <style></style>
-</head>
-<body>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
-</body>
+  </head>
+  <body>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon/favicon-32x32.png"
+    />
+  </body>
 </html>
 ```
 
@@ -1497,12 +1521,16 @@ Except when it ends up in the `{html}<head>` tag of an HTML document! See, this 
 
 ```html
 <html lang="en">
-    <head>
-        <x-slot name="styles" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png"/>
-    </head>
-    <body>
-    </body>
+  <head>
+    <x-slot name="styles" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicon/favicon-32x32.png"
+    />
+  </head>
+  <body></body>
 </html>
 ```
 
@@ -1522,7 +1550,7 @@ Why is it part of the spec? As far as I understand, HTML5 allows you to write so
 
 Because `{html}<head>` only allows a specific set of tags that can't exist in `{html}<body>`, the DOM parser can infer when the `{html}<head>` is done, even if it doesn't have a closing tag. That's why custom elements like `{html}<x-slot name="styles" />` can't live in `{html}<head>`: as soon as the DOM parser encounters it, it'll assume it has entered the body, despite there being an explicit `{html}</head>` further down below.
 
-This is one of these things where I think "this behaviour is bound to cause more problems than it solves." But it is part of the spec, and people much smarter than me have thought this through, so… ¯\\\_(ツ)_/¯
+This is one of these things where I think "this behaviour is bound to cause more problems than it solves." But it is part of the spec, and people much smarter than me have thought this through, so… ¯\\\_(ツ)\_/¯
 
 In the end… the fix was simple: don't render slots when they don't have any content. Or comment them out so that they are still visible in the source code. That's what I settled on eventually:
 
@@ -1538,17 +1566,17 @@ A pretty simple fix after a pretty intense debugging session. Had I known the HT
 
 Until next time!
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-03-08-static-websites-with-tempest.md -->
 
 ---
+
 title: Static websites with Tempest
 description: Tempest makes it super convenient to convert any controller action in statically generated pages.
 author: brent
 tag: Tutorial
+
 ---
 
 Let's say you have a controller that shows blog posts — kind of like the page you're reading now:
@@ -1682,17 +1710,17 @@ On a final note, you can always clean up the generated HTML files by running `{c
 
 It's a pretty cool feature that requires minimal effort, but will have a huge impact on your website's performance. If you want more insights into Tempest's static pages, you can head over to [the docs](/main/features/static-pages) to learn more.
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-03-13-request-objects-in-tempest.md -->
 
 ---
+
 title: Request objects in Tempest
 description: Why Tempest requests are super intuitive
 author: brent
 tag: Tutorial
+
 ---
 
 Tempest's tagline is "the framework that gets out of your way". One of the best examples of that principle in action is request validation. A pattern I learned to appreciate over the years was to represent "raw data" (like for example, request data), as typed objects in PHP — so-called "data transfer objects". The sooner I have a typed object within my app's lifecycle, the sooner I have a bunch of guarantees about that data, which makes coding a lot easier.
@@ -1918,17 +1946,17 @@ final readonly class BookController
 
 And that is all! Pretty clean, right?
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-03-16-discovery-explained.md -->
 
 ---
+
 title: Tempest's Discovery explained
 description: A deep dive into the heart of Tempest.
 author: brent
 tag: Tutorial
+
 ---
 
 At the very core of Tempest lies a concept called "discovery". It's _the_ feature that sets Tempest apart from any other framework. While frameworks like Symfony and Laravel have limited discovery capabilities for convenience, Tempest starts from discovery, and makes into what powers everything else. In this blog post, I'll explain how discovery works, why it's so powerful, and how you can easily build your own.
@@ -1995,11 +2023,11 @@ View components are discovered based on their file name:
 <!-- x-button.view.php -->
 
 <a :if="isset($href)" class="button" :href="$href">
-    <x-slot/>
+  <x-slot />
 </a>
 
 <div :else class="button">
-    <x-slot/>
+  <x-slot />
 </div>
 ```
 
@@ -2138,11 +2166,9 @@ For local development, the [`tempest/app`](https://github.com/tempestphp/tempest
 
 ```json
 {
-	"scripts": {
-		"post-package-update": [
-			"@php ./tempest discovery:generate"
-		]
-	}
+  "scripts": {
+    "post-package-update": ["@php ./tempest discovery:generate"]
+  }
 }
 ```
 
@@ -2154,17 +2180,17 @@ So, that concludes this dive into discovery. I like to think of it as Tempest's 
 
 Do whatever you want, Tempest will figure it out. Why? Because it's **the framework that truly gets out of your way**.
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-03-24-alpha-6.md -->
 
 ---
+
 title: The final alpha release
 description: Tempest alpha 6 is released, we'll talk about Tempest's future and highlight the most important new features in this release
 author: brent
 tag: Release
+
 ---
 
 Tempest alpha 6 is here: the final alpha release for Tempest. The next one will be beta 1, and from there on out it'll be a straight line to a stable 1.0 release! This final alpha release brings a bunch of new features, improvements, and fixes; this time by 8 contributors in total. I'll walk you through the highlights, but I want to start by talking about the future plans.
@@ -2193,8 +2219,8 @@ There's a new `{html}<x-template>` component which will only render its contents
 
 ```html
 <x-template :foreach="$posts as $post">
-    <div>{{ $post->title }}</div>
-    <span>{{ $post->description }}</span>
+  <div>{{ $post->title }}</div>
+  <span>{{ $post->description }}</span>
 </x-template>
 ```
 
@@ -2215,21 +2241,21 @@ View components now have direct access to the `$slots` and `$attributes` variabl
 
 ```html
 <x-component name="x-tabs">
-    <span :foreach="$attributes['tags'] as $tag">{{ $tag }}</span>
+  <span :foreach="$attributes['tags'] as $tag">{{ $tag }}</span>
 
-    <x-codeblock :foreach="$slots as $slot">
-        <h1>{{ $slot->name }}</h1>
+  <x-codeblock :foreach="$slots as $slot">
+    <h1>{{ $slot->name }}</h1>
 
-        <h2>{{ $slot->attributes['language'] }}</h2>
+    <h2>{{ $slot->attributes['language'] }}</h2>
 
-        <div>{!! $slot->content !!}</div>
-    </x-codeblock>
+    <div>{!! $slot->content !!}</div>
+  </x-codeblock>
 </x-component>
 
 <x-tabs :tags="['a', 'b', 'c']">
-    <x-slot name="php" language="PHP">This is the PHP tab</x-slot>
-    <x-slot name="js" language="JavaScript">This is the JS tab</x-slot>
-    <x-slot name="html" language="HTML">This is the HTML tab</x-slot>
+  <x-slot name="php" language="PHP">This is the PHP tab</x-slot>
+  <x-slot name="js" language="JavaScript">This is the JS tab</x-slot>
+  <x-slot name="html" language="HTML">This is the HTML tab</x-slot>
 </x-tabs>
 ```
 
@@ -2245,7 +2271,7 @@ There's support for fallthrough attributes: any `{html}class`, `{html}style` or 
 
 ```html
 <x-component name="x-with-fallthrough-attributes">
-    <div class="bar"></div>
+  <div class="bar"></div>
 </x-component>
 
 <x-with-fallthrough-attributes class="foo"></x-with-fallthrough-attributes>
@@ -2306,17 +2332,15 @@ View components can now be discovered by file name:
 <!-- x-base.view.php -->
 
 <html>
-    <head></head>
-    <body>
-        <x-slot/>
-    </body>
+  <head></head>
+  <body>
+    <x-slot />
+  </body>
 </html>
 ```
 
 ```html
-<x-base>
-  Hello World!
-</x-base>
+<x-base> Hello World! </x-base>
 ```
 
 ### The `x-icon` component
@@ -2424,12 +2448,12 @@ Next, add `{html}<x-vite-tags />`, in the `{html}<head>` of your template:
 ```html
 <html lang="en" class="h-dvh flex flex-col">
   <head>
-      <!-- … -->
+    <!-- … -->
 
-      <x-vite-tags/>
+    <x-vite-tags />
   </head>
   <body>
-      <x-slot/>
+    <x-slot />
   </body>
 </html>
 ```
@@ -2492,17 +2516,17 @@ One last thing to mention — you might have noticed it already — we've comple
 
 That's it for this release, I hope you're excited to give Tempest a try, because your input is so valuable. Don't hesitate to [open issues](https://github.com/tempestphp/tempest-framework/issues) and join our [Discord server](https://tempestphp.com/discord), we'd love to hear from you!
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-03-30-about-route-attributes.md -->
 
 ---
+
 title: About route attributes
 description: Let's explore Tempest's route attributes in depth
 author: brent
 tag: Thoughts
+
 ---
 
 Routing in Tempest is done with route attributes: each controller action can have one or more attributes assigned to them, and each attribute represents a route through which that action is accessible. Here's what that looks like:
@@ -2517,16 +2541,16 @@ final class BookAdminController
 {
     #[Get('/books')]
     public function index(): Response { /* … */ }
-    
+
     #[Get('/books/{book}/show')]
     public function show(Book $book): Response { /* … */ }
-    
+
     #[Post('/books/new')]
     public function new(StoreBookRequest $request): Response { /* … */ }
-    
+
     #[Post('/books/{book}/update')]
     public function update(BookRequest $bookRequest, Book $book): Response { /* … */ }
-    
+
     #[Delete('/books/{book}/delete')]
     public function delete(Book $book): Response { /* … */ }
 }
@@ -2585,16 +2609,16 @@ final class BookAdminController
 {
     #[Get('/books')]
     public function index(): View { /* … */ }
-    
+
     #[Get('/books/{book}/show')]
     public function show(Book $book): View { /* … */ }
-    
+
     #[Post('/books/new')]
     public function new(): View { /* … */ }
-    
+
     #[Post('/books/{book}/update')]
     public function update(): View { /* … */ }
-    
+
     #[Delete('/books/{book}/delete')]
     public function delete(): View { /* … */ }
 }
@@ -2611,7 +2635,7 @@ final class BookAdminController
 {
     #[Get('/books/{book}')]
     public function show(Book $book): Response { /* … */ }
-    
+
     #[Get('/books/new')]
     public function new(): Response { /* … */ }
 }
@@ -2624,7 +2648,7 @@ final class BookAdminController
 {
     #[Get('/books/new')]
     public function new(): Response { /* … */ }
-    
+
     #[Get('/books/{book}')]
     public function show(Book $book): Response { /* … */ }
 }
@@ -2663,18 +2687,18 @@ Routes need controllers and controllers need routes. They cannot live without ea
 
 I hope it goes without saying, you choose what works best for you. If you decide that route attributes aren't your thing then, well, Tempest won't be your thing. That's ok. I do hope that I was able to present a couple of good arguments in favor of route attributes; and that they might have challenged your opinion if you were absolutely against them.
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-05-08-beta-1.md -->
 
 ---
+
 title: Tempest is beta
 description: |
-    Today we release the first beta version of Tempest, the PHP framework for web and console apps that gets out of your way. It's one of the final steps towards a stable 1.0 release. We'll use this beta phase to fix bugs, and we're committed to not making any breaking changes anymore, apart from experimental features.
+Today we release the first beta version of Tempest, the PHP framework for web and console apps that gets out of your way. It's one of the final steps towards a stable 1.0 release. We'll use this beta phase to fix bugs, and we're committed to not making any breaking changes anymore, apart from experimental features.
 author: brent
 tag: Release
+
 ---
 
 Two years ago, Tempest started out as an educational project during one of my livestreams. Since then, we've had 56 people contribute to the framework, merged 591 pull requests, resolved 455 issues, and have written around 50k lines of code. Two contributors joined the core team and dedicated a lot of their time to help make Tempest into something real. And today, we're tagging Tempest as beta.
@@ -2894,19 +2918,19 @@ See you soon!
 
 <img class="w-[1.66em] shadow-md rounded-full" src="/tempest-logo.png" alt="Tempest" />
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-05-26-tempests-vision.md -->
 
 ---
+
 title: Tempest's vision
 description: What sets Tempest apart as a framework for modern PHP development.
 author: brent
 tag: Thoughts
 meta:
-    canonical: https://tempestphp.com/main/getting-started/introduction
+canonical: https://tempestphp.com/main/getting-started/introduction
+
 ---
 
 Today I want to share a bit of Tempest's vision. People often ask about the "why" of building a new framework, and so I wanted to take some time to properly think and write down my thoughts.
@@ -3018,11 +3042,11 @@ Finally, since Tempest originated as an educational project, many Tempest featur
 final readonly class BooksCommand
 {
     use HasConsole;
-    
+
     public function __construct(
         private BookRepository $repository,
     ) {}
-    
+
     #[ConsoleCommand]
     public function find(?string $initial = null): void
     {
@@ -3033,7 +3057,7 @@ final readonly class BooksCommand
     }
 
     #[ConsoleCommand(middleware: [CautionMiddleware::class])]
-    public function delete(string $title, bool $verbose = false): void 
+    public function delete(string $title, bool $verbose = false): void
     { /* … */ }
 }
 ```
@@ -3074,17 +3098,15 @@ Then there's our view engine, which embraces the most original template engine o
 
 ```html
 <x-base :title="$this->seo->title">
-    <ul>
-        <li :foreach="$this->books as $book">
-            {{ $book->title }}
+  <ul>
+    <li :foreach="$this->books as $book">
+      {{ $book->title }}
 
-            <span :if="$this->showDate($book)">
-                <x-tag>
-                    {{ $book->publishedAt }}
-                </x-tag>
-            </span>
-        </li>
-    </ul>
+      <span :if="$this->showDate($book)">
+        <x-tag> {{ $book->publishedAt }} </x-tag>
+      </span>
+    </li>
+  </ul>
 </x-base>
 ```
 
@@ -3101,24 +3123,24 @@ People who use Tempest say it's the sweet spot between the robustness of Symfony
 
 But, you shouldn't take my word for it. I'd encourage you to [give Tempest a try](/main/getting-started/installation).
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-06-27-tempest-1.md -->
 
 ---
+
 title: Tempest 1.0
 description: Tempest's first stable release
 author: brent
 tag: Release
+
 ---
 
 After almost 2 years and 656 merged pull requests by 59 contributors, it is finally time to tag the first release of Tempest. In case you don't know: Tempest is a framework for web and console application development. [It's community-driven, embraces modern PHP, gets out of your way, and dares to think outside the box](/blog/tempests-vision). There is so much to tell about Tempest, but I think code says more than words, so let me share a few highlights that I personally am excited about.
 
 [A truly decoupled ORM](/main/essentials/database); this is what model classes look like in Tempest:
 
-```php 
+```php
 use Tempest\Validation\Rules\Length;
 use App\Author;
 
@@ -3144,17 +3166,15 @@ $book = query(Book::class)
 
 ```html
 <x-base :title="$this->seo->title">
-    <ul>
-        <li :foreach="$this->books as $book">
-            {{ $book->title }}
+  <ul>
+    <li :foreach="$this->books as $book">
+      {{ $book->title }}
 
-            <span :if="$this->showDate($book)">
-                <x-tag>
-                    {{ $book->publishedAt }}
-                </x-tag>
-            </span>
-        </li>
-    </ul>
+      <span :if="$this->showDate($book)">
+        <x-tag> {{ $book->publishedAt }} </x-tag>
+      </span>
+    </li>
+  </ul>
 </x-base>
 ```
 
@@ -3164,11 +3184,11 @@ $book = query(Book::class)
 final readonly class BooksCommand
 {
     use HasConsole;
-    
+
     public function __construct(
         private BookRepository $repository,
     ) {}
-    
+
     #[ConsoleCommand]
     public function find(): void
     {
@@ -3179,7 +3199,7 @@ final readonly class BooksCommand
     }
 
     #[ConsoleCommand(middleware: [CautionMiddleware::class])]
-    public function delete(string $title, bool $verbose = false): void 
+    public function delete(string $title, bool $verbose = false): void
     { /* … */ }
 }
 ```
@@ -3217,7 +3237,7 @@ Or what about [the mapper](/main/features/mapper), [command bus](/main/features/
 
 There is a lot to tell about Tempest, and honestly, I'm so proud of what a small but very talented community has managed to achieve. When I started Tempest 2 years ago, the goal was for it to be an educational project, nothing more. But people stepped in. They liked the direction of this framework so much, eventually leading to where we are today.
 
-And you might wonder: where does Tempest fit in, in an age where we have mature frameworks like Symfony and Laravel? Well: tagging 1.0 is only the beginning, and there is so much more to be done. At the same time, so many people have tried Tempest and said they like it a lot. It's simple, modern, intuitive, there's no legacy to be dealt with. Developers like Tempest. 
+And you might wonder: where does Tempest fit in, in an age where we have mature frameworks like Symfony and Laravel? Well: tagging 1.0 is only the beginning, and there is so much more to be done. At the same time, so many people have tried Tempest and said they like it a lot. It's simple, modern, intuitive, there's no legacy to be dealt with. Developers like Tempest.
 
 I remember the first Reddit posts announcing Laravel, more than a decade ago; people were so skeptical of something new. And yet, see where Laravel is today. I believe there's room for Tempest to continue to grow, and I would say this is the perfect time to get started with it.
 
@@ -3225,14 +3245,15 @@ If you're ready to give it a try, head over to [the docs](/main/getting-started/
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2025-06-29-ten-tempest-tips.md -->
 
 ---
+
 title: Ten Tempest Tips
-description: "Ten things you might now know about Tempest" 
+description: "Ten things you might now know about Tempest"
 author: brent
 tag: Thoughts
+
 ---
 
 With the release of Tempest 1.0, many people wonder what the framework is about. There is so much to talk about, and I decided to highlight a couple of features in this blog post. I hope it might intrigue you to give Tempest a try, and discover even more!
@@ -3261,7 +3282,7 @@ Tempest is designed with the flexibility to structure your projects whatever way
 
 ## 2. Discovery
 
-The mechanism that allows such a flexible project structure is called [Discovery](/blog/discovery-explained). With Discovery, Tempest will scan your whole project and infer an incredible amount of information by reading your code, so that you don't have to configure the framework manually. On top of that, Tempest's discovery is designed to be extensible for project developers and package authors. 
+The mechanism that allows such a flexible project structure is called [Discovery](/blog/discovery-explained). With Discovery, Tempest will scan your whole project and infer an incredible amount of information by reading your code, so that you don't have to configure the framework manually. On top of that, Tempest's discovery is designed to be extensible for project developers and package authors.
 
 For example, I built a small event-sourcing implementation to keep track of website analytics [on this website](https://github.com/tempestphp/tempest-docs/blob/main/src/StoredEvents/ProjectionDiscovery.php). For that, I wanted to discover event projections within the app. Instead of manually listing classes in a config file somewhere. So I hooked into Tempest's discovery flow, which only requires implementing a single interface:
 
@@ -3413,7 +3434,7 @@ final readonly class EventsReplayCommand
     { /* … */ }
 }
 
-// ./tempest events:replay PackageDownloadsPerDayProjector --force 
+// ./tempest events:replay PackageDownloadsPerDayProjector --force
 ```
 
 ## 6. Response classes
@@ -3431,15 +3452,15 @@ final class DownloadController
     public function index(): Response
     {
         // …
-        
+
         return new Ok(/* … */);
     }
-    
+
     #[Get('/downloads/{id}')]
     public function download(string $id): Response
     {
         // …
-        
+
         return new Download($path);
     }
 }
@@ -3526,11 +3547,11 @@ You can also make your own console middleware, you can [find out how here](/docs
 
 ## 9. Interfaces everywhere
 
-When you're diving into Tempest's internals, you'll notice how we prefer to use interfaces over abstract classes. The idea is simple: if there's something framework-related to hook into, you'll be able to implement an interface and register your own implementation in the container. Most of the time, you'll also find a default trait implementation. There's a good reason behind this design, and you can read all about it [here](https://stitcher.io/blog/extends-vs-implements).  
+When you're diving into Tempest's internals, you'll notice how we prefer to use interfaces over abstract classes. The idea is simple: if there's something framework-related to hook into, you'll be able to implement an interface and register your own implementation in the container. Most of the time, you'll also find a default trait implementation. There's a good reason behind this design, and you can read all about it [here](https://stitcher.io/blog/extends-vs-implements).
 
 ## 10. Initializers
 
-Finally, let's talk about [dependency initializers](/docs/essentials/container#dependency-initializers). Initializers are tasked with setting up one or more dependencies in the container. Whenever you need a complex dependency available everywhere, your best option is to make a dedicated initializer class for it. Here's an example: setting up a Markdown converter that can be used throughout your app:  
+Finally, let's talk about [dependency initializers](/docs/essentials/container#dependency-initializers). Initializers are tasked with setting up one or more dependencies in the container. Whenever you need a complex dependency available everywhere, your best option is to make a dedicated initializer class for it. Here's an example: setting up a Markdown converter that can be used throughout your app:
 
 ```php
 use Tempest\Container\Container;
@@ -3563,25 +3584,26 @@ As with most things-Tempest, they are discovered automatically. Creating an init
 
 ## There's a lot more!
 
-To truly appreciate Tempest, you'll have to write code with it. To get started, head over to [the documentation](/docs/getting-started/installation) and [join our Discord server](/discord)! 
+To truly appreciate Tempest, you'll have to write code with it. To get started, head over to [the documentation](/docs/getting-started/installation) and [join our Discord server](/discord)!
 
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-07-05-tempest-1-1.md -->
 
 ---
+
 title: Tempest 1.1 released
 description: A new minor version is available
 author: brent
 tag: Release
+
 ---
 
 It's been a little over a week since Tempest was released. It's great to see so many people have [joined the Discord server](/discord), created issues and feature requests, and sent PRs! Today we're tagging the first minor release which includes a range of bugfixes, as well as some new features. Let's take a look!
 
 ## Database seeders
 
-This release adds support for [database seeders](/docs/essentials/database#database-seeders), which allow you to fill your database with dummy data for  local development. The only thing you need is a class implementing the {`\Tempest\Database\DatabaseSeeder`} interface, which Tempest will then discover:
+This release adds support for [database seeders](/docs/essentials/database#database-seeders), which allow you to fill your database with dummy data for local development. The only thing you need is a class implementing the {`\Tempest\Database\DatabaseSeeder`} interface, which Tempest will then discover:
 
 ```console
 ./tempest database:seed
@@ -3616,20 +3638,21 @@ There were also a bunch of smaller features and bug fixes added in this release:
 
 ## What's next?
 
-We aim to release a new minor version every one to two weeks. We're currently working on the [new email component](https://github.com/tempestphp/tempest-framework/pull/1227), [redis support](https://github.com/tempestphp/tempest-framework/pull/1252), [a wrapper for symfony/process](https://github.com/tempestphp/tempest-framework/pull/1326), discussing oauth support, and more. 
+We aim to release a new minor version every one to two weeks. We're currently working on the [new email component](https://github.com/tempestphp/tempest-framework/pull/1227), [redis support](https://github.com/tempestphp/tempest-framework/pull/1252), [a wrapper for symfony/process](https://github.com/tempestphp/tempest-framework/pull/1326), discussing oauth support, and more.
 
 As always: you're welcome to join the Tempest community to help shape the future of the framework. The best place to start is by [joining our Discord server](/discord).
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2025-07-17-mail-component.md -->
 
 ---
+
 title: Mailing with Tempest
 description: The newest Tempest release adds mailing support
 author: brent
 tag: Release
+
 ---
 
 Mailing is a pretty crucial feature for many apps, and I'm happy that we tagged Tempest 1.4 today, which includes mailing support. We didn't invent mailing from scratch though, we decided to build on top of the excellent Mailer component provided by Symfony (including all of its transport drivers) and build a small layer on top of those that fits well within Tempest.
@@ -3660,7 +3683,7 @@ final class WelcomeEmail implements Email, HasAttachments
     public string|View $html {
         get => view('welcome.view.php', user: $this->user);
     }
-    
+
     public array $attachments {
         get => [
             Attachment::fromFilesystem(__DIR__ . '/welcome.pdf')
@@ -3674,7 +3697,7 @@ And here is how you'd use it:
 ```php
 use Tempest\Mail\Mailer;
 use Tempest\Mail\GenericEmail;
- 
+
 final class UserEventHandlers
 {
     public function __construct(
@@ -3725,11 +3748,12 @@ $mailer->send('welcome.view.php', user: $user);
 <!-- Work in progress! -->
 
 <x-email subject="Welcome!" :to="$user->to">
-    <h1>Welcome {{ $user->name }}!</h1>
-    
-    <p>
-        Please activate your account by visiting this link: {{ $user->activationLink }}
-    </p>
+  <h1>Welcome {{ $user->name }}!</h1>
+
+  <p>
+    Please activate your account by visiting this link: {{ $user->activationLink
+    }}
+  </p>
 </x-email>
 ```
 
@@ -3737,14 +3761,15 @@ Mailing is the first big feature we release after Tempest 1.0. We decided to mar
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2025-07-28-tempest-view-updates.md -->
 
 ---
+
 title: Major updates to Tempest views
 description: Tempest 1.5 released with some major improvements to its templating engine
 author: brent
 tag: Release
+
 ---
 
 Today we released Tempest version 1.5, which includes a bunch of improvements to [Tempest View](/docs/essentials/views), the templating engine that ships by default with the framework. Tempest also has support for Blade and Twig, but we designed Tempest View to take a unique approach to templating with PHP, and I must say: it looks excellent! (I might be biased.)
@@ -3763,9 +3788,9 @@ With these changes, local variables defined within a view component cannot be le
 
 ```html
 <x-post>
-    <?php $title = str($post->title)->title(); ?>
-    
-    <h1>{{ $title }}</h1>
+  <?php $title = str($post->title)->title(); ?>
+
+  <h1>{{ $title }}</h1>
 </x-post>
 
 <!-- $title won't be available outside the view component. -->
@@ -3784,9 +3809,7 @@ There's one exception to this rule: variables defined by the view itself are dir
 :::code-group
 
 ```html x-home-highlight.view.php
-<div class="<!-- … -->">
-    {!! $highlights[$name] !!}
-</div>
+<div class="<!-- … -->">{!! $highlights[$name] !!}</div>
 
 <!-- in home.view.php -->
 <x-home-highlight name="orm" />
@@ -3823,7 +3846,7 @@ The second feature made some changes to view component discovery. We now have an
  <dim>│</dim>   ⋅ x-markdown
  <dim>│</dim>   ⋅ x-input
  <dim>│</dim>   ⋅ x-icon
- 
+
 <comment>…</comment>
 ```
 
@@ -3849,26 +3872,21 @@ use function Tempest\Support\str;
 /** @var Session $session */
 $session = get(Session::class);
 
-$label ??= str($name)->title();
-$id ??= $name;
-$type ??= 'text';
-$default ??= null;
-
-$errors = $session->getErrorsFor($name);
-$original = $session->getOriginalValueFor($name, $default);
-?>
+$label ??= str($name)->title(); $id ??= $name; $type ??= 'text'; $default ??=
+null; $errors = $session->getErrorsFor($name); $original =
+$session->getOriginalValueFor($name, $default); ?>
 
 <div>
-    <label :for="$id">{{ $label }}</label>
+  <label :for="$id">{{ $label }}</label>
 
-    <textarea :if="$type === 'textarea'" :name="$name" :id="$id">{{ $original }}</textarea>
-    <input :else :type="$type" :name="$name" :id="$id" :value="$original"/>
+  <textarea :if="$type === 'textarea'" :name="$name" :id="$id">
+{{ $original }}</textarea
+  >
+  <input :else :type="$type" :name="$name" :id="$id" :value="$original" />
 
-    <div :if="$errors !== []">
-        <div :foreach="$errors as $error">
-            {{ $error->message() }}
-        </div>
-    </div>
+  <div :if="$errors !== []">
+    <div :foreach="$errors as $error">{{ $error->message() }}</div>
+  </div>
 </div>
 ```
 
@@ -3892,17 +3910,17 @@ From the beginning I've said that IDE support is a must for any project to succe
 
 If you're inspired and interested to help out with any of these features, then you're more than welcome to [join the Tempest Discord](/discord) and take it from there.
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-07-29-tempest-1-5.md -->
 
 ---
+
 title: Tempest 1.5
 description: This release brings a new markdown view component, CSRF support, installable view components, and more.
 tag: release
 author: brent
+
 ---
 
 ## Installable view components
@@ -3918,11 +3936,11 @@ We made some pretty significant changes to view component's discovery. These cha
  <dim>│</dim>   ⋅ x-markdown
  <dim>│</dim>   ⋅ x-input
  <dim>│</dim>   ⋅ x-icon
- 
+
 <comment>…</comment>
 ```
 
-This refactor came with some breaking changes though. Tempest View is still an experimental component of the framework, so occasional breaking changes might happen. We documented the how and why of these changes in [a separate blog post](/blog/tempest-view-updates). In the end, these changes made a lot of sense, and it's great to see how [Discovery](/blog/discovery-explained) made the installer part with vendor- and project-based view components trivial to add. 
+This refactor came with some breaking changes though. Tempest View is still an experimental component of the framework, so occasional breaking changes might happen. We documented the how and why of these changes in [a separate blog post](/blog/tempest-view-updates). In the end, these changes made a lot of sense, and it's great to see how [Discovery](/blog/discovery-explained) made the installer part with vendor- and project-based view components trivial to add.
 
 Apart from the view component installer, we also made a bunch of fixes to how view components deal with local and global variable scope, and we added a bunch more built-in view components that ship with the framework:
 
@@ -3940,7 +3958,7 @@ Any form request will now have CSRF protection. Because CSRF protection is enabl
 
 ```html
 <form action="…">
-    <x-csrf-token />
+  <x-csrf-token />
 </form>
 ```
 
@@ -3988,18 +4006,19 @@ public function test_can_assert_view_data(): void
 }
 ```
 
-That's all the notable new features in Tempest 1.5. Of course, there are a bunch of bug fixes as well. Click here to read [the full changelog](https://github.com/tempestphp/tempest-framework/releases/tag/v1.5.0).  
+That's all the notable new features in Tempest 1.5. Of course, there are a bunch of bug fixes as well. Click here to read [the full changelog](https://github.com/tempestphp/tempest-framework/releases/tag/v1.5.0).
 
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-09-16-tempest-2.md -->
 
 ---
+
 title: Tempest 2.0
 description: We've just tagged Tempest 2.0. It's a release focussed on fine-tuning and fixing lots of details. It also signifies that we're committed to Tempest, we're in this for the long run!
 tag: release
 author: brent
+
 ---
 
 As we've said from the start: our aim is to make upgrades with Tempest as smooth as possible. Breaking changes are bound to happen in any project in this stage, and we want to burden our users as little as possible. That's why we added an easy, automated way which handles the upgrade to Tempest 2.0 for you. It should only take five minutes.
@@ -4010,7 +4029,6 @@ Tempest upgrades are handled via [Rector](https://getrector.com/). So before doi
 {:hl-comment:~:} composer require rector/rector --dev {:hl-comment:# to require rector as a dev dependency:}
 {:hl-comment:~:} vendor/bin/rector {:hl-comment:# to create a default rector config file:}
 ```
-
 
 Next, update Tempest; it's important to add the `--no-scripts` flag to prevent any errors from being thrown during the update.
 
@@ -4039,24 +4057,24 @@ Then run the following commands
 {:hl-comment:~:} ./tempest migrate:rehash {:hl-comment:# To rehash all migrations, which internal workings were changed with this release:}
 ```
 
-Finally, review and test your project and make sure to read through the list of the breaking changes below. The changes in **bold** are automated by Rector, the other ones are internal changes that should — _in theory_ — have no effect. Yet we wanted to mention them for transparency's sake. 
+Finally, review and test your project and make sure to read through the list of the breaking changes below. The changes in **bold** are automated by Rector, the other ones are internal changes that should — _in theory_ — have no effect. Yet we wanted to mention them for transparency's sake.
 
-- [#1458](https://github.com/tempestphp/tempest-framework/pull/1458): **`Tempest\Database\Id` is now called `Tempest\Database\PrimaryKey`**. 
-- [#1458](https://github.com/tempestphp/tempest-framework/pull/1458): **The value property of `Tempest\Database\PrimaryKey` has been renamed from `id` to `value`**. 
-- [#1507](https://github.com/tempestphp/tempest-framework/pull/1507): **`Tempest\CommandBus\AsyncCommand` is now called `Tempest\CommandBus\Async`**. 
-- [#1444](https://github.com/tempestphp/tempest-framework/pull/1444): **Validation rule names were updated**. 
-- [#1513](https://github.com/tempestphp/tempest-framework/pull/1513): **The `DatabaseMigration` interface was split into two**. 
+- [#1458](https://github.com/tempestphp/tempest-framework/pull/1458): **`Tempest\Database\Id` is now called `Tempest\Database\PrimaryKey`**.
+- [#1458](https://github.com/tempestphp/tempest-framework/pull/1458): **The value property of `Tempest\Database\PrimaryKey` has been renamed from `id` to `value`**.
+- [#1507](https://github.com/tempestphp/tempest-framework/pull/1507): **`Tempest\CommandBus\AsyncCommand` is now called `Tempest\CommandBus\Async`**.
+- [#1444](https://github.com/tempestphp/tempest-framework/pull/1444): **Validation rule names were updated**.
+- [#1513](https://github.com/tempestphp/tempest-framework/pull/1513): **The `DatabaseMigration` interface was split into two**.
 - **`\Tempest\uri` and `\Tempest\is_current_uri` are both moved to the `\Tempest\Router` namespace**.
-- You cannot longer declare view components via the `{html}<x-component name="x-my-component">` tag. All files using this syntax must remove the wrapping `{html}<x-component` tag an[#1439](https://github.com/tempestphp/tempest-framework/pull/1439): d instead rename the filename to `x-my-component.view.php`. This was an undocumented feature and likely not used by anyone.  
-- [#1447](https://github.com/tempestphp/tempest-framework/pull/1447): Cookies are now encrypted by default and developers must run `tempest key:generate` once per environment. 
-- [#1435](https://github.com/tempestphp/tempest-framework/pull/1435): Changes in view component variable scoping rules might affect view files. 
-- [#1444](https://github.com/tempestphp/tempest-framework/pull/1444): The validator now requires the translator, and should always be injected instead of manually created. 
+- You cannot longer declare view components via the `{html}<x-component name="x-my-component">` tag. All files using this syntax must remove the wrapping `{html}<x-component` tag an[#1439](https://github.com/tempestphp/tempest-framework/pull/1439): d instead rename the filename to `x-my-component.view.php`. This was an undocumented feature and likely not used by anyone.
+- [#1447](https://github.com/tempestphp/tempest-framework/pull/1447): Cookies are now encrypted by default and developers must run `tempest key:generate` once per environment.
+- [#1435](https://github.com/tempestphp/tempest-framework/pull/1435): Changes in view component variable scoping rules might affect view files.
+- [#1444](https://github.com/tempestphp/tempest-framework/pull/1444): The validator now requires the translator, and should always be injected instead of manually created.
 
 Apart from these breaking changes, Tempest 2.0 also includes a range of bug fixes, internal refactors, and a handful of new features. You can [read the full release notes here](https://github.com/tempestphp/tempest-framework/releases/tag/v2.0.0).
 
 ## What's next?
 
-There are [many more things to work on](https://github.com/tempestphp/tempest-framework/issues). My personal focus for now will be to get [FrankenPHP's worker mode support](https://github.com/tempestphp/tempest-framework/issues/1548) built-into Tempest. We're also working on a proper [PhpStorm plugin for Tempest View](https://github.com/tempestphp/tempest-phpstorm-plugin), and Enzo's focus will be on a debugging UI, as well as asynchronous transport features. Exciting times ahead!  
+There are [many more things to work on](https://github.com/tempestphp/tempest-framework/issues). My personal focus for now will be to get [FrankenPHP's worker mode support](https://github.com/tempestphp/tempest-framework/issues/1548) built-into Tempest. We're also working on a proper [PhpStorm plugin for Tempest View](https://github.com/tempestphp/tempest-phpstorm-plugin), and Enzo's focus will be on a debugging UI, as well as asynchronous transport features. Exciting times ahead!
 
 Finally, if you're interested in trying Tempest out or in contributing, make sure to [join our Discord](/discord), where by now over 500 developers are gathered to work with and talk about Tempest.
 
@@ -4068,14 +4086,15 @@ If you happen to encounter such an issue, please let us know on [Discord](/disco
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2025-09-19-migrations-in-tempest-2.md -->
 
 ---
+
 title: No more down migrations
-description: Database migrations have had a serious refactor in the newest Tempest release 
+description: Database migrations have had a serious refactor in the newest Tempest release
 author: brent
 tag: thoughts
+
 ---
 
 With Tempest 2 comes a pretty significant change to how database migrations work. Luckily, the [upgrade process is automated](/blog/tempest-2). I thought it would be interesting to explain _why_ we made this change, though.
@@ -4088,7 +4107,7 @@ interface DatabaseMigration
     public string $name { get; }
 
     public function up(): ?QueryStatement;
-    
+
     public function down(): ?QueryStatement;
 }
 ```
@@ -4162,18 +4181,19 @@ So why did we keep the `MigratesDown` interface? Some developers told me they li
 ./tempest migrate:fresh --seeder="Tests\Tempest\Fixtures\InvoiceSeeder"
 ```
 
-Either way, we decided to keep `MigrateDown` in for now, and see the community's reaction to this new approach. We might get rid of down migrations altogether in the future, or we might keep them. Our recommended approach won't change, though: don't try to reverse the past, focus on moving forward. 
+Either way, we decided to keep `MigrateDown` in for now, and see the community's reaction to this new approach. We might get rid of down migrations altogether in the future, or we might keep them. Our recommended approach won't change, though: don't try to reverse the past, focus on moving forward.
 
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-10-02-oauth-in-tempest.md -->
 
 ---
+
 title: OAuth in Tempest 2.2
 description: Tempest 2.2 gets a new OAuth integration which makes authentication super simple
 author: brent
 tag: release
+
 ---
 
 Authentication is a challenging problem to solve. It's not just about logging a user in and session management, it's also about allowing them to manage their profile, email confirmation and password reset flows, custom authentication forms, 2FA, and what not. Ever since the start of Tempest, we've tried a number of approaches to have a built-in authentication layer that ships with the framework, and every time the solution felt suboptimal.
@@ -4230,7 +4250,7 @@ use Tempest\Router\Get;
 final readonly class DiscordAuthController
 {
     public function __construct(
-        #[Tag('discord')] 
+        #[Tag('discord')]
         private OAuthClient $oauth,
     ) {}
 
@@ -4239,7 +4259,7 @@ final readonly class DiscordAuthController
     {
         return $this->oauth->createRedirect();
     }
-    
+
     // …
 }
 ```
@@ -4258,16 +4278,16 @@ use Tempest\Router\Get;
 final readonly class DiscordAuthController
 {
     public function __construct(
-        #[Tag('discord')] 
+        #[Tag('discord')]
         private OAuthClient $oauth,
     ) {}
-    
+
     #[Get('/auth/discord')]
     public function redirect(): Redirect
     {
         return $this->oauth->createRedirect();
     }
-    
+
     #[Get('/auth/discord/callback')]
     public function callback(Request $request): Redirect
     {
@@ -4294,14 +4314,15 @@ All in all, I think this is a very solid base to build upon. You can read more a
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2025-10-27-re-the-journey-thus-far.md -->
 
 ---
-title: "RE: the journey this far" 
-description: Replying to someone trying out Tempest 
+
+title: "RE: the journey this far"
+description: Replying to someone trying out Tempest
 author: brent
 tag: thoughts
+
 ---
 
 I recently stumbled upon a blogpost by Vyygir describing their first steps with Tempest, and I loved reading it. There were some good things, some bad things, and it's this kind of real-life feedback that is invaluable for Tempest to grow. I hope more people will do it in the future. Reading through it, I had some thoughts that I think might be a valuable addition, so I figured I'd do a "reply-style" blog post. You can read the [original one here](https://starle.sh/tempest-the-journey-thus-far), but I'll quote the parts I'm replying to over here as well.
@@ -4320,7 +4341,7 @@ Don't feel bad, it's nice to hear good things, but even better what can be impro
 
 I actually agree with Vyygir. Starting from a completely empty src directory can feel disorienting. It's actually on our roadmap to have two or three scaffold projects, which you can choose from based on your preference. We haven't gotten to that stage yet because, honestly, we're still trying to figure it out ourselves. Maybe we should stop using that excuse and just build _something_. [Noted](https://github.com/tempestphp/tempest-framework/issues/1665).
 
-That being said, I've experimented a lot, and I've refactored a lot. The one thing that sets Tempest apart from other frameworks is that it truly *does not care* about how your project is structured, and thus also doesn't care about refactorings. You can move everything around, and everything will keep working (given that you clear discovery caches in production). So even if you run into issues down the line, refactoring your project shouldn't be hard.
+That being said, I've experimented a lot, and I've refactored a lot. The one thing that sets Tempest apart from other frameworks is that it truly _does not care_ about how your project is structured, and thus also doesn't care about refactorings. You can move everything around, and everything will keep working (given that you clear discovery caches in production). So even if you run into issues down the line, refactoring your project shouldn't be hard.
 
 ## Discovery
 
@@ -4336,11 +4357,11 @@ Ah, yes. This highlights a crucial drawback in our documentation. I did write a 
 
 However, there was one critique about discovery that I didn't fully understand:
 
-> I had an idea that I'd use Discovery to find my entries in ./entries/*.md and then load them into a repository. I even tried it. But the major problem I was hitting was that my EntryRepository wasn't actually in the container at the point of discovery which, when you read through the bootstrap steps actually makes a lot of sense.
+> I had an idea that I'd use Discovery to find my entries in ./entries/\*.md and then load them into a repository. I even tried it. But the major problem I was hitting was that my EntryRepository wasn't actually in the container at the point of discovery which, when you read through the bootstrap steps actually makes a lot of sense.
 
-The way Vyygir describes it should indeed work, and I'm curious to learn why it didn't. It's actually how discovery works at its core: it scans files (PHP files or any you'd like) and registers the result in some kind of dependency. Usually it's a singleton config, but it can be anything that is available in the container. 
+The way Vyygir describes it should indeed work, and I'm curious to learn why it didn't. It's actually how discovery works at its core: it scans files (PHP files or any you'd like) and registers the result in some kind of dependency. Usually it's a singleton config, but it can be anything that is available in the container.
 
-As a sidenote: Vyygir mentions that he let go of the idea after seeing the [source code of my blog](https://github.com/brendt/stitcher.io/blob/main/app/Blog/BlogPostRepository.php#L75) (where I do a runtime filescan on one directory instead of leveraging discovery). A good rule of thumb is to rely on discovery when file locations are unknown: discovery will be scanning your whole project and relevant vendor sources, and your specific discovery classes that interact with that scanning cycle. If you already know which folder will contain all relevant files (a content directory with markdown files, for example), then you're better off just directly interacting with that folder instead of relying on discovery.  
+As a sidenote: Vyygir mentions that he let go of the idea after seeing the [source code of my blog](https://github.com/brendt/stitcher.io/blob/main/app/Blog/BlogPostRepository.php#L75) (where I do a runtime filescan on one directory instead of leveraging discovery). A good rule of thumb is to rely on discovery when file locations are unknown: discovery will be scanning your whole project and relevant vendor sources, and your specific discovery classes that interact with that scanning cycle. If you already know which folder will contain all relevant files (a content directory with markdown files, for example), then you're better off just directly interacting with that folder instead of relying on discovery.
 
 Nevertheless, discovery should technically work for Vyygir's use case (up to you whether you want to use it or not). Maybe ha was running into an underlying issue, maybe something else was at play. Anyway, Vyygir, if you're reading this let me know, and I'm happy to help you debug.
 
@@ -4390,9 +4411,9 @@ I would really encourage you to read up on the topic though, because as soon as 
 
 ## View Syntax
 
->I'm going to be honest, I just struggle to parse this mentally in comparison to something like Twig. This is almost definitely a problem unique to me (because my brain don't do the working right). I just wanted to mention it though.
+> I'm going to be honest, I just struggle to parse this mentally in comparison to something like Twig. This is almost definitely a problem unique to me (because my brain don't do the working right). I just wanted to mention it though.
 
-That's fair. That's why we have [built-in support for Twig and Blade](/2.x/essentials/views#using-other-engines) as well. We're actively working on a PhpStorm plugin for Tempest View, which will make life easier. 
+That's fair. That's why we have [built-in support for Twig and Blade](/2.x/essentials/views#using-other-engines) as well. We're actively working on a PhpStorm plugin for Tempest View, which will make life easier.
 
 ## `DateTime` (no, not that one)
 
@@ -4400,13 +4421,13 @@ That's fair. That's why we have [built-in support for Twig and Blade](/2.x/essen
 
 Ok so, story time. We wanted a DateTime library that was more powerful than PHP's built-in datetime, so that you could more easily work with date time objects. Stuff like adding or subtracting days, an easier interface to create datetime objects, … (you can read about it [here](https://tempestphp.com/2.x/features/datetime)).
 
-There were two options: [Carbon](https://carbon.nesbot.com/docs/) or the [PSL](https://github.com/azjezz/psl) implementation. We went with the second one (and added a wrapper for it within the framework). 
+There were two options: [Carbon](https://carbon.nesbot.com/docs/) or the [PSL](https://github.com/azjezz/psl) implementation. We went with the second one (and added a wrapper for it within the framework).
 
 IMO, we've made a mistake. Here's what I dislike about:
 
 - We have `Tempest\DateTime\DateTime`, which has a naming collision with `\DateTime`. I cannot count the number of times where I accidentally imported the wrong library
 - Having used Carbon for years, it's really annoying getting used to another API, eg: `plusDay()` instead of `addDay()`, etc.
-- The date format. Oh how I dislike the date format. Just to clarify, PSL's implementation relies on [the standardized ICU spec](https://unicode-org.github.io/icu/userguide/format_parse/datetime/#formatting-dates-and-times), which in fact is more widely used than PHP's "built-in" datetime formatting. For example, with Tempest's implementation you write `$dateTime->format('yyyy-MM-dd HH:mm:ss')` instead of `$dateTime->format('Y-m-d H:i:s')`. You could argue that this just requires some "getting used to", but I, for one, haven't gotten used to it, so I can imagine how frustrating it is for newcomers. 
+- The date format. Oh how I dislike the date format. Just to clarify, PSL's implementation relies on [the standardized ICU spec](https://unicode-org.github.io/icu/userguide/format_parse/datetime/#formatting-dates-and-times), which in fact is more widely used than PHP's "built-in" datetime formatting. For example, with Tempest's implementation you write `$dateTime->format('yyyy-MM-dd HH:mm:ss')` instead of `$dateTime->format('Y-m-d H:i:s')`. You could argue that this just requires some "getting used to", but I, for one, haven't gotten used to it, so I can imagine how frustrating it is for newcomers.
 
 That being said, we should also note that using Tempest's implementation is totally opt-in. You can choose to use either PHP's built-in `\DateTime`, or `Carbon` instead. However, how to do so is also undocumented. Again, [noted](https://github.com/tempestphp/tempest-framework/issues/1668).
 
@@ -4414,18 +4435,17 @@ That being said, we should also note that using Tempest's implementation is tota
 
 I'm so thankful for Vyygir taking the time to write down their thoughts. I'm also happy that most of their pain points come down to improving the docs, more than anything else; and this feedback will make Tempest better. Thank you!
 
-
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2025-11-10-route-decorators.md -->
 
 ---
+
 title: "Route decorators in Tempest 2.8"
 description: Taking a deep dive in a new Tempest feature
 author: brent
 tag: release
+
 ---
 
 When I began working on Tempest, the very first features were a container and a router. I already had a clear vision on what I wanted routing to look like: to embrace attributes to keep routes and controller actions close together. Coming from Laravel, this is quite a different approach, and so I wrote about [my vision on the router's design](/blog/about-route-attributes) to make sure everyone understood.
@@ -4473,16 +4493,16 @@ final class BookAdminController
 {
     #[AdminRoute('/books')]
     public function index(): View { /* … */ }
-    
+
     #[AdminRoute('/books/{book}/show')]
     public function show(Book $book): View { /* … */ }
-    
+
     #[AdminRoute('/books/new', method: Method::POST)]
     public function new(): View { /* … */ }
-    
+
     #[AdminRoute('/books/{book}/update', method: Method::POST)]
     public function update(): View { /* … */ }
-    
+
     #[AdminRoute('/books/{book}/delete', method: Method::DELETE)]
     public function delete(): View { /* … */ }
 }
@@ -4503,16 +4523,16 @@ class BookAdminController extends AbstractController
 {
     #[Route('/', name: 'index')]
     public function index(): Response { /* … */ }
-    
+
     #[Route('/{book}/show')]
     public function show(Book $book): Response { /* … */ }
-    
+
     #[Route('/new', methods: ['POST'])]
     public function new(): Response { /* … */ }
-    
+
     #[Route('/{book}/update', methods: ['POST'])]
     public function update(): Response { /* … */ }
-    
+
     #[Route('/{book}/delete', methods: ['DELETE'])]
     public function delete(): Response { /* … */ }
 }
@@ -4560,7 +4580,7 @@ final class BookAdminController
 {
     #[{:hl-type:Admin:}, {:hl-type:Books:}, {:hl-type:Get:}('/{book}/show')]
     public function show(Book $book): View { /* … */ }
-    
+
     // …
 }
 ```
@@ -4573,16 +4593,16 @@ final class BookAdminController
 {
     #[Get('/')]
     public function index(): View { /* … */ }
-    
+
     #[Get('/{book}/show')]
     public function show(Book $book): View { /* … */ }
-    
+
     #[Post('/new')]
     public function new(): View { /* … */ }
-    
+
     #[Post('/{book}/update')]
     public function update(): View { /* … */ }
-    
+
     #[Delete('/{book}/delete')]
     public function delete(): View { /* … */ }
 }
@@ -4628,7 +4648,7 @@ You can probably guess what a route decorator's job is: it is passed the current
 ```php
 // Get the route attribute
 $route = $method->getAttributes(Route::class);
-            
+
 // Get all decorators from the method and its controller class
  $decorators = [
     ...$method->getDeclaringClass()->getAttributes(RouteDecorator::class),
@@ -4652,26 +4672,26 @@ On top of adding the {b`Tempest\Router\RouteDecorator`} interface, I've also add
 
 I really like the solution we ended up with. I think it combines the best of both worlds. Maybe you have some thoughts about it as well? [Join the Tempest Discord](/discord) to let us know! You can also read all the details of route decorators [in the docs](/2.x/essentials/routing#route-decorators-route-groups).
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2026-01-13-open-source-strategies.md -->
 
 ---
+
 title: "Open source strategies"
 description: Staying happy and productive while doing open source
 author: brent
 tag: thoughts
+
 ---
 
-Imagine getting a group of 20 to 50 random people together in a room, all having to work on the same project. They have different backgrounds, educations, timezones, cultures — and your job is to guide them to success. Does that sound challenging enough? Let's say these people come and go whenever they please, sometimes finishing a task, sometimes doing it half, sometimes having AI do it for them without any review, and some people are simply there to angrily shout from the sideline. 
+Imagine getting a group of 20 to 50 random people together in a room, all having to work on the same project. They have different backgrounds, educations, timezones, cultures — and your job is to guide them to success. Does that sound challenging enough? Let's say these people come and go whenever they please, sometimes finishing a task, sometimes doing it half, sometimes having AI do it for them without any review, and some people are simply there to angrily shout from the sideline.
 
-Writing it like that, it's crazy to think that any open source project can be successful. 
+Writing it like that, it's crazy to think that any open source project can be successful.
 
-However, many projects are, and I've got to experience that first hand, being involved in open source for over a decade. First were some hobby projects, then I worked at [Spatie](https://spatie.be/open-source) where I helped build and maintain around 200 Laravel and PHP packages, and in recent years there's [Tempest](https://github.com/tempestphp/tempest-framework). What's interesting is that, even though I know fairly well how to code, "open source" was a whole new skill I had to learn; one I've come to like as much as writing actual code (or maybe even more). 
+However, many projects are, and I've got to experience that first hand, being involved in open source for over a decade. First were some hobby projects, then I worked at [Spatie](https://spatie.be/open-source) where I helped build and maintain around 200 Laravel and PHP packages, and in recent years there's [Tempest](https://github.com/tempestphp/tempest-framework). What's interesting is that, even though I know fairly well how to code, "open source" was a whole new skill I had to learn; one I've come to like as much as writing actual code (or maybe even more).
 
-At its core, **open source is a "people problem", more than a technical one**; and for me, solving that problem is exactly what makes open source so much fun. 
+At its core, **open source is a "people problem", more than a technical one**; and for me, solving that problem is exactly what makes open source so much fun.
 
 Over the years, I had to learn several ways of navigating and dealing with that "people problem". Some things I learned from colleagues, some from other open source maintainers, some lessons I had to learn on my own. In this post, I want to bundle these findings for myself to remember and maybe for others to learn.
 
@@ -4681,7 +4701,7 @@ In the past, I've definitely worked on open source projects chasing my own fame 
 
 I realized that by empowering others, the project benefits. This sometimes means putting _my_ needs aside and truly listening to the needs of others. That isn't always an easy thing to do, but it has a very powerful consequence: when contributors feel appreciated and acknowledged, they often want to be involved even more. Eventually they themselves become advocates for the project, leading to even more people getting involved, and the process repeats.
 
-Helping others to thrive is a core principle in successful collaborative open source. 
+Helping others to thrive is a core principle in successful collaborative open source.
 
 ## BDFL
 
@@ -4691,7 +4711,7 @@ Where people come together, there will inevitably be differences in opinions. So
 
 ## Say no
 
-Sometimes an idea isn't bad at all, but still I have to say "no". 
+Sometimes an idea isn't bad at all, but still I have to say "no".
 
 Because of the "open" nature of open source, people come and go. They contribute to the codebase free of charge, but they are equally not obliged to maintain their code either. In the end, it's me having the final responsibility over this project, and so sometimes I say "no" because I don't feel capable or comfortable maintaining whatever is being proposed in the long run.
 
@@ -4705,7 +4725,7 @@ For the same reason, I try to be quick in responding to new issues and PRs — I
 
 I prefer code to be opinionated. Trying to solve all problems and edge cases is a fallacy, especially within open source where there will always be someone coming up with a use case no one else in the world has thought of. The reality is that time and resources are limited, which means that adding all knobs and pulls and configuration to please everyone is impossible.
 
-Years of practice have shown that this strategy works. While people are often taken aback by it at first, it turns out to not be the blocker they feared it would. 
+Years of practice have shown that this strategy works. While people are often taken aback by it at first, it turns out to not be the blocker they feared it would.
 
 ## Automate the boring parts
 
@@ -4713,7 +4733,7 @@ Besides the people side of open source, my passion is still with code. With Temp
 
 ## Keep moving forward
 
-I tag often — usually whenever there's something to tag — I'm not limited to a fixed release cycle. This means that people's contributions become publicly available very quickly, which contributors seem to appreciate. 
+I tag often — usually whenever there's something to tag — I'm not limited to a fixed release cycle. This means that people's contributions become publicly available very quickly, which contributors seem to appreciate.
 
 One thing to take into account with having so many new releases (sometimes several per week, sometimes even several per day), is that you have to disconnect "releases" and "marketing" from each other. Where many open source projects think of "a new major release" as a once-every-one-or-two-years event that has to generate lots of buzz, I find that disconnecting the two makes life a lot more easy. I write feature highlight blog posts whenever there's time to do so, and simply mention "this feature is available since version X".
 
@@ -4725,18 +4745,19 @@ Finally: the realization that the world won't end when people take a break. I ju
 
 ---
 
-For now, those are the things I wanted to write down. If anything, I'll use this list as a personal reminder from time to time to keep my priorities straight. And maybe it'll help others as well. 
+For now, those are the things I wanted to write down. If anything, I'll use this list as a personal reminder from time to time to keep my priorities straight. And maybe it'll help others as well.
 
 ---
-
 
 <!-- source: src/Web/Blog/articles/2026-02-12-tempest-3.md -->
 
 ---
+
 title: Tempest 3.0
-description: Tempest 3.0 comes with a new exception handler, several performance improvements,  PHP 8.5 support, and more.
+description: Tempest 3.0 comes with a new exception handler, several performance improvements, PHP 8.5 support, and more.
 tag: release
 author: brent
+
 ---
 
 Tempest 3.0 is now available, and I want to take a moment to specifically thank all contributors who helped with this release. We've seen a continuous growth in the Tempest community over these past two years, and it's amazing to work with so many talented developers. So thank you all!
@@ -4780,7 +4801,7 @@ use Tempest\Validation\Rules\ValidateWith;
 final class Book
 {
     use IsDatabaseModel;
-    
+
     #[ValidateWith(static function (string $value): bool {
         return ! str_starts_with($value, ' ');
     })]
@@ -4797,18 +4818,15 @@ We improved our view parser so that [whitespaces are kept as-is](https://github.
 ```html
 <!-- x-test.view.php -->
 <div class="test">
-    <x-slot />
+  <x-slot />
 </div>
 
 <!-- home.view.php -->
-<x-test :class="$shouldHighlight ? 'bg-red-100' : ''">
-    …
-</x-test>
+<x-test :class="$shouldHighlight ? 'bg-red-100' : ''"> … </x-test>
 
 <!-- These attributes will now be merged correctly: -->
 <!-- <div class="test bg-red-100"> -->
 ```
-
 
 ## OAuth improvements
 
@@ -4887,14 +4905,15 @@ We've already started work on a new list of features and fixes for the [3.x rele
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2026-02-16-generating-typescript-types-with-tempest.md -->
 
 ---
+
 title: Generating TypeScript types with Tempest
 description: Tempest now has the ability to generate TypeScript interfaces from PHP classes to ease integration with TypeScript-based front-ends.
 tag: release
 author: brent
+
 ---
 
 Tempest 3.1.0 was just released, and with it comes a new `generate:typescript-types` command. This command will take any value objects, DTOs, or enums written in PHP and generate TypeScript equivalents for them that you can use in your frontend. The only thing you need is annotated PHP code with [`#[AsType]`](https://github.com/tempestphp/tempest-framework/blob/3.x/packages/generation/src/TypeScript/AsType.php), and Tempest handles the rest.
@@ -4919,11 +4938,11 @@ final class BlogPost
     public ?string $description = null;
     public bool $published = true;
     public array $meta = [];
-    
+
     public string $uri {
         get => uri([BlogController::class, 'show'], slug: $this->slug);
     }
-    
+
     public string $metaImageUri {
         get => uri([MetaImageController::class, 'blog'], slug: $this->slug);
     }
@@ -4970,14 +4989,15 @@ Of course, Tempest will [discover](/3.x/essentials/discovery) all relevant class
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2026-02-20-view-source-mapping.md -->
 
 ---
+
 title: Tempest View with source mapping
 description: Tempest 3.2 improves View debugging by introducing source maps.
 tag: release
 author: brent
+
 ---
 
 With Tempest 3.2, we've made a significant improvement for debugging view files. For context: Tempest Views are compiled to normal PHP files, and if you were to encounter a runtime error in those compiled files (unknown variables, missing imports, etc.) — in those cases the stack trace used to look something like this:
@@ -4994,17 +5014,18 @@ This was a crucial feature to make Tempest View truly developer-friendly. Specia
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2026-03-13-truly-decoupled-discovery.md -->
 
 ---
+
 title: Truly decoupled discovery
 description: Tempest's discovery can now be used in any project
 tag: release
 author: brent
+
 ---
 
-Making the Tempest components work in all types of projects has been a goal from the very start of the framework. For example, [`tempest/view`](/3.x/essentials/views#tempest-view-as-a-standalone-engine) can already be plugged into any project or framework you'd like. 
+Making the Tempest components work in all types of projects has been a goal from the very start of the framework. For example, [`tempest/view`](/3.x/essentials/views#tempest-view-as-a-standalone-engine) can already be plugged into any project or framework you'd like.
 
 Today we're making another component truly standalone: [`tempest/discovery`](/3.x/essentials/discovery). Discovery is what powers Tempest: it reads all your project and vendor code and configures that code in a PSR-11 compliant container for you. It's a simple idea, but really powerful when put into practice. And while frameworks like Symfony and Laravel have similar capabilities for framework-specific classes, Tempest's discovery is built to be extensible for all code.
 
@@ -5024,7 +5045,7 @@ The next step is to have a PSR-11 container. You can think of discovery as an ex
 composer require php-di/php-di
 ```
 
-The next step is to boot discovery. This means discovery will scan all your project and vendor files and pass them to discovery classes to be processed.  
+The next step is to boot discovery. This means discovery will scan all your project and vendor files and pass them to discovery classes to be processed.
 
 ```php ./index.php
 use Tempest\Discovery\BootDiscovery;
@@ -5061,7 +5082,7 @@ That's all for the basic setup. If you want more complex configuration and learn
 
 ### An example
 
-Let's say you're building an event-sourced system where "projectors" can be used to replay all previously stored events. You want to build a command that shows all available projectors where the user can select the relevant projectors. Furthermore, whenever an event is dispatched, you need to loop over that same list of projectors to find out which events should be passed to which ones. 
+Let's say you're building an event-sourced system where "projectors" can be used to replay all previously stored events. You want to build a command that shows all available projectors where the user can select the relevant projectors. Furthermore, whenever an event is dispatched, you need to loop over that same list of projectors to find out which events should be passed to which ones.
 
 The interface would look something like this:
 
@@ -5146,7 +5167,7 @@ final readonly class EventsReplayCommand
     {
         foreach ($this->projectorConfig->projectors as $projectorClass) {
             // …
-        }   
+        }
     }
 }
 ```
@@ -5164,7 +5185,7 @@ final readonly class StoredEventMiddleware implements EventBusMiddleware
     public function __invoke(string|object $event, EventBusMiddlewareCallable $next): void
     {
         // …
-        
+
         foreach ($this->projectorConfig->projectors as $projectorClass) {
             // Dispatch the event to the relevant projectors
         }
@@ -5187,7 +5208,7 @@ We had to do a small refactor to make discovery truly standalone. In theory, you
 For starters, install Rector if you haven't yet:
 
 ```
-composer require rector/rector --dev 
+composer require rector/rector --dev
 vendor/bin/rector
 ```
 
@@ -5231,17 +5252,17 @@ The Tempest community has been using discovery for years, and without any except
 
 Finally, come [join our Discord](/discord) if you're interested in Tempest or want to further talk about discovery. We'd love to hear from you!
 
-
 ---
-
 
 <!-- source: src/Web/Blog/articles/2026-03-26-idempotency-in-tempest.md -->
 
 ---
+
 title: Idempotency in Tempest
 description: We've recently added an idempotency feature into Tempest to help you avoid code running twice when it shouldn't.
 tag: release
 author: brent
+
 ---
 
 Oftentimes you need to ensure an operation only runs once: creating payments, generating invoices, provisioning resources, and what not; you want to prevent these things happening twice or more when they should only happen once. That's where our new idempotency package comes in. You can now mark routes and commands with the `#[Idempotent]` attribute to make sure they won't be run multiple times when they shouldn't.
@@ -5320,17 +5341,18 @@ Finally, idempotency can be configured in many ways as well. You can [read all a
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2026-03-27-new-orm-relations.md -->
 
 ---
+
 title: New ORM relations
 description: Tempest's ORM now supports HasOneThrough, HasManyThrough, and BelongsToMany relations
 tag: release
 author: brent
+
 ---
 
-Thanks to the work of [Layla Tichi](https://github.com/tempestphp/tempest-framework/issues?q=sort%3Aupdated-desc+is%3Apr+author%3Alaylatichy), Tempest's ORM has gotten a significant upgrade. 
+Thanks to the work of [Layla Tichi](https://github.com/tempestphp/tempest-framework/issues?q=sort%3Aupdated-desc+is%3Apr+author%3Alaylatichy), Tempest's ORM has gotten a significant upgrade.
 
 First, there's the {b`#[Tempest\Database\HasOneThrough]`} attribute. It defines a one-to-one relationship that traverses through an intermediate model. This lets you access a distant relation directly, resolved in a single SQL query with two JOINs.
 
@@ -5406,34 +5428,34 @@ Of course, there's a lot more you can do with these attributes to make them work
 
 ---
 
-
 <!-- source: src/Web/Blog/articles/2026-06-05-tempest-markdown.md -->
 
 ---
+
 title: A new Markdown parser
 description: Introducing tempest/markdown, its design goals, and how it works
 tag: thoughts
 author: brent
+
 ---
 
-What started as a performance experiment ended as a new package: `tempest/markdown`. I read [this post on Reddit](https://www.reddit.com/r/PHP/comments/1tac5j9/mdparser_030_native_php_commonmark_gfm_parser/) about how someone built a Markdown parser as a PHP extension. They mentioned how much faster it was compared to `league/commonmark`, which was the biggest selling point. 
+What started as a performance experiment ended as a new package: `tempest/markdown`. I read [this post on Reddit](https://www.reddit.com/r/PHP/comments/1tac5j9/mdparser_030_native_php_commonmark_gfm_parser/) about how someone built a Markdown parser as a PHP extension. They mentioned how much faster it was compared to `league/commonmark`, which was the biggest selling point.
 
 Now, I do a lot with Markdown: from blogs to docs, from mails to books, most of the things I do online involve parsing Markdown in some way. And for as long as I can remember, I've used `league/commonmark` to do so. Indeed, it's not the fastest thing out there — but it's manageable. However, with the [100-million-row challenge](/challenges/parsing-100m-lines) still fresh on my mind, I wondered if we really needed an _extension_ to get better Markdown performance. Having used League's implementation for years, I know they heavily rely on regex; which I learned with the 100-million-row challenge, was never the most performant solution for parsing big blobs of text.
 
-So I set up a naive test: a very basic Markdown parser that doesn't rely on regex but instead does a single pass over the text input, translates Markdown into tokens, which are then rendered to HTML. It's not a full-fledged lexer/parser that builds an AST, but instead directly goes from tokens to HTML. After a couple of hours, I got a working prototype. Then I set up [phpbench](https://github.com/phpbench/phpbench) to compare my implementation with league's. 
+So I set up a naive test: a very basic Markdown parser that doesn't rely on regex but instead does a single pass over the text input, translates Markdown into tokens, which are then rendered to HTML. It's not a full-fledged lexer/parser that builds an AST, but instead directly goes from tokens to HTML. After a couple of hours, I got a working prototype. Then I set up [phpbench](https://github.com/phpbench/phpbench) to compare my implementation with league's.
 
-
-| Package                | Memory   | Time to parse |
-|------------------------|----------|---------------|
-| tempest/markdown       | 5.944mb  | 6.281ms       |
-| league/commonmark      | 21.114mb | 56.993ms      |
+| Package           | Memory   | Time to parse |
+| ----------------- | -------- | ------------- |
+| tempest/markdown  | 5.944mb  | 6.281ms       |
+| league/commonmark | 21.114mb | 56.993ms      |
 
 Of course, my implementation was far from feature-complete, so I figured these numbers weren't accurate yet. However, the difference did show that there might be something to improve, and that a non-regex approach may indeed be faster.
 
 I did wonder whether I missed something obvious, though. The difference in performance was pretty big, and I hadn't even tried that hard. So I did the most productive thing I could think of to verify whether an idea has merit: [I asked /r/php to roast my code](https://www.reddit.com/r/PHP/comments/1tbyepk/roast_my_code_im_building_a_markdown_parser/). The feedback was very valuable, but what stood out most was someone sending a PR to the repo with ["some performance improvements"](https://github.com/tempestphp/markdown/pull/3):
 
 | Package               | Time to parse |
-|-----------------------|---------------|
+| --------------------- | ------------- |
 | tempest/markdown      | 6.281ms       |
 | tempest/markdown (PR) | 0.723ms       |
 | league/commonmark     | 56.993ms      |
@@ -5444,21 +5466,20 @@ The inline function approach worked, but it made it virtually impossible to add 
 
 What bothered me more with `league/commonmark` is the fact that it's so bare-bones. Every project I start I have to copy over configuration to support frontmatter, code highlighting, responsive images, tables, external hyperlinks, and what not. There are solutions for all these problems, but `league/commonmark` was designed to be extended, so it takes some setting up and tweaking before I can use it for my use cases.
 
-If I had this Markdown parser that 5-10x faster, with all these features built-in; maybe that wouldn't be so bad? 
+If I had this Markdown parser that 5-10x faster, with all these features built-in; maybe that wouldn't be so bad?
 
 I so I did exactly that; I continued to add the base Markdown features, and then I added support for all the things _I_ would find useful: frontmatter, code highlighting, responsive images, tables, external hyperlinks, divs, and strikethrough formatting. In the end, the benchmarks showed these results:
 
-
-| Package                | Memory   | Time to parse |
-|------------------------|----------|---------------|
-| tempest/markdown       | 6.664mb  | 10.906ms      |
-| league/commonmark      | 21.114mb | 56.993ms      |
+| Package           | Memory   | Time to parse |
+| ----------------- | -------- | ------------- |
+| tempest/markdown  | 6.664mb  | 10.906ms      |
+| league/commonmark | 21.114mb | 56.993ms      |
 
 As expected, performance had decreased a bit, but `tempest/markdown` was still 5x faster than `league/commonmark`. I actually suspect there are some big gains to be made still by combining the parsing and HTML rendering in one loop instead of two (TBD).
 
 On top of that, I did add extension points so that external projects could completely change the parser's working to their needs.
 
-So that's where I'm at today. Once again I wonder: what's the next step? And once again, I think it's time to ask /r/php and other places to take another look at what's here. I'm now using the parser myself for my blog and this website. It works very well, it has simplified a lot of code, and I'm happy with it. But is there really something here? I hope others can help me figure that out. 
+So that's where I'm at today. Once again I wonder: what's the next step? And once again, I think it's time to ask /r/php and other places to take another look at what's here. I'm now using the parser myself for my blog and this website. It works very well, it has simplified a lot of code, and I'm happy with it. But is there really something here? I hope others can help me figure that out.
 
 So if you're curious, head over to [the docs](/docs/packages/markdown) and take a look. I'm very open for feedback! (The best place for that feedback would be on [GitHub](https://github.com/tempestphp/markdown), by the way.)
 
@@ -5473,7 +5494,6 @@ Well the two obvious reasons are that `league/commonmark` is a regex-based parse
 Let me know your thoughts! Either on [GitHub](https://github.com/tempestphp/markdown) or on [the Tempest Discord](/discord), or whever you're reading this. I'm looking forward to it!
 
 ---
-
 
 <!-- source: src/Web/hello.md -->
 
@@ -5494,7 +5514,6 @@ Let me know your thoughts! Either on [GitHub](https://github.com/tempestphp/mark
 
 ---
 
-
 <!-- source: src/Web/Homepage/codeblocks/config.md -->
 
 ```php src/sqlite.config.php
@@ -5503,9 +5522,7 @@ return new SQLiteConfig(
 );
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/console.md -->
 
@@ -5517,9 +5534,9 @@ final readonly class FetchBookCommand
         private Isbn $isbn,
         private Console $console,
     ) {}
-    
+
     #[ConsoleCommand(description: 'Synchronize a book from ISBN by its title')]
-    public function __invoke(string $title, bool $force = false): void 
+    public function __invoke(string $title, bool $force = false): void
     {
         $data = $this->isbn->findByTitle($title);
 
@@ -5541,9 +5558,7 @@ final readonly class FetchBookCommand
 }
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/controller.md -->
 
@@ -5560,9 +5575,7 @@ final readonly class BookController
 }
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/event-handler.md -->
 
@@ -5577,9 +5590,7 @@ final readonly class BookObserver
 }
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/initializer.md -->
 
@@ -5591,7 +5602,7 @@ final readonly class MarkdownInitializer implements Initializer
     {
         $highlighter = new Highlighter(new CssTheme())
             ->addLanguage(new TempestViewLanguage());
-        
+
         $environment = new Environment()
             ->addRenderer(Code::class, new CodeBlockRenderer($highlighter));
 
@@ -5600,9 +5611,7 @@ final readonly class MarkdownInitializer implements Initializer
 }
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/mapper.md -->
 
@@ -5614,9 +5623,7 @@ map('path/to/books.json')->collection->to(Book::class);
 map($book)->to(MapTo::JSON);
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/model.md -->
 
@@ -5633,9 +5640,7 @@ final class Book
 }
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/orm.md -->
 
@@ -5650,9 +5655,7 @@ $book = query(Book::class)
 $json = map($book)->toJson();
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/query.md -->
 
@@ -5662,9 +5665,7 @@ query('authors')
     ->execute();
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/static-pages.md -->
 
@@ -5676,9 +5677,7 @@ query('authors')
 /framework/05-models <dim>....................</dim> <em>/public/framework/05-models/index.html</em>
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/templating-component.md -->
 
@@ -5693,15 +5692,15 @@ query('authors')
     <x-vite-tags />
   </head>
   <body class="antialiased flex flex-col grow">
-    <x-slot /> <!-- Main slot -->
-    <x-slot name="scripts" /> <!-- Named slot -->
+    <x-slot />
+    <!-- Main slot -->
+    <x-slot name="scripts" />
+    <!-- Named slot -->
   </body>
 </html>
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/templating-view.md -->
 
@@ -5714,18 +5713,14 @@ query('authors')
 
       <!-- Metadata -->
       <span :if="$this->showDate($book)">
-        <x-badge variant="outline">
-          {{ $book->publishedAt }}
-        </x-badge>
+        <x-badge variant="outline"> {{ $book->publishedAt }} </x-badge>
       </span>
     </li>
   </ul>
 </x-base>
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/view-component.md -->
 
@@ -5736,9 +5731,7 @@ query('authors')
 </article>
 ```
 
-
 ---
-
 
 <!-- source: src/Web/Homepage/codeblocks/view-processor.md -->
 
@@ -5759,6 +5752,5 @@ final class StarCountViewProcessor implements ViewProcessor
     }
 }
 ```
-
 
 ---

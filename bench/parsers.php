@@ -1,6 +1,6 @@
 <?php
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Parser;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use Tempest\Markdown\Markdown;
@@ -14,7 +14,7 @@ use Tempest\Markdown\Markdown;
  * object construction. Construct once, here, outside any timed loop.
  *
  * Parsers:
- *   'helgesverre/markdown'         — our FFI -> md4c parser (HelgeSverre\Markdown\FfiParser), GFM on
+ *   'helgesverre/markdown'         — our FFI -> md4c parser (HelgeSverre\Markdown\Parser), GFM on
  *   'tempest'       — tempest/markdown
  *   'league-gfm'    — league/commonmark GitHub Flavored
  *   'league-strict' — league/commonmark strict CommonMark
@@ -39,11 +39,11 @@ return (static function (): array {
     $registry = [];
 
     // --- 'helgesverre/markdown' : our FFI -> md4c parser ----------------------------------
-    // Construct one FfiParser and reuse it. The render method is resolved by
+    // Construct one Parser and reuse it. The render method is resolved by
     // probing (ordered below) so the registry stays decoupled from the exact
     // public API.
-    if (class_exists(FfiParser::class)) {
-        $ours = new FfiParser();
+    if (class_exists(Parser::class)) {
+        $ours = new Parser();
         $call = null;
         // toHtml first: the throughput benchmark must measure the fast path,
         // not parse() (which also strips front matter and anchors headings).
@@ -67,13 +67,13 @@ return (static function (): array {
             // Last resort: surface a clear error if the API is unexpected.
             $registry['helgesverre/markdown'] = static function (string $md): string {
                 throw new RuntimeException(
-                    'HelgeSverre\Markdown\FfiParser exists but exposes no known parse method (tried parse/toHtml/convert/render/html/__invoke).',
+                    'HelgeSverre\Markdown\Parser exists but exposes no known parse method (tried parse/toHtml/convert/render/html/__invoke).',
                 );
             };
         }
     } else {
         $registry['helgesverre/markdown'] = static function (string $md): string {
-            throw new RuntimeException('HelgeSverre\Markdown\FfiParser not found — run `composer install` (and `composer build` on an unshipped platform).');
+            throw new RuntimeException('HelgeSverre\Markdown\Parser not found — run `composer install` (and `composer build` on an unshipped platform).');
         };
     }
 

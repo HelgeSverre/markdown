@@ -6,7 +6,7 @@ Generated feature-rich markdown for parser benchmarking. Contains headings, emph
 
 ## Section 1: the streaming buffer
 
-This is paragraph **number 1** describing a *streaming* buffer. It runs in `O(n)` time and handles [external links](https://example.com/page/43) alongside ~~deprecated~~ APIs. We measured a **91% speedup** over the baseline implementation, with a tail latency of *37.3ms* per document.
+This is paragraph **number 1** describing a _streaming_ buffer. It runs in `O(n)` time and handles [external links](https://example.com/page/43) alongside ~~deprecated~~ APIs. We measured a **91% speedup** over the baseline implementation, with a tail latency of _37.3ms_ per document.
 
 > Blockquote 1: "Performance is a feature." The buffer processed 43 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -15,7 +15,7 @@ This is paragraph **number 1** describing a *streaming* buffer. It runs in `O(n)
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/1)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the buffer
   - Another nested point at 91% coverage
@@ -40,11 +40,11 @@ This is paragraph **number 1** describing a *streaming* buffer. It runs in `O(n)
 
 ### Benchmark table 1
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 805 | 5.2 | yes |
-| league GFM | 22 | 47 | yes |
-| tempest | 22 | 43 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               805 |     5.2     |   yes   |
+| league GFM |                22 |     47      |   yes   |
+| tempest    |                22 |     43      | partial |
 
 Here is a fenced code block in `diff`:
 
@@ -56,9 +56,10 @@ run --threads 43 --target 91
 A final paragraph with an autolink <https://autolink.test/1> and a footnote-ish aside. Inline `code spans` survive 43 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 2: the vectorized pipeline
 
-This is paragraph **number 2** describing a *vectorized* pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/71) alongside ~~deprecated~~ APIs. We measured a **82% speedup** over the baseline implementation, with a tail latency of *55.1ms* per document.
+This is paragraph **number 2** describing a _vectorized_ pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/71) alongside ~~deprecated~~ APIs. We measured a **82% speedup** over the baseline implementation, with a tail latency of _55.1ms_ per document.
 
 > Blockquote 2: "Performance is a feature." The pipeline processed 71 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -67,7 +68,7 @@ This is paragraph **number 2** describing a *vectorized* pipeline. It runs in `O
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/2)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the pipeline
   - Another nested point at 82% coverage
@@ -92,11 +93,11 @@ This is paragraph **number 2** describing a *vectorized* pipeline. It runs in `O
 
 ### Benchmark table 2
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 648 | 4 | yes |
-| league GFM | 52 | 31 | yes |
-| tempest | 28 | 42 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               648 |      4      |   yes   |
+| league GFM |                52 |     31      |   yes   |
+| tempest    |                28 |     42      | partial |
 
 Here is a fenced code block in `bash`:
 
@@ -108,9 +109,10 @@ run --threads 71 --target 82
 A final paragraph with an autolink <https://autolink.test/2> and a footnote-ish aside. Inline `code spans` survive 71 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 3: the zero-copy parser
 
-This is paragraph **number 3** describing a *zero-copy* parser. It runs in `O(n)` time and handles [external links](https://example.com/page/88) alongside ~~deprecated~~ APIs. We measured a **83% speedup** over the baseline implementation, with a tail latency of *61.8ms* per document.
+This is paragraph **number 3** describing a _zero-copy_ parser. It runs in `O(n)` time and handles [external links](https://example.com/page/88) alongside ~~deprecated~~ APIs. We measured a **83% speedup** over the baseline implementation, with a tail latency of _61.8ms_ per document.
 
 > Blockquote 3: "Performance is a feature." The parser processed 88 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -119,7 +121,7 @@ This is paragraph **number 3** describing a *zero-copy* parser. It runs in `O(n)
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/3)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the parser
   - Another nested point at 83% coverage
@@ -144,11 +146,11 @@ This is paragraph **number 3** describing a *zero-copy* parser. It runs in `O(n)
 
 ### Benchmark table 3
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 607 | 3 | yes |
-| league GFM | 50 | 86 | yes |
-| tempest | 28 | 58 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               607 |      3      |   yes   |
+| league GFM |                50 |     86      |   yes   |
+| tempest    |                28 |     58      | partial |
 
 Here is a fenced code block in `rust`:
 
@@ -160,9 +162,10 @@ run --threads 88 --target 83
 A final paragraph with an autolink <https://autolink.test/3> and a footnote-ish aside. Inline `code spans` survive 88 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 4: the cache-warm parser
 
-This is paragraph **number 4** describing a *cache-warm* parser. It runs in `O(n)` time and handles [external links](https://example.com/page/65) alongside ~~deprecated~~ APIs. We measured a **78% speedup** over the baseline implementation, with a tail latency of *31.7ms* per document.
+This is paragraph **number 4** describing a _cache-warm_ parser. It runs in `O(n)` time and handles [external links](https://example.com/page/65) alongside ~~deprecated~~ APIs. We measured a **78% speedup** over the baseline implementation, with a tail latency of _31.7ms_ per document.
 
 > Blockquote 4: "Performance is a feature." The parser processed 65 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -171,7 +174,7 @@ This is paragraph **number 4** describing a *cache-warm* parser. It runs in `O(n
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/4)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the parser
   - Another nested point at 78% coverage
@@ -196,11 +199,11 @@ This is paragraph **number 4** describing a *cache-warm* parser. It runs in `O(n
 
 ### Benchmark table 4
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 688 | 2.6 | yes |
-| league GFM | 61 | 90 | yes |
-| tempest | 43 | 107 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               688 |     2.6     |   yes   |
+| league GFM |                61 |     90      |   yes   |
+| tempest    |                43 |     107     | partial |
 
 Here is a fenced code block in `diff`:
 
@@ -212,9 +215,10 @@ run --threads 65 --target 78
 A final paragraph with an autolink <https://autolink.test/4> and a footnote-ish aside. Inline `code spans` survive 65 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 5: the branchless arena
 
-This is paragraph **number 5** describing a *branchless* arena. It runs in `O(n)` time and handles [external links](https://example.com/page/3) alongside ~~deprecated~~ APIs. We measured a **15% speedup** over the baseline implementation, with a tail latency of *20ms* per document.
+This is paragraph **number 5** describing a _branchless_ arena. It runs in `O(n)` time and handles [external links](https://example.com/page/3) alongside ~~deprecated~~ APIs. We measured a **15% speedup** over the baseline implementation, with a tail latency of _20ms_ per document.
 
 > Blockquote 5: "Performance is a feature." The arena processed 3 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -223,7 +227,7 @@ This is paragraph **number 5** describing a *branchless* arena. It runs in `O(n)
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/5)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the arena
   - Another nested point at 15% coverage
@@ -248,24 +252,25 @@ This is paragraph **number 5** describing a *branchless* arena. It runs in `O(n)
 
 ### Benchmark table 5
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 830 | 5.9 | yes |
-| league GFM | 47 | 90 | yes |
-| tempest | 24 | 73 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               830 |     5.9     |   yes   |
+| league GFM |                47 |     90      |   yes   |
+| tempest    |                24 |     73      | partial |
 
 Here is a fenced code block in `json`:
 
 ```json
-{"doc": 5, "speedup": 15, "latency_ms": 20}
+{ "doc": 5, "speedup": 15, "latency_ms": 20 }
 ```
 
 A final paragraph with an autolink <https://autolink.test/5> and a footnote-ish aside. Inline `code spans` survive 3 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 6: the compiled codepath
 
-This is paragraph **number 6** describing a *compiled* codepath. It runs in `O(n)` time and handles [external links](https://example.com/page/73) alongside ~~deprecated~~ APIs. We measured a **80% speedup** over the baseline implementation, with a tail latency of *6.7ms* per document.
+This is paragraph **number 6** describing a _compiled_ codepath. It runs in `O(n)` time and handles [external links](https://example.com/page/73) alongside ~~deprecated~~ APIs. We measured a **80% speedup** over the baseline implementation, with a tail latency of _6.7ms_ per document.
 
 > Blockquote 6: "Performance is a feature." The codepath processed 73 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -274,7 +279,7 @@ This is paragraph **number 6** describing a *compiled* codepath. It runs in `O(n
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/6)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the codepath
   - Another nested point at 80% coverage
@@ -299,11 +304,11 @@ This is paragraph **number 6** describing a *compiled* codepath. It runs in `O(n
 
 ### Benchmark table 6
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 898 | 4.1 | yes |
-| league GFM | 27 | 34 | yes |
-| tempest | 58 | 43 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               898 |     4.1     |   yes   |
+| league GFM |                27 |     34      |   yes   |
+| tempest    |                58 |     43      | partial |
 
 Here is a fenced code block in `rust`:
 
@@ -315,9 +320,10 @@ run --threads 73 --target 80
 A final paragraph with an autolink <https://autolink.test/6> and a footnote-ish aside. Inline `code spans` survive 73 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 7: the cache-warm codepath
 
-This is paragraph **number 7** describing a *cache-warm* codepath. It runs in `O(n)` time and handles [external links](https://example.com/page/80) alongside ~~deprecated~~ APIs. We measured a **72% speedup** over the baseline implementation, with a tail latency of *3.4ms* per document.
+This is paragraph **number 7** describing a _cache-warm_ codepath. It runs in `O(n)` time and handles [external links](https://example.com/page/80) alongside ~~deprecated~~ APIs. We measured a **72% speedup** over the baseline implementation, with a tail latency of _3.4ms_ per document.
 
 > Blockquote 7: "Performance is a feature." The codepath processed 80 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -326,7 +332,7 @@ This is paragraph **number 7** describing a *cache-warm* codepath. It runs in `O
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/7)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the codepath
   - Another nested point at 72% coverage
@@ -351,11 +357,11 @@ This is paragraph **number 7** describing a *cache-warm* codepath. It runs in `O
 
 ### Benchmark table 7
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 565 | 2.2 | yes |
-| league GFM | 58 | 42 | yes |
-| tempest | 39 | 72 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               565 |     2.2     |   yes   |
+| league GFM |                58 |     42      |   yes   |
+| tempest    |                39 |     72      | partial |
 
 Here is a fenced code block in `rust`:
 
@@ -367,9 +373,10 @@ run --threads 80 --target 72
 A final paragraph with an autolink <https://autolink.test/7> and a footnote-ish aside. Inline `code spans` survive 80 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 8: the branchless arena
 
-This is paragraph **number 8** describing a *branchless* arena. It runs in `O(n)` time and handles [external links](https://example.com/page/85) alongside ~~deprecated~~ APIs. We measured a **22% speedup** over the baseline implementation, with a tail latency of *23.2ms* per document.
+This is paragraph **number 8** describing a _branchless_ arena. It runs in `O(n)` time and handles [external links](https://example.com/page/85) alongside ~~deprecated~~ APIs. We measured a **22% speedup** over the baseline implementation, with a tail latency of _23.2ms_ per document.
 
 > Blockquote 8: "Performance is a feature." The arena processed 85 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -378,7 +385,7 @@ This is paragraph **number 8** describing a *branchless* arena. It runs in `O(n)
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/8)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the arena
   - Another nested point at 22% coverage
@@ -403,11 +410,11 @@ This is paragraph **number 8** describing a *branchless* arena. It runs in `O(n)
 
 ### Benchmark table 8
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 486 | 2.8 | yes |
-| league GFM | 23 | 30 | yes |
-| tempest | 30 | 50 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               486 |     2.8     |   yes   |
+| league GFM |                23 |     30      |   yes   |
+| tempest    |                30 |     50      | partial |
 
 Here is a fenced code block in `sql`:
 
@@ -419,9 +426,10 @@ run --threads 85 --target 22
 A final paragraph with an autolink <https://autolink.test/8> and a footnote-ish aside. Inline `code spans` survive 85 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 9: the zero-copy pipeline
 
-This is paragraph **number 9** describing a *zero-copy* pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/79) alongside ~~deprecated~~ APIs. We measured a **56% speedup** over the baseline implementation, with a tail latency of *94.8ms* per document.
+This is paragraph **number 9** describing a _zero-copy_ pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/79) alongside ~~deprecated~~ APIs. We measured a **56% speedup** over the baseline implementation, with a tail latency of _94.8ms_ per document.
 
 > Blockquote 9: "Performance is a feature." The pipeline processed 79 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -430,7 +438,7 @@ This is paragraph **number 9** describing a *zero-copy* pipeline. It runs in `O(
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/9)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the pipeline
   - Another nested point at 56% coverage
@@ -455,11 +463,11 @@ This is paragraph **number 9** describing a *zero-copy* pipeline. It runs in `O(
 
 ### Benchmark table 9
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 541 | 2.5 | yes |
-| league GFM | 34 | 84 | yes |
-| tempest | 54 | 70 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               541 |     2.5     |   yes   |
+| league GFM |                34 |     84      |   yes   |
+| tempest    |                54 |     70      | partial |
 
 Here is a fenced code block in `c`:
 
@@ -471,9 +479,10 @@ if (!out) return -1; /* 56% of runs */
 A final paragraph with an autolink <https://autolink.test/9> and a footnote-ish aside. Inline `code spans` survive 79 round-trips. Some &amp; entity &copy; handling and a backslash escape \* here.
 
 ---
+
 ## Section 10: the native pipeline
 
-This is paragraph **number 10** describing a *native* pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/95) alongside ~~deprecated~~ APIs. We measured a **61% speedup** over the baseline implementation, with a tail latency of *51.9ms* per document.
+This is paragraph **number 10** describing a _native_ pipeline. It runs in `O(n)` time and handles [external links](https://example.com/page/95) alongside ~~deprecated~~ APIs. We measured a **61% speedup** over the baseline implementation, with a tail latency of _51.9ms_ per document.
 
 > Blockquote 10: "Performance is a feature." The pipeline processed 95 thousand nodes without a single heap allocation in the hot loop.
 >
@@ -482,7 +491,7 @@ This is paragraph **number 10** describing a *native* pipeline. It runs in `O(n)
 ### Unordered features
 
 - First item with `inline code` and a [link](http://x.test/10)
-- Second item is **bold** and *italic* combined into ***both***
+- Second item is **bold** and _italic_ combined into **_both_**
 - Third item with nested detail:
   - Nested point about the pipeline
   - Another nested point at 61% coverage
@@ -507,11 +516,11 @@ This is paragraph **number 10** describing a *native* pipeline. It runs in `O(n)
 
 ### Benchmark table 10
 
-| Engine | Throughput (MB/s) | Memory (MB) | Correct |
-|:-------|------------------:|:-----------:|:-------:|
-| md4c (FFI) | 462 | 3.7 | yes |
-| league GFM | 52 | 33 | yes |
-| tempest | 44 | 107 | partial |
+| Engine     | Throughput (MB/s) | Memory (MB) | Correct |
+| :--------- | ----------------: | :---------: | :-----: |
+| md4c (FFI) |               462 |     3.7     |   yes   |
+| league GFM |                52 |     33      |   yes   |
+| tempest    |                44 |     107     | partial |
 
 Here is a fenced code block in `diff`:
 

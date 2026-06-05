@@ -10,8 +10,9 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use HelgeSverre\Markdown\FfiBatchParser;
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\BatchParser;
+use HelgeSverre\Markdown\Ffi\Library;
+use HelgeSverre\Markdown\Parser;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 $fail = [];
@@ -22,9 +23,9 @@ $check = function (string $name, bool $cond) use (&$fail): void {
     }
 };
 
-$lib = FfiParser::libPath();
-$ours = new FfiParser();
-echo "parser : {$ours->name()}\n";
+$lib = Library::path();
+$ours = new Parser();
+echo "parser : helgesverre/markdown (FFI→md4c)\n";
 echo 'php    : ' . PHP_VERSION . ' on ' . PHP_OS_FAMILY . "\n";
 echo "lib    : {$lib} (" . (is_file($lib) ? filesize($lib) . ' bytes' : 'MISSING!') . ")\n\n";
 
@@ -65,7 +66,7 @@ foreach (['h1', 'h2', 'ul', 'ol', 'li', 'table', 'tr', 'th', 'td', 'strong', 'em
 
 // 5. batch path parity (md2html_batch, pthread pool, anchor fix applied per doc)
 $docs = ["# A\n", "| x |\n|---|\n| y |\n", "[https://a.com/p](https://a.com/p)\n"];
-$batch = new FfiBatchParser()->toHtmlBatch($docs);
+$batch = new BatchParser()->toHtmlBatch($docs);
 $batchOk = true;
 foreach ($docs as $i => $d) {
     if ($batch[$i] === $ours->toHtml($d)) {

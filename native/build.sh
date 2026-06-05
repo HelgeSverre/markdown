@@ -20,6 +20,12 @@ command -v "$CC" >/dev/null 2>&1 || CC=clang
 command -v "$CC" >/dev/null 2>&1 || CC=gcc
 command -v "$CC" >/dev/null 2>&1 || { echo "error: no C compiler (cc/clang/gcc) found" >&2; exit 1; }
 
+# Optional build mode. `native/build.sh profile` produces a symbol-rich,
+# frame-pointer build (libmd4cshim.prof.*) for native profilers — samply, perf,
+# Valgrind/DHAT, heaptrack — WITHOUT touching the shipped lib or the preload
+# header. See docs/profiling.md.
+MODE="${1:-build}"
+
 case "$(uname -s)" in
   Darwin)               LIBNAME="libmd4cshim.dylib" ;;
   Linux)                LIBNAME="libmd4cshim.so" ;;
@@ -29,14 +35,53 @@ esac
 
 SOURCES=(shim.c md4c/md4c.c md4c/md4c-html.c md4c/entity.c)
 
-echo "==> Compiling $LIBNAME  ($CC -O3 -flto -pthread)"
-"$CC" -O3 -flto -fPIC -shared -DNDEBUG -pthread -o "$LIBNAME" "${SOURCES[@]}"
+if [ "$MODE" = profile ]; then
+  # libmd4cshim.dylib -> libmd4cshim.prof.dylib  (keep the original extension)
+  LIBNAME="${LIBNAME%.*}.prof.${LIBNAME##*.}"
+  PROFFLAGS=(-O2 -g -fno-omit-frame-pointer -fPIC -DNDEBUG -pthread)
+  # -O2 -g -fno-omit-frame-pointer: optimized, but symbolicated and unwindable.
+  # Intentionally NO -flto (it inlines md4c into the shim and collapses the very
+  # frames you want to read) and NO -Wl,-s strip.
+  #
+  # Two-step (compile to .o, then link) rather than one-shot: a one-shot build
+  # routes DWARF through temp .o files that get deleted, breaking macOS's debug
+  # map so dsymutil/samply can't resolve md4c's static functions. Keeping real
+  # .o files lets dsymutil emit a proper .dSYM (and Linux carries DWARF inline).
+  echo "==> Compiling $LIBNAME  ($CC -O2 -g -fno-omit-frame-pointer, no -flto)"
+  OBJS=()
+  for src in "${SOURCES[@]}"; do
+    obj="prof-$(basename "${src%.c}").o"
+    "$CC" "${PROFFLAGS[@]}" -c -o "$obj" "$src"
+    OBJS+=("$obj")
+  done
+  "$CC" "${PROFFLAGS[@]}" -shared -o "$LIBNAME" "${OBJS[@]}"
+  if [ "$(uname -s)" = "Darwin" ] && command -v dsymutil >/dev/null 2>&1; then
+    dsymutil "$LIBNAME" >/dev/null 2>&1 && echo "    + $LIBNAME.dSYM (DWARF incl. static fns)"
+  fi
+  rm -f "${OBJS[@]}"
+else
+  echo "==> Compiling $LIBNAME  ($CC -O3 -flto -pthread)"
+  "$CC" -O3 -flto -fPIC -shared -DNDEBUG -pthread -o "$LIBNAME" "${SOURCES[@]}"
+fi
 
 echo "==> Symbols:"
 if command -v nm >/dev/null 2>&1; then
   # Defined text symbols print as "<addr> T <name>" on both BSD/macOS and GNU
   # nm (macOS prefixes an underscore). Undefined refs have only two fields.
   nm "$LIBNAME" 2>/dev/null | awk '$2=="T" && $3 ~ /md2html/ {print "      "$3}' | sort -u || true
+fi
+
+if [ "$MODE" = profile ]; then
+  echo
+  echo "==> Profiling lib ready (symbols + frame pointers, not stripped)."
+  echo "    Point FFI at it AND disable the preload so the cdef fallback loads it:"
+  echo
+  echo "      MARKDOWN_FFI_LIB=\"$DIR/$LIBNAME\" \\"
+  echo "        php -d opcache.preload= -d ffi.enable=1 bench/profile_target.php"
+  echo
+  echo "    (The preload fast path binds the optimized shipped lib via FFI::scope;"
+  echo "     leaving it set would shadow this profiling build.) See docs/profiling.md."
+  exit 0
 fi
 
 # Regenerate the FFI scope header with THIS machine's absolute lib path.
@@ -46,6 +91,7 @@ cat > md4cshim.h <<EOF
 #define FFI_SCOPE "MD4C"
 #define FFI_LIB "$DIR/$LIBNAME"
 char* md2html(const char* input, size_t input_len, size_t* out_len, unsigned int parser_flags, unsigned int renderer_flags);
+char* md2html_anchor(const char* html, size_t html_len, size_t* out_len, char** toc, size_t* toc_len);
 void md2html_free(char* p);
 unsigned int md2html_dialect_github(void);
 char* md2html_batch(const char* packed, const size_t* in_offsets, size_t n, size_t* out_offsets, unsigned int parser_flags, unsigned int renderer_flags, int threads);

@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown\Tests;
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Ffi\Library;
+use HelgeSverre\Markdown\Parser;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-final class FfiParserTest extends TestCase
+final class ParserTest extends TestCase
 {
-    private FfiParser $parser;
+    private Parser $parser;
 
     protected function setUp(): void
     {
-        $this->parser = new FfiParser();
+        $this->parser = new Parser();
     }
 
     #[Test]
@@ -97,12 +98,6 @@ final class FfiParserTest extends TestCase
     #[Test]
     public function it_resolves_a_library_path_that_exists(): void
     {
-        $this->assertFileExists(FfiParser::libPath());
-    }
-
-    #[Test]
-    public function it_reports_a_name(): void
-    {
-        $this->assertNotEmpty($this->parser->name());
+        $this->assertFileExists(Library::path());
     }
 }

@@ -14,6 +14,9 @@ native/*.so
 native/*.dll
 native/*.o
 native/*.a
+# Profiling build by-product (native/build.sh profile): the macOS debug bundle.
+# The libmd4cshim.prof.* lib itself is already covered by the globs above.
+native/*.dSYM/
 # Generated FFI scope header (build.sh writes it with a machine-specific path)
 native/md4cshim.h
 
@@ -38,3 +41,9 @@ lib/**/*.exp
 # Mago's binary lives in vendor/; only a baseline dir would land here if ever generated.
 /.mago/
 /_storage/
+
+# PHPBench intermediate dump (RESULTS.md + results.json are the artifacts)
+/results/raw.xml
+
+# Raw native-sampler dump (PROFILE.md is the artifact; this is its raw input)
+/results/profile.sample.txt

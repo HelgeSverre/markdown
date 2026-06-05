@@ -29,7 +29,7 @@ symbols() {
   local f="$1"
   if command -v nm >/dev/null 2>&1; then
     local n
-    n=$(nm "$f" 2>/dev/null | grep -c -E 'md2html(_free|_dialect_github|_batch)?$' || true)
+    n=$(nm "$f" 2>/dev/null | grep -c -E 'md2html(_free|_dialect_github|_batch|_anchor)?$' || true)
     echo "      $n md2html* symbols"
   fi
 }

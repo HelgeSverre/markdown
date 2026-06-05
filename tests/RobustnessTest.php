@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown\Tests;
 
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Parser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +33,7 @@ final class RobustnessTest extends TestCase
     #[DataProvider('hostileInputs')]
     public function it_never_crashes_on_hostile_input(string $input): void
     {
-        $html = new FfiParser()->toHtml($input);
+        $html = new Parser()->toHtml($input);
 
         $this->assertIsString($html);
     }
@@ -43,7 +43,7 @@ final class RobustnessTest extends TestCase
     {
         // PHP's strlen() is binary-safe, so the (ptr, len) FFI path passes the
         // entire input through md4c — nothing is cut at the first NUL.
-        $html = new FfiParser()->toHtml("alpha\x00omega\n");
+        $html = new Parser()->toHtml("alpha\x00omega\n");
 
         $this->assertStringContainsString('alpha', $html);
         $this->assertStringContainsString('omega', $html);
@@ -52,7 +52,7 @@ final class RobustnessTest extends TestCase
     #[Test]
     public function it_does_not_leak_php_memory_across_many_renders(): void
     {
-        $parser = new FfiParser();
+        $parser = new Parser();
         $doc = "# H\n\n- a\n- b\n\n[x](http://y.com/z)\n\n| a |\n|---|\n| 1 |\n";
 
         // Warm the Zend allocator's bundle to steady state first.

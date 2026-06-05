@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use HelgeSverre\Markdown\FfiBatchParser;
-use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\BatchParser;
+use HelgeSverre\Markdown\Parser;
 
 $root = dirname(__DIR__);
 
@@ -44,7 +44,7 @@ while (count($docs) < 500) {
 $totalBytes = array_sum(array_map('strlen', $docs));
 
 // Sequential: one FFI call per document.
-$single = new FfiParser();
+$single = new Parser();
 $t = hrtime(true);
 foreach ($docs as $d) {
     $single->toHtml($d);
@@ -52,7 +52,7 @@ foreach ($docs as $d) {
 $seqMs = (hrtime(true) - $t) / 1e6;
 
 // Batch: pack all docs, one FFI call, pthread pool fans them across cores.
-$batch = new FfiBatchParser();
+$batch = new BatchParser();
 $t = hrtime(true);
 $out = $batch->toHtmlBatch($docs);
 $batchMs = (hrtime(true) - $t) / 1e6;
