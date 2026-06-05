@@ -1,0 +1,17 @@
+{
+    "$schema": "vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "bench",
+    "runner.file_pattern": "*Bench.php",
+    "runner.iterations": 10,
+    "runner.revs": 50,
+    "runner.warmup": 2,
+    "runner.retry_threshold": 2.0,
+    "runner.php_config": {
+        "opcache.enable": "1",
+        "opcache.enable_cli": "1",
+        "opcache.jit_buffer_size": "64M",
+        "opcache.jit": "tracing",
+        "ffi.enable": "1"
+    }
+}

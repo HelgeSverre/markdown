@@ -1,0 +1,28 @@
+{
+    "name": "helge/markdown-fight",
+    "description": "A dirty-tricks markdown parser (FFI -> md4c) benchmarked against tempest/markdown and league/commonmark.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.5",
+        "ext-ffi": "*",
+        "tempest/markdown": "^1.0",
+        "league/commonmark": "^2.7"
+    },
+    "require-dev": {
+        "phpbench/phpbench": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "MarkdownFight\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "tempest/*": true
+        },
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

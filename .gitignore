@@ -1,0 +1,23 @@
+# Composer
+/vendor/
+composer.phar
+
+# IDE / editors
+/.idea/
+/.vscode/
+*.swp
+.DS_Store
+
+# Compiled native FFI artifacts (build from native/shim.c)
+native/*.dylib
+native/*.so
+native/*.dll
+native/*.o
+native/*.a
+
+# Tool caches
+.phpunit.result.cache
+.phpunit.cache/
+.php-cs-fixer.cache
+.phpbench/
+/_storage/
