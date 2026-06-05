@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 require '/Users/helge/code/markdown-fight/vendor/autoload.php';
 
-use MarkdownFight\FfiParser;
-use MarkdownFight\FfiBatchParser;
+use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\FfiBatchParser;
 
 function ok(string $label): void
 {

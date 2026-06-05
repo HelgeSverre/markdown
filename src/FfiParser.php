@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MarkdownFight;
+namespace HelgeSverre\Markdown;
 
 use FFI;
 use RuntimeException;
@@ -18,8 +18,6 @@ use Throwable;
  */
 final class FfiParser implements MarkdownParser
 {
-    private const LIB = '/Users/helge/code/markdown-fight/native/libmd4cshim.dylib';
-
     private const CDEF = <<<'C'
         char* md2html(const char* input, size_t input_len, size_t* out_len, unsigned int parser_flags, unsigned int renderer_flags);
         void md2html_free(char* p);
@@ -39,10 +37,22 @@ final class FfiParser implements MarkdownParser
             $this->ffi = FFI::scope('MD4C');
         } catch (Throwable) {
             // Fallback: parse the inline declarations and dlopen the lib now.
-            $this->ffi = FFI::cdef(self::CDEF, self::LIB);
+            $this->ffi = FFI::cdef(self::CDEF, self::libPath());
         }
 
         $this->flags = $this->ffi->md2html_dialect_github();
+    }
+
+    /** Resolve the compiled shared library for the current platform. */
+    public static function libPath(): string
+    {
+        $dir = dirname(__DIR__) . '/native/';
+
+        return match (PHP_OS_FAMILY) {
+            'Darwin'  => $dir . 'libmd4cshim.dylib',
+            'Windows' => $dir . 'md4cshim.dll',
+            default   => $dir . 'libmd4cshim.so',
+        };
     }
 
     public function toHtml(string $markdown): string

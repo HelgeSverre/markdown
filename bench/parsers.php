@@ -8,7 +8,7 @@
  * object construction. Construct once, here, outside any timed loop.
  *
  * Parsers:
- *   'fight'         — our FFI -> md4c parser (MarkdownFight\FfiParser), GFM on
+ *   'fight'         — our FFI -> md4c parser (HelgeSverre\Markdown\FfiParser), GFM on
  *   'tempest'       — tempest/markdown
  *   'league-gfm'    — league/commonmark GitHub Flavored
  *   'league-strict' — league/commonmark strict CommonMark
@@ -33,12 +33,12 @@ return (static function (): array {
     $registry = [];
 
     // --- 'fight' : our FFI -> md4c parser ----------------------------------
-    // MarkdownFight\FfiParser is written by the native agent. It exists at run
+    // HelgeSverre\Markdown\FfiParser is written by the native agent. It exists at run
     // time. We construct exactly one instance and reuse it. We probe for the
     // method name so we are resilient to its exact public API (parse / toHtml
     // / convert / render / __invoke) without coupling tightly to one name.
-    if (class_exists(\MarkdownFight\FfiParser::class)) {
-        $fight = new \MarkdownFight\FfiParser();
+    if (class_exists(\HelgeSverre\Markdown\FfiParser::class)) {
+        $fight = new \HelgeSverre\Markdown\FfiParser();
         $call = null;
         foreach (['parse', 'toHtml', 'convert', 'render', 'html'] as $m) {
             if (method_exists($fight, $m)) {
@@ -58,14 +58,14 @@ return (static function (): array {
             // Last resort: surface a clear error if the API is unexpected.
             $registry['fight'] = static function (string $md): string {
                 throw new \RuntimeException(
-                    'MarkdownFight\FfiParser exists but exposes no known parse method '
+                    'HelgeSverre\Markdown\FfiParser exists but exposes no known parse method '
                     . '(tried parse/toHtml/convert/render/html/__invoke).'
                 );
             };
         }
     } else {
         $registry['fight'] = static function (string $md): string {
-            throw new \RuntimeException('MarkdownFight\FfiParser class not found (native agent not done?).');
+            throw new \RuntimeException('HelgeSverre\Markdown\FfiParser class not found (native agent not done?).');
         };
     }
 

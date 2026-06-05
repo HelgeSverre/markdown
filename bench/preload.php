@@ -17,7 +17,7 @@ if (!extension_loaded('FFI')) {
     return;
 }
 
-$header = '/Users/helge/code/markdown-fight/native/md4cshim.h';
+$header = dirname(__DIR__) . '/native/md4cshim.h';
 
 try {
     // If the scope is already bound, FFI::scope() succeeds and we skip the load.

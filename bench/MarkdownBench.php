@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MarkdownFight\Bench;
+namespace HelgeSverre\Markdown\Bench;
 
 use League\CommonMark\GithubFlavoredMarkdownConverter;
-use MarkdownFight\FfiParser;
+use HelgeSverre\Markdown\FfiParser;
 use PhpBench\Attributes as Bench;
 use Tempest\Markdown\Markdown as TempestMarkdown;
 

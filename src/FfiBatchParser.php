@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MarkdownFight;
+namespace HelgeSverre\Markdown;
 
 use FFI;
 use RuntimeException;
@@ -22,8 +22,6 @@ use Throwable;
  */
 final class FfiBatchParser implements MarkdownParser
 {
-    private const LIB = '/Users/helge/code/markdown-fight/native/libmd4cshim.dylib';
-
     private const CDEF = <<<'C'
         char* md2html(const char* input, size_t input_len, size_t* out_len, unsigned int parser_flags, unsigned int renderer_flags);
         void md2html_free(char* p);
@@ -44,7 +42,7 @@ final class FfiBatchParser implements MarkdownParser
         try {
             $this->ffi = FFI::scope('MD4C');
         } catch (Throwable) {
-            $this->ffi = FFI::cdef(self::CDEF, self::LIB);
+            $this->ffi = FFI::cdef(self::CDEF, FfiParser::libPath());
         }
 
         $this->flags = $this->ffi->md2html_dialect_github();
@@ -160,7 +158,8 @@ final class FfiBatchParser implements MarkdownParser
     {
         $cpus = 4;
         if (function_exists('shell_exec')) {
-            $detected = (int) trim((string) @shell_exec('sysctl -n hw.ncpu 2>/dev/null'));
+            // macOS: sysctl; Linux: nproc. Whichever answers first wins.
+            $detected = (int) trim((string) @shell_exec('sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null'));
             if ($detected > 0) {
                 $cpus = $detected;
             }

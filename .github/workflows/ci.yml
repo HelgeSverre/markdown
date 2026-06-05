@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: PHP 8.5 · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.5 (FFI + opcache + tracing JIT)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi, opcache
+          ini-values: >-
+            opcache.enable_cli=1,
+            opcache.jit=tracing,
+            opcache.jit_buffer_size=64M,
+            ffi.enable=1
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Build the native md4c shim (.so / .dylib)
+        run: bash native/build.sh
+
+      - name: Correctness gate (render parity + GFM + speed sanity)
+        run: >-
+          php -d opcache.enable_cli=1
+          -d opcache.preload=bench/preload.php
+          -d ffi.enable=1
+          bench/ci_check.php
+
+      - name: Benchmark — small + medium corpora (smoke)
+        run: php bench/run.php corpus/ci-manifest.json || true

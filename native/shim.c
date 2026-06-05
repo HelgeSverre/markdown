@@ -32,6 +32,64 @@ static void membuf_append(const MD_CHAR* text, MD_SIZE size, void* userdata) {
 }
 
 /*
+ * Collapse anchors nested directly inside other anchors.
+ *
+ * md4c's GFM permissive-autolink will re-wrap the *text* of an explicit
+ * [text](url) link when that text is itself a bare URL, emitting invalid
+ * <a href="OUTER"><a href="INNER">text</a></a>. CommonMark/GFM (and league)
+ * never autolink inside link text. We fix it with a single in-place pass:
+ * any <a ...> seen while already inside an anchor is dropped (along with its
+ * matching </a>), keeping the outermost href and the visible text intact.
+ *
+ * Safe because md4c only ever emits real anchor tags as literal "<a"/"</a>"
+ * — any "<a" in document content is HTML-escaped (&lt;a) before it reaches us.
+ * Output length is always <= input length (we only delete tags), so this is
+ * done in place. Returns the new length.
+ */
+static size_t collapse_nested_anchors(char* s, size_t n) {
+    size_t w = 0;          /* write cursor */
+    size_t i = 0;          /* read cursor  */
+    int    depth = 0;      /* anchor depth in the OUTPUT (0 or 1) */
+    int    suppressed = 0; /* dropped inner opens whose </a> we must also drop */
+
+    while (i < n) {
+        /* closing </a> */
+        if (s[i] == '<' && i + 3 < n && s[i+1] == '/' && s[i+2] == 'a' && s[i+3] == '>') {
+            if (suppressed > 0) {            /* matches a dropped open: drop it too */
+                suppressed--;
+                i += 4;
+            } else {
+                s[w++] = '<'; s[w++] = '/'; s[w++] = 'a'; s[w++] = '>';
+                if (depth > 0) depth--;
+                i += 4;
+            }
+            continue;
+        }
+        /* opening <a ...> (md4c emits <a href="...">) */
+        if (s[i] == '<' && i + 2 < n && s[i+1] == 'a' &&
+            (s[i+2] == ' ' || s[i+2] == '>' || s[i+2] == '\t' || s[i+2] == '\n')) {
+            size_t j = i + 2;
+            while (j < n && s[j] != '>') j++;
+            if (j >= n) {                    /* unterminated tag: copy the rest verbatim */
+                while (i < n) s[w++] = s[i++];
+                break;
+            }
+            if (depth >= 1) {                /* nested open: drop it, remember its close */
+                suppressed++;
+            } else {                         /* top-level open: keep it */
+                for (size_t k = i; k <= j; k++) s[w++] = s[k];
+                depth++;
+            }
+            i = j + 1;
+            continue;
+        }
+        s[w++] = s[i++];
+    }
+    s[w] = '\0';
+    return w;
+}
+
+/*
  * Parse `input` (length `input_len`) markdown -> HTML.
  * Returns a malloc'd, NUL-terminated buffer and writes the byte length
  * (excluding the NUL) to *out_len. Caller MUST free via md2html_free().
@@ -50,6 +108,7 @@ char* md2html(const char* input, size_t input_len, size_t* out_len,
     /* ensure NUL terminator (membuf already reserved room for it) */
     if (b.cap == 0) { b.data = (char*)malloc(1); b.cap = 1; }
     b.data[b.size] = '\0';
+    b.size = collapse_nested_anchors(b.data, b.size);
     if (out_len) *out_len = b.size;
     return b.data;
 }
@@ -93,6 +152,14 @@ static void batch_render_one(batch_ctx* c, size_t i) {
     size_t doc_len = c->in_offsets[i + 1] - c->in_offsets[i];
     int rc = md_html(doc, (MD_SIZE)doc_len, membuf_append, b,
                      c->parser_flags, c->renderer_flags);
+    if (rc == 0 && b->size > 0) {
+        if (b->size + 1 > b->cap) {  /* ensure room for the NUL collapse writes */
+            b->data = (char*)realloc(b->data, b->size + 1);
+            b->cap = b->size + 1;
+        }
+        b->data[b->size] = '\0';
+        b->size = collapse_nested_anchors(b->data, b->size);
+    }
     c->ok[i] = (rc == 0) ? 1 : 0;
 }
 

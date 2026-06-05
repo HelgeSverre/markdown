@@ -1,7 +1,7 @@
 {
-    "name": "helge/markdown-fight",
-    "description": "A dirty-tricks markdown parser (FFI -> md4c) benchmarked against tempest/markdown and league/commonmark.",
-    "type": "project",
+    "name": "helgesverre/markdown",
+    "description": "A dirty-tricks Markdown parser (PHP FFI -> md4c). A Claude Code \"ultracode\" benchmark stunt, not a serious library.",
+    "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.5",
@@ -10,11 +10,17 @@
         "league/commonmark": "^2.7"
     },
     "require-dev": {
-        "phpbench/phpbench": "^1.4"
+        "phpbench/phpbench": "^1.4",
+        "phpunit/phpunit": "^13.2"
     },
     "autoload": {
         "psr-4": {
-            "MarkdownFight\\": "src/"
+            "HelgeSverre\\Markdown\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HelgeSverre\\Markdown\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -22,6 +28,27 @@
             "tempest/*": true
         },
         "optimize-autoloader": true
+    },
+    "scripts": {
+        "build": "bash native/build.sh",
+        "test": "phpunit",
+        "check": "@php -d opcache.enable_cli=1 -d opcache.preload=bench/preload.php -d ffi.enable=1 bench/ci_check.php",
+        "bench": "@php bench/run.php",
+        "bench:phpbench": "phpbench run bench/MarkdownBench.php --report=default",
+        "examples": [
+            "@php examples/01-basic.php",
+            "@php examples/02-render-file.php",
+            "@php examples/03-batch-multicore.php",
+            "@php examples/04-compare-parsers.php"
+        ]
+    },
+    "scripts-descriptions": {
+        "build": "Compile the native md4c FFI shim for this platform (.dylib/.so/.dll)",
+        "test": "Run the PHPUnit test suite",
+        "check": "Run the CI correctness gate (render parity + GFM + speed sanity)",
+        "bench": "Run the full head-to-head benchmark across the corpus",
+        "bench:phpbench": "Run the phpbench parity benchmark (the Tempest blog's methodology)",
+        "examples": "Run every examples/*.php acid-test script in order"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

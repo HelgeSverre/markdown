@@ -8,12 +8,17 @@ composer.phar
 *.swp
 .DS_Store
 
-# Compiled native FFI artifacts (build from native/shim.c)
+# Compiled native FFI artifacts (build with native/build.sh)
 native/*.dylib
 native/*.so
 native/*.dll
 native/*.o
 native/*.a
+# Generated FFI scope header (build.sh writes it with a machine-specific path)
+native/md4cshim.h
+
+# Example output
+/examples/output/
 
 # Tool caches
 .phpunit.result.cache

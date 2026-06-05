@@ -1,0 +1,26 @@
+[
+  {
+    "path": "synthetic/doc-2kb.md",
+    "bytes": 3708,
+    "label": "Synthetic feature-rich markdown, ~2KB tier",
+    "source": "synthetic"
+  },
+  {
+    "path": "synthetic/doc-16kb.md",
+    "bytes": 17624,
+    "label": "Synthetic feature-rich markdown, ~16KB tier",
+    "source": "synthetic"
+  },
+  {
+    "path": "synthetic/doc-128kb.md",
+    "bytes": 131537,
+    "label": "Synthetic feature-rich markdown, ~128KB tier",
+    "source": "synthetic"
+  },
+  {
+    "path": "tempest-docs.md",
+    "bytes": 258770,
+    "label": "Real Tempest docs corpus",
+    "source": "real"
+  }
+]
