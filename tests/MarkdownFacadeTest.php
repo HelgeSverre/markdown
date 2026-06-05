@@ -35,4 +35,14 @@ final class MarkdownFacadeTest extends TestCase
     {
         $this->assertSame(Markdown::toHtml("# X\n"), Markdown::toHtml("# X\n"));
     }
+
+    #[Test]
+    public function parse_returns_front_matter_html_and_toc(): void
+    {
+        $result = Markdown::parse("---\ntitle: Doc\n---\n# Heading\n");
+
+        $this->assertSame('Doc', $result->frontmatter['title']);
+        $this->assertStringContainsString('<h1 id="heading">Heading</h1>', $result->html);
+        $this->assertSame([['level' => 1, 'text' => 'Heading', 'slug' => 'heading']], $result->toc);
+    }
 }

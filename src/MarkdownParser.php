@@ -7,6 +7,4 @@ namespace HelgeSverre\Markdown;
 interface MarkdownParser
 {
     public function toHtml(string $markdown): string;
-
-    public function name(): string;
 }

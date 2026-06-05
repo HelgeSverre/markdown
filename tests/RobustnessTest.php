@@ -33,7 +33,7 @@ final class RobustnessTest extends TestCase
     #[DataProvider('hostileInputs')]
     public function it_never_crashes_on_hostile_input(string $input): void
     {
-        $html = (new FfiParser())->toHtml($input);
+        $html = new FfiParser()->toHtml($input);
 
         $this->assertIsString($html);
     }
@@ -43,7 +43,7 @@ final class RobustnessTest extends TestCase
     {
         // PHP's strlen() is binary-safe, so the (ptr, len) FFI path passes the
         // entire input through md4c — nothing is cut at the first NUL.
-        $html = (new FfiParser())->toHtml("alpha\x00omega\n");
+        $html = new FfiParser()->toHtml("alpha\x00omega\n");
 
         $this->assertStringContainsString('alpha', $html);
         $this->assertStringContainsString('omega', $html);

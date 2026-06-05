@@ -4,35 +4,36 @@
 
 A fast PHP Markdown parser that binds to the [md4c](https://github.com/mity/md4c) C library over FFI.
 
-> **What this is:** a Claude Code "ultracode" experiment — built by an agent fleet in a single session — whose goal was to beat the `tempest/markdown` and `league/commonmark` benchmarks by any means necessary. It works: ~13–59× faster on the same input. But it's PHP calling C, not a faster PHP parser. The numbers are real and reproducible; for production work, [use a real PHP parser](#use-a-real-parser-instead).
-
-## Requirements
-
-- **PHP 8.5+** with `ext-ffi`
-- A C compiler (`cc`/`clang`/`gcc`) **only if** you build from source — prebuilt binaries ship for the four supported platforms.
+> **What this is:** it started as a Claude Code "ultracode" experiment — an agent fleet in a single session, seeing how far it could beat the `tempest/markdown` and `league/commonmark` benchmarks. It worked (~13–59× faster on the same input), and it's grown into a real, tested GFM parser with front matter, heading anchors, and a table of contents. The one honest caveat: it's PHP calling C, so you ship a small native binary per platform. If that's a dealbreaker, a [pure-PHP parser](#alternatives) is the better fit.
 
 ## Install
 
 ```bash
-composer install
+composer require helgesverre/markdown
 ```
 
-That's it. Prebuilt shared libraries ship in [`lib/`](lib/) and the right one is picked at runtime, so the supported platforms need no compiler:
+Needs **PHP 8.5+** with the **FFI** extension. FFI ships with PHP — on the CLI it's on by default; for web/FPM set `ffi.enable=1` (or `preload`) in `php.ini`. **No C compiler required**: a prebuilt shared library for your platform is bundled and selected at runtime.
 
-| Platform | Artifact |
-|---|---|
-| macOS (Apple Silicon + Intel) | `lib/darwin/libmd4cshim.dylib` (universal) |
-| Linux x86-64 (glibc) | `lib/linux-x86_64/libmd4cshim.so` |
-| Linux aarch64 (glibc) | `lib/linux-aarch64/libmd4cshim.so` |
-| Windows x64 | `lib/windows-x86_64/md4cshim.dll` |
+| Platform | Min glibc | Artifact |
+|---|---|---|
+| macOS (Apple Silicon + Intel) | — | `lib/darwin/libmd4cshim.dylib` (universal) |
+| Linux x86-64 | 2.14 (≈ any distro since 2011) | `lib/linux-x86_64/libmd4cshim.so` |
+| Linux aarch64 | 2.17 | `lib/linux-aarch64/libmd4cshim.so` |
+| Windows x64 | — | `lib/windows-x86_64/md4cshim.dll` |
+
+> Verified clean-room: `composer require` on a stock `php:8.5-cli` Linux container loads the bundled `.so` and renders correctly — no system packages beyond the FFI extension. Every binary is exercised on its real platform in CI.
 
 `FfiParser::libPath()` resolves the artifact for your OS and architecture, checking in order:
 
 1. `$MARKDOWN_FFI_LIB` (explicit override)
-2. the shipped `lib/<platform>/` binary
-3. a dev build in `native/`
+2. the bundled `lib/<platform>/` binary
+3. a dev build in `native/` (for unshipped targets — `composer build`)
+
+Developing this repo instead of consuming it? Clone and run `composer install`.
 
 ## Usage
+
+### Render Markdown to HTML
 
 ```php
 use HelgeSverre\Markdown\Markdown;
@@ -41,16 +42,60 @@ $html  = Markdown::toHtml("# Hello\n\n- a\n- b\n");        // one document → G
 $htmls = Markdown::toHtmlBatch($arrayOfMarkdownStrings);  // many, across CPU cores in C
 ```
 
-The facade reuses a single parser instance under the hood. For explicit lifecycle control, construct [`FfiParser`](src/FfiParser.php) / [`FfiBatchParser`](src/FfiBatchParser.php) directly:
+The `Markdown` facade reuses a single parser instance under the hood. For explicit lifecycle control, construct [`FfiParser`](src/FfiParser.php) / [`FfiBatchParser`](src/FfiBatchParser.php) directly:
 
 ```php
 use HelgeSverre\Markdown\FfiParser;
 
 $parser = new FfiParser();
-$html = $parser->toHtml("# Hello\n");
+$html   = $parser->toHtml("# Hello\n");
 ```
 
-`toHtmlBatch` packs all documents into a single buffer and parses them across an OS thread pool in C, returning HTML in order.
+`toHtmlBatch` packs all documents into a single buffer and parses them across an OS thread pool in C, returning HTML in order. `toHtml()` is the fast path — raw Markdown in, HTML out, nothing else.
+
+### Parse a document: front matter + table of contents
+
+`parse()` does the document-level work md4c alone doesn't: it strips YAML front matter, adds GitHub-style `id` anchors to headings, and builds a table of contents. It returns a [`ParsedMarkdown`](src/ParsedMarkdown.php), which casts to its HTML string.
+
+```php
+use HelgeSverre\Markdown\Markdown;
+
+$doc = <<<MD
+---
+title: Hello World
+tags: [php, markdown]
+---
+# Introduction
+
+## Getting started
+MD;
+
+$result = Markdown::parse($doc);
+
+$result->html;         // <h1 id="introduction">Introduction</h1>\n<h2 id="getting-started">…
+$result->frontmatter;  // ['title' => 'Hello World', 'tags' => ['php', 'markdown']]
+$result->toc;          // [['level' => 1, 'text' => 'Introduction', 'slug' => 'introduction'], …]
+(string) $result;      // same as $result->html
+```
+
+Front matter is parsed with [`symfony/yaml`](https://symfony.com/doc/current/components/yaml.html) (a dependency, installed automatically); malformed front matter degrades to `[]` rather than throwing. Heading slugs are lower-cased, ASCII-folded, and de-duplicated (`intro`, `intro-1`, …). All of this runs in PHP on top of the C render, and **only** on `parse()` — the `toHtml()` fast path is untouched.
+
+### Options: dialect, safe HTML, XHTML
+
+The parser constructors take a few options (defaults shown):
+
+```php
+use HelgeSverre\Markdown\FfiParser;
+use HelgeSverre\Markdown\Dialect;
+
+new FfiParser(
+    dialect: Dialect::GitHub,   // ::GitHub (tables, strikethrough, task lists, autolinks) or ::CommonMark (strict)
+    safe: false,                // true → strip raw HTML (md4c MD_FLAG_NOHTML), for rendering untrusted input
+    xhtml: false,               // true → self-closing void tags (<br />, <hr />)
+);
+```
+
+`FfiBatchParser` takes the same options. The `Markdown` facade uses the defaults; for a different dialect or safe mode, construct an `FfiParser`/`FfiBatchParser` yourself.
 
 ## Build from source (optional)
 
@@ -58,7 +103,7 @@ Most people never need this — `composer install` already ships a binary for yo
 
 ```bash
 composer build       # compile the shim for THIS platform → native/
-composer build:all   # cross-compile all four shipped libraries → lib/
+composer build:all   # cross-compile every shipped library → lib/
 ```
 
 | Script | Tooling required | Output |
@@ -77,6 +122,7 @@ The C shim is Windows-safe — the batch path falls back to single-threaded wher
 | `composer test` | Run the PHPUnit suite |
 | `composer check` | CI correctness gate (render parity + GFM + speed sanity) |
 | `composer bench` | Full head-to-head benchmark across the corpus → `results/` |
+| `composer bench:frontmatter` | Front-matter extraction vs tempest, league, and raw `symfony/yaml` |
 | `composer bench:phpbench` | phpbench parity run (the Tempest blog's methodology) |
 | `composer examples` | Run every `examples/*.php` script in order |
 
@@ -99,21 +145,34 @@ Reproducible on this machine (PHP 8.5.5, Apple arm64) via `composer bench`. Each
 
 | Parser | mean ms | MB/s | peak MB | vs this |
 |---|--:|--:|--:|--:|
-| **helgesverre/markdown** (FFI→md4c) | **0.94** | **275.9** | 6.0 | — |
-| league/commonmark (GFM) | 24.31 | 10.7 | 10.0 | ~26× slower |
-| tempest/markdown | 40.71 | 6.4 | 8.0 | ~43× slower |
+| **helgesverre/markdown** (FFI→md4c) | **0.97** | **266.8** | 6.0 | — |
+| league/commonmark (GFM) | 25.52 | 10.1 | 10.0 | ~26× slower |
+| tempest/markdown | 42.41 | 6.1 | 8.0 | ~44× slower |
 
-Throughput holds ~170–250 MB/s flat from 2 KB to 8 MB, because md4c's working set stays small while pure-PHP parsers build an AST that grows with the document. On an **8 MB** document this parser does **50 ms at 39 MB peak**; `league-gfm` takes **3,806 ms at 375 MB**.
+Throughput holds ~160–270 MB/s flat from 2 KB to 8 MB, because md4c's working set stays small while pure-PHP parsers build an AST that grows with the document. On an **8 MB** document this parser does **51 ms at 41 MB peak**; `league-gfm` takes **3,804 ms at 375 MB**.
 
 Median across the whole corpus: **~13× faster than tempest, ~59× faster than league-gfm.**
 
 The Tempest pitch is "we're ~5× faster than league." The question this repo answers is how much faster you can go if PHP stops parsing Markdown itself.
 
+### Front-matter extraction
+
+`composer bench:frontmatter` isolates one feature — pulling the YAML front matter off a document — and compares it against raw `symfony/yaml` (the floor) and the other parsers:
+
+| Approach | mean µs | renders body? | vs floor |
+|---|--:|:--:|--:|
+| symfony/yaml (raw floor) | ~44 | no | 1.00× |
+| **helgesverre/markdown** (`FrontMatter::extract`) | ~48 | no | 0.92× |
+| league/commonmark (`FrontMatterParser`) | ~51 | no | 0.88× |
+| tempest/markdown (`parse()`) | ~431 | yes | 0.10× |
+
+Our dedicated extractor lands within a hair of the raw `symfony/yaml` floor — it adds only a cheap split on top of the same YAML parse. Parsers with no front-matter-only API (tempest) must render the whole document just to read its header, so they pay ~10×. (Front matter never touches the C shim — md4c has no YAML; it's a PHP-side concern.)
+
 ---
 
 ## How it beats the benchmarks
 
-The whole approach is to not parse Markdown in PHP at all. md4c does the work in C; PHP just moves bytes in and out. Five things keep the FFI boundary cheap.
+The whole approach is to not parse Markdown in PHP at all. md4c does the work in C; PHP just moves bytes in and out. A handful of tricks keep the FFI boundary cheap.
 
 ### 1. FFI → md4c
 
@@ -123,7 +182,7 @@ The parser is bound directly from PHP — PHP never touches a parse tree. It han
 
 ### 2. A flat-ABI C shim so no callbacks cross FFI
 
-md4c's native API calls *you* for every block and inline span. Routing those callbacks into PHP closures through FFI would mean a context switch per token. Instead, [`native/shim.c`](native/shim.c) buffers the whole document inside C (a `realloc`-backed membuf) and exposes one function:
+md4c's native API calls *you* for every block and inline span. Routing those callbacks into PHP closures through FFI would mean a context switch per token. Instead, [`native/shim.c`](native/shim.c) buffers the whole document inside C (a `realloc`-backed membuf) and exposes a small, flat C surface — the hot path is a single function:
 
 ```c
 char* md2html(const char* input, size_t input_len, size_t* out_len,
@@ -159,7 +218,7 @@ The methodology is honest like-for-like steady-state benchmarking: same input, i
 - **The memory column undercounts the win.** Output lives on the C heap, which PHP's `memory_get_peak_usage()` can't see. Measured with `/usr/bin/time -l` (which does count it), the real-RSS win on a 1 MB doc is ~2.3×, not the ~8× the Zend-only column suggests.
 - **The slowest rows rest on few samples** (8 MB × league ≈ 3 iterations). The trend is clear; those specific point estimates are low-confidence.
 
-On correctness, this parser matches `league` on GFM: visible text matches on every corpus file, anchor counts match exactly after the collapse pass, and all four GFM extensions render correctly. It's also *more* robust than `tempest`, which leaves some list items as literal paragraph text (`A list:\n- one` → `<p>A list:\n- one</p>`), fails setext headings, and — because it treats every leading `---` as mandatory YAML front matter, scans unbounded for a closing `---`, and never accepts the valid YAML `...` terminator — throws a hard exception on any document that simply opens with a `---` thematic break or uses `...`-closed front matter. That last case is exactly why it errors out on the CommonMark spec (md4c and `league` both render it fine).
+On correctness, this parser matches `league` on GFM: visible text matches on every corpus file, anchor counts match exactly after the collapse pass, and the GFM extensions (tables, strikethrough, task lists, autolinks) render correctly. It's also *more* robust than `tempest`, which leaves some list items as literal paragraph text (`A list:\n- one` → `<p>A list:\n- one</p>`), fails setext headings, and — because it treats every leading `---` as mandatory YAML front matter, scans unbounded for a closing `---`, and never accepts the valid YAML `...` terminator — throws a hard exception on any document that simply opens with a `---` thematic break or uses `...`-closed front matter. That last case is exactly why it errors out on the CommonMark spec (md4c and `league` both render it fine).
 
 ## Tests
 
@@ -167,13 +226,13 @@ On correctness, this parser matches `league` on GFM: visible text matches on eve
 composer test
 ```
 
-Five test files cover CommonMark plus all four GFM extensions, the nested-anchor collapse, visible-text parity against `league/commonmark`, batch-vs-sequential equivalence, the shipped-library guard, and a robustness battery: empty input, 1 MB of `#`, deeply nested structures, embedded NUL bytes, invalid UTF-8, and a leak check. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) builds and runs them on Linux and macOS.
+The suite in [`tests/`](tests/) covers CommonMark and the GFM extensions, the dialect/safe/XHTML options, the nested-anchor collapse, `parse()` (front matter, heading slugs + de-dup, table of contents), visible-text parity against `league/commonmark`, batch-vs-sequential equivalence, the shipped-library guard, and a robustness battery: empty input, megabytes of `#`, many identical headings (linear-time de-dup), deeply nested structures, embedded NUL bytes, invalid UTF-8, and a leak check. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) builds and runs them on Linux and macOS.
 
 ---
 
-## Use a real parser instead
+## Alternatives
 
-This repo is a benchmark experiment, not a Markdown library you should depend on. For real work, reach for one of these — both are pure PHP, need no native artifact, and are the libraries this project benchmarks against:
+It began as a benchmark experiment, and the tradeoff it makes is real: it's PHP calling C, so you ship a native binary per platform. If you'd rather not — you want pure PHP with no native artifact, or you're already in the Tempest ecosystem — these are excellent, and they're what this project benchmarks against:
 
 - **[`league/commonmark`](https://commonmark.thephpleague.com/)** — the de-facto standard PHP Markdown library. Strict CommonMark via `CommonMarkConverter`, GitHub-flavored Markdown via `GithubFlavoredMarkdownConverter`. Mature, extensible, widely used. If you're unsure, use this.
 - **[`tempest/markdown`](https://tempestphp.com/blog/tempest-markdown)** — the Markdown parser from the [Tempest framework](https://tempestphp.com), with a bundled syntax highlighter and heading-anchor generator. A good fit if you're already in the Tempest ecosystem or want highlighting and slugs out of the box.

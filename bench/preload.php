@@ -13,7 +13,7 @@ declare(strict_types=1);
  * Guarded so a double-preload (or a stray include) is a graceful no-op.
  */
 
-if (!extension_loaded('FFI')) {
+if (! extension_loaded('FFI')) {
     return;
 }
 

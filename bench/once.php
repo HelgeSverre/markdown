@@ -41,14 +41,15 @@ function bench_fail(string $parserId, string $corpusPath, string $message): neve
     $label = $corpusPath !== '' ? basename($corpusPath) : '(none)';
     fwrite(STDOUT, json_encode([
         'parserId' => $parserId,
-        'corpus'   => $label,
+        'corpus' => $label,
         'corpus_path' => $corpusPath,
-        'error'    => $message,
-    ], JSON_UNESCAPED_SLASHES) . "\n");
+        'error' => $message,
+    ], JSON_UNESCAPED_SLASHES)
+        . "\n");
     exit(0); // exit 0: the orchestrator parses stdout; a row-level error is not fatal.
 }
 
-$parserId   = $argv[1] ?? '';
+$parserId = $argv[1] ?? '';
 $corpusPath = $argv[2] ?? '';
 
 if ($parserId === '' || $corpusPath === '') {
@@ -58,12 +59,12 @@ if ($parserId === '' || $corpusPath === '') {
 $root = dirname(__DIR__);
 
 $autoload = $root . '/vendor/autoload.php';
-if (!is_file($autoload)) {
+if (! is_file($autoload)) {
     bench_fail($parserId, $corpusPath, "vendor/autoload.php not found at {$autoload}");
 }
 require $autoload;
 
-if (!is_file($corpusPath)) {
+if (! is_file($corpusPath)) {
     bench_fail($parserId, $corpusPath, "corpus file not found: {$corpusPath}");
 }
 $md = file_get_contents($corpusPath);
@@ -77,11 +78,11 @@ $label = basename($corpusPath);
 try {
     /** @var array<string, callable(string):string> $parsers */
     $parsers = require $root . '/bench/parsers.php';
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     bench_fail($parserId, $corpusPath, 'parser registry build failed: ' . $e->getMessage());
 }
 
-if (!isset($parsers[$parserId])) {
+if (! isset($parsers[$parserId])) {
     bench_fail($parserId, $corpusPath, "unknown parserId '{$parserId}'; known: " . implode(',', array_keys($parsers)));
 }
 $parse = $parsers[$parserId];
@@ -93,8 +94,8 @@ $parse = $parsers[$parserId];
 // we stop warming early after $warmupCeilingNs of cumulative warmup work — we
 // still always do at least 2 warmups (one to render, one to confirm a hot path)
 // so the timed numbers stay representative without a runaway child.
-$warmupIters       = 5;
-$warmupCeilingNs   = 2_000_000_000; // ~2s total spent on warmup, at most
+$warmupIters = 5;
+$warmupCeilingNs = 2_000_000_000; // ~2s total spent on warmup, at most
 $outBytes = 0;
 try {
     $firstHtml = '';
@@ -113,7 +114,7 @@ try {
         bench_fail($parserId, $corpusPath, 'parser produced empty output for non-empty input');
     }
     unset($firstHtml);
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     bench_fail($parserId, $corpusPath, 'warmup parse threw: ' . $e->getMessage());
 }
 
@@ -123,14 +124,14 @@ try {
 // cap the forced minimum so the child cannot blow past the orchestrator's
 // timeout. We use the warmup-measured single-parse cost to bound it: never
 // force more than ~$minWorkNs of guaranteed work.
-$budgetNs   = 1_000_000_000; // 1.0 second target
-$minWorkNs  = 3_000_000_000; // hard ceiling on the "forced minimum" phase (~3s)
-$minIters   = 20;
+$budgetNs = 1_000_000_000; // 1.0 second target
+$minWorkNs = 3_000_000_000; // hard ceiling on the "forced minimum" phase (~3s)
+$minIters = 20;
 if ($singleParseNs > 0) {
     // If 20 parses would exceed the ceiling, reduce the forced minimum
     // (but always do at least 3 timed iterations for a usable mean).
     $affordable = (int) max(3, intdiv($minWorkNs, $singleParseNs));
-    $minIters   = min($minIters, $affordable);
+    $minIters = min($minIters, $affordable);
 }
 
 $iters = 0;
@@ -148,7 +149,7 @@ try {
         $iters++;
         $elapsed = hrtime(true) - $start;
     }
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     bench_fail($parserId, $corpusPath, 'timed parse threw: ' . $e->getMessage());
 }
 if ($elapsed <= 0) {
@@ -156,26 +157,26 @@ if ($elapsed <= 0) {
 }
 
 $elapsedSec = $elapsed / 1e9;
-$opsPerSec  = $elapsedSec > 0 ? $iters / $elapsedSec : 0.0;
-$mbPerSec   = $elapsedSec > 0 ? ($bytes * $iters) / $elapsedSec / 1e6 : 0.0;
-$meanMs     = $iters > 0 ? ($elapsed / $iters) / 1e6 : 0.0;
-$peakMb     = memory_get_peak_usage(true) / 1048576;
+$opsPerSec = $elapsedSec > 0 ? $iters / $elapsedSec : 0.0;
+$mbPerSec = $elapsedSec > 0 ? (($bytes * $iters) / $elapsedSec) / 1e6 : 0.0;
+$meanMs = $iters > 0 ? ($elapsed / $iters) / 1e6 : 0.0;
+$peakMb = memory_get_peak_usage(true) / 1_048_576;
 
 $row = [
-    'parserId'    => $parserId,
-    'corpus'      => $label,
+    'parserId' => $parserId,
+    'corpus' => $label,
     'corpus_path' => $corpusPath,
-    'bytes'       => $bytes,
-    'iters'       => $iters,
-    'elapsed_s'   => round($elapsedSec, 6),
+    'bytes' => $bytes,
+    'iters' => $iters,
+    'elapsed_s' => round($elapsedSec, 6),
     'ops_per_sec' => round($opsPerSec, 3),
-    'mb_per_sec'  => round($mbPerSec, 4),
-    'mean_ms'     => round($meanMs, 6),
-    'out_bytes'   => $outBytes,
-    'peak_mb'     => round($peakMb, 4),
-    'php'         => PHP_VERSION,
-    'jit'         => function_exists('opcache_get_status'),
-    'error'       => null,
+    'mb_per_sec' => round($mbPerSec, 4),
+    'mean_ms' => round($meanMs, 6),
+    'out_bytes' => $outBytes,
+    'peak_mb' => round($peakMb, 4),
+    'php' => PHP_VERSION,
+    'jit' => function_exists('opcache_get_status'),
+    'error' => null,
 ];
 
 fwrite(STDOUT, json_encode($row, JSON_UNESCAPED_SLASHES) . "\n");

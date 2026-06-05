@@ -1,17 +1,19 @@
 {
     "name": "helgesverre/markdown",
-    "description": "A dirty-tricks Markdown parser (PHP FFI -> md4c). A Claude Code \"ultracode\" benchmark stunt, not a serious library.",
+    "description": "A dirty-tricks Markdown parser (PHP FFI -> md4c).",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.5",
         "ext-ffi": "*",
-        "tempest/markdown": "^1.0",
-        "league/commonmark": "^2.7"
+        "symfony/yaml": "^8.0"
     },
     "require-dev": {
-        "phpbench/phpbench": "^1.4",
-        "phpunit/phpunit": "^13.2"
+        "tempest/markdown": "^1.0",
+        "league/commonmark": "^2.7",
+        "phpbench/phpbench": "^1.6",
+        "phpunit/phpunit": "^13.2",
+        "carthage-software/mago": "^1.30"
     },
     "autoload": {
         "psr-4": {
@@ -33,8 +35,17 @@
         "build": "bash native/build.sh",
         "build:all": "bash native/build-all.sh",
         "test": "phpunit",
+        "format": "mago fmt",
+        "format:check": "mago fmt --check",
+        "lint": "mago lint",
+        "lint:fix": "mago lint --fix --format-after-fix",
+        "style": [
+            "@format",
+            "@lint:fix"
+        ],
         "check": "@php -d opcache.enable_cli=1 -d opcache.preload=bench/preload.php -d ffi.enable=1 bench/ci_check.php",
         "bench": "@php bench/run.php",
+        "bench:frontmatter": "@php bench/frontmatter.php",
         "bench:phpbench": "phpbench run bench/MarkdownBench.php --report=default",
         "corpus": [
             "@php corpus/gen_synthetic.php 1048576 corpus/synthetic/doc-1mb.md",
@@ -51,8 +62,14 @@
         "build": "Compile the native md4c FFI shim for this platform (.dylib/.so/.dll)",
         "build:all": "Cross-compile shipped libraries for all platforms into lib/ (needs zig)",
         "test": "Run the PHPUnit test suite",
+        "format": "Format all PHP code with Mago (same formatter Tempest uses)",
+        "format:check": "Verify formatting without writing changes (CI gate)",
+        "lint": "Report code-style/lint issues with Mago (non-failing warnings)",
+        "lint:fix": "Auto-fix safe lint issues, then reformat",
+        "style": "Format + auto-fix everything in one go (format then lint:fix)",
         "check": "Run the CI correctness gate (render parity + GFM + speed sanity)",
         "bench": "Run the full head-to-head benchmark across the corpus",
+        "bench:frontmatter": "Benchmark front-matter extraction vs tempest, league, and raw symfony/yaml",
         "bench:phpbench": "Run the phpbench parity benchmark (the Tempest blog's methodology)",
         "corpus": "Regenerate the large synthetic corpus tiers (doc-1mb/doc-8mb, not committed)",
         "examples": "Run every examples/*.php acid-test script in order"

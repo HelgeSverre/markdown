@@ -34,8 +34,10 @@ final class LeagueParityTest extends TestCase
     #[DataProvider('samples')]
     public function visible_text_matches_league_gfm(string $markdown): void
     {
-        $ours = (new FfiParser())->toHtml($markdown);
-        $league = (string) (new GithubFlavoredMarkdownConverter())->convert($markdown)->getContent();
+        $ours = new FfiParser()->toHtml($markdown);
+        $league = (string) new GithubFlavoredMarkdownConverter()
+            ->convert($markdown)
+            ->getContent();
 
         $this->assertSame($this->visibleText($league), $this->visibleText($ours));
     }
@@ -43,11 +45,12 @@ final class LeagueParityTest extends TestCase
     #[Test]
     public function anchor_count_matches_league_on_a_link_heavy_document(): void
     {
-        $markdown = "[a](http://a.com) and [b](http://b.com), bare https://c.com, "
-            . "and [https://d.com/x](https://d.com/x).\n";
+        $markdown = '[a](http://a.com) and [b](http://b.com), bare https://c.com, ' . "and [https://d.com/x](https://d.com/x).\n";
 
-        $ours = (new FfiParser())->toHtml($markdown);
-        $league = (string) (new GithubFlavoredMarkdownConverter())->convert($markdown)->getContent();
+        $ours = new FfiParser()->toHtml($markdown);
+        $league = (string) new GithubFlavoredMarkdownConverter()
+            ->convert($markdown)
+            ->getContent();
 
         $this->assertSame(substr_count($league, '<a '), substr_count($ours, '<a '));
     }

@@ -35,4 +35,13 @@ final class Markdown
     {
         return (self::$batch ??= new FfiBatchParser())->toHtmlBatch($documents);
     }
+
+    /**
+     * Parse a full document: split front matter, anchor headings, and return a
+     * ParsedMarkdown ({@see ParsedMarkdown::$html}, ::$frontmatter, ::$toc).
+     */
+    public static function parse(string $markdown): ParsedMarkdown
+    {
+        return (self::$parser ??= new FfiParser())->parse($markdown);
+    }
 }

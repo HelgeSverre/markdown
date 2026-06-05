@@ -15,9 +15,22 @@ use Throwable;
  * in a single malloc'd, NUL-terminated buffer so no PHP callback ever crosses
  * the FFI boundary. We copy it once with FFI::string and always free the C
  * buffer in a finally block.
+ *
+ *   toHtml()  — the fast path: raw Markdown -> HTML, nothing else.
+ *   parse()   — document-aware: strips front matter, anchors headings, and
+ *               returns a ParsedMarkdown (html + frontmatter + toc).
  */
 final class FfiParser implements MarkdownParser
 {
+    /**
+     * md4c flags we toggle from PHP — these mirror native/md4c/md4c.h. The
+     * GitHub dialect composite is fetched from C (md2html_dialect_github) so we
+     * never duplicate that value here.
+     */
+    public const MD_FLAG_NOHTML = 0x0060; // NOHTMLBLOCKS | NOHTMLSPANS
+
+    public const MD_HTML_FLAG_XHTML = 0x0008;
+
     private const CDEF = <<<'C'
         char* md2html(const char* input, size_t input_len, size_t* out_len, unsigned int parser_flags, unsigned int renderer_flags);
         void md2html_free(char* p);
@@ -26,11 +39,17 @@ final class FfiParser implements MarkdownParser
 
     private FFI $ffi;
 
-    /** Cached GitHub-dialect parser flags (GFM extensions on). */
+    /** Cached parser flags (md4c MD_FLAG_* bitmask). */
     private int $flags;
 
-    public function __construct()
-    {
+    /** Cached HTML renderer flags (md4c MD_HTML_FLAG_* bitmask). */
+    private int $rendererFlags;
+
+    public function __construct(
+        Dialect $dialect = Dialect::GitHub,
+        bool $safe = false,
+        bool $xhtml = false,
+    ) {
         // Fast path: bind against the opcache-preloaded scope. This skips the
         // C-declaration parse entirely on every request.
         try {
@@ -40,7 +59,19 @@ final class FfiParser implements MarkdownParser
             $this->ffi = FFI::cdef(self::CDEF, self::libPath());
         }
 
-        $this->flags = $this->ffi->md2html_dialect_github();
+        $this->flags = self::resolveParserFlags($this->ffi, $dialect, $safe);
+        $this->rendererFlags = $xhtml ? self::MD_HTML_FLAG_XHTML : 0;
+    }
+
+    /** Resolve md4c parser flags for a dialect + safety choice. */
+    public static function resolveParserFlags(FFI $ffi, Dialect $dialect, bool $safe): int
+    {
+        $flags = $dialect === Dialect::GitHub ? $ffi->md2html_dialect_github() : 0;
+        if ($safe) {
+            $flags |= self::MD_FLAG_NOHTML;
+        }
+
+        return $flags;
     }
 
     /**
@@ -65,20 +96,22 @@ final class FfiParser implements MarkdownParser
 
         $candidates = match (PHP_OS_FAMILY) {
             'Darwin' => [
-                $root . '/lib/darwin/libmd4cshim.dylib',   // universal: arm64 + x86_64
+                $root . '/lib/darwin/libmd4cshim.dylib', // universal: arm64 + x86_64
                 $root . '/native/libmd4cshim.dylib',
             ],
             'Windows' => [
                 $root . '/lib/windows-x86_64/md4cshim.dll',
                 $root . '/native/md4cshim.dll',
             ],
-            default => $isArm ? [
-                $root . '/lib/linux-aarch64/libmd4cshim.so',
-                $root . '/native/libmd4cshim.so',
-            ] : [
-                $root . '/lib/linux-x86_64/libmd4cshim.so',
-                $root . '/native/libmd4cshim.so',
-            ],
+            default => $isArm
+                ? [
+                    $root . '/lib/linux-aarch64/libmd4cshim.so',
+                    $root . '/native/libmd4cshim.so',
+                ]
+                : [
+                    $root . '/lib/linux-x86_64/libmd4cshim.so',
+                    $root . '/native/libmd4cshim.so',
+                ],
         };
 
         foreach ($candidates as $path) {
@@ -92,6 +125,7 @@ final class FfiParser implements MarkdownParser
         return $candidates[array_key_last($candidates)];
     }
 
+    /** Render Markdown to HTML. The fast path — no front matter, no anchors. */
     public function toHtml(string $markdown): string
     {
         // size_t out param so the shim can hand back the exact byte length.
@@ -107,7 +141,7 @@ final class FfiParser implements MarkdownParser
             strlen($markdown),
             FFI::addr($len),
             $this->flags,
-            0,
+            $this->rendererFlags,
         );
 
         if ($ptr === null) {
@@ -119,6 +153,22 @@ final class FfiParser implements MarkdownParser
         } finally {
             $this->ffi->md2html_free($ptr);
         }
+    }
+
+    /**
+     * Parse a full document: split front matter, render the body, then anchor
+     * the headings and collect a table of contents.
+     *
+     * The render itself runs at md4c speed in C; the document-level work (front
+     * matter, heading ids, TOC) happens in PHP. It only runs on this opt-in
+     * path, never in the toHtml() fast path.
+     */
+    public function parse(string $markdown): ParsedMarkdown
+    {
+        [$frontmatter, $body] = FrontMatter::extract($markdown);
+        [$html, $toc] = HeadingAnchors::process($this->toHtml($body));
+
+        return new ParsedMarkdown($html, $frontmatter, $toc);
     }
 
     public function name(): string

@@ -33,19 +33,25 @@ final class FfiBatchParser implements MarkdownParser
 
     private int $flags;
 
+    private int $rendererFlags;
+
     private bool $hasBatch;
 
     private FfiParser $sequential;
 
-    public function __construct()
-    {
+    public function __construct(
+        Dialect $dialect = Dialect::GitHub,
+        bool $safe = false,
+        bool $xhtml = false,
+    ) {
         try {
             $this->ffi = FFI::scope('MD4C');
         } catch (Throwable) {
             $this->ffi = FFI::cdef(self::CDEF, FfiParser::libPath());
         }
 
-        $this->flags = $this->ffi->md2html_dialect_github();
+        $this->flags = FfiParser::resolveParserFlags($this->ffi, $dialect, $safe);
+        $this->rendererFlags = $xhtml ? FfiParser::MD_HTML_FLAG_XHTML : 0;
 
         // Probe for the batch symbol once. Accessing an undefined C function on
         // the binding throws, so this is a reliable availability check.
@@ -57,7 +63,7 @@ final class FfiBatchParser implements MarkdownParser
             $this->hasBatch = false;
         }
 
-        $this->sequential = new FfiParser();
+        $this->sequential = new FfiParser($dialect, $safe, $xhtml);
     }
 
     public function toHtml(string $markdown): string
@@ -78,7 +84,7 @@ final class FfiBatchParser implements MarkdownParser
             return [];
         }
 
-        if (!$this->hasBatch) {
+        if (! $this->hasBatch) {
             return $this->sequentialBatch($docs);
         }
 
@@ -87,7 +93,7 @@ final class FfiBatchParser implements MarkdownParser
 
         // Pack all docs into one contiguous buffer + an (n+1) offset table.
         $packed = '';
-        $inOffsets = $this->ffi->new("size_t[" . ($n + 1) . "]");
+        $inOffsets = $this->ffi->new('size_t[' . ($n + 1) . ']');
         $inOffsets[0] = 0;
         $cursor = 0;
         foreach ($list as $i => $doc) {
@@ -96,7 +102,7 @@ final class FfiBatchParser implements MarkdownParser
             $inOffsets[$i + 1] = $cursor;
         }
 
-        $outOffsets = $this->ffi->new("size_t[" . ($n + 1) . "]");
+        $outOffsets = $this->ffi->new('size_t[' . ($n + 1) . ']');
 
         $threads = $this->workerCount($n);
 
@@ -106,7 +112,7 @@ final class FfiBatchParser implements MarkdownParser
             $n,
             $outOffsets,
             $this->flags,
-            0,
+            $this->rendererFlags,
             $threads,
         );
 

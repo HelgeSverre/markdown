@@ -34,6 +34,7 @@ lib/**/*.exp
 # Tool caches
 .phpunit.result.cache
 .phpunit.cache/
-.php-cs-fixer.cache
 .phpbench/
+# Mago's binary lives in vendor/; only a baseline dir would land here if ever generated.
+/.mago/
 /_storage/

@@ -1,4 +1,10 @@
 <?php
+
+use HelgeSverre\Markdown\FfiParser;
+use League\CommonMark\CommonMarkConverter;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+use Tempest\Markdown\Markdown;
+
 /**
  * bench/parsers.php — Uniform parser registry.
  *
@@ -33,18 +39,21 @@ return (static function (): array {
     $registry = [];
 
     // --- 'helgesverre/markdown' : our FFI -> md4c parser ----------------------------------
-    // HelgeSverre\Markdown\FfiParser is written by the native agent. It exists at run
-    // time. We construct exactly one instance and reuse it. We probe for the
-    // method name so we are resilient to its exact public API (parse / toHtml
-    // / convert / render / __invoke) without coupling tightly to one name.
-    if (class_exists(\HelgeSverre\Markdown\FfiParser::class)) {
-        $ours = new \HelgeSverre\Markdown\FfiParser();
+    // Construct one FfiParser and reuse it. The render method is resolved by
+    // probing (ordered below) so the registry stays decoupled from the exact
+    // public API.
+    if (class_exists(FfiParser::class)) {
+        $ours = new FfiParser();
         $call = null;
-        foreach (['parse', 'toHtml', 'convert', 'render', 'html'] as $m) {
-            if (method_exists($ours, $m)) {
-                $call = $m;
-                break;
+        // toHtml first: the throughput benchmark must measure the fast path,
+        // not parse() (which also strips front matter and anchors headings).
+        foreach (['toHtml', 'convert', 'render', 'html', 'parse'] as $m) {
+            if (! method_exists($ours, $m)) {
+                continue;
             }
+
+            $call = $m;
+            break;
         }
         if ($call !== null) {
             $registry['helgesverre/markdown'] = static function (string $md) use ($ours, $call): string {
@@ -57,32 +66,31 @@ return (static function (): array {
         } else {
             // Last resort: surface a clear error if the API is unexpected.
             $registry['helgesverre/markdown'] = static function (string $md): string {
-                throw new \RuntimeException(
-                    'HelgeSverre\Markdown\FfiParser exists but exposes no known parse method '
-                    . '(tried parse/toHtml/convert/render/html/__invoke).'
+                throw new RuntimeException(
+                    'HelgeSverre\Markdown\FfiParser exists but exposes no known parse method (tried parse/toHtml/convert/render/html/__invoke).',
                 );
             };
         }
     } else {
         $registry['helgesverre/markdown'] = static function (string $md): string {
-            throw new \RuntimeException('HelgeSverre\Markdown\FfiParser class not found (native agent not done?).');
+            throw new RuntimeException('HelgeSverre\Markdown\FfiParser not found — run `composer install` (and `composer build` on an unshipped platform).');
         };
     }
 
     // --- 'tempest' : tempest/markdown --------------------------------------
-    $tempest = new \Tempest\Markdown\Markdown();
+    $tempest = new Markdown();
     $registry['tempest'] = static function (string $md) use ($tempest): string {
         return (string) $tempest->parse($md)->html;
     };
 
     // --- 'league-gfm' : GitHub Flavored CommonMark -------------------------
-    $leagueGfm = new \League\CommonMark\GithubFlavoredMarkdownConverter();
+    $leagueGfm = new GithubFlavoredMarkdownConverter();
     $registry['league-gfm'] = static function (string $md) use ($leagueGfm): string {
         return (string) $leagueGfm->convert($md)->getContent();
     };
 
     // --- 'league-strict' : strict CommonMark -------------------------------
-    $leagueStrict = new \League\CommonMark\CommonMarkConverter();
+    $leagueStrict = new CommonMarkConverter();
     $registry['league-strict'] = static function (string $md) use ($leagueStrict): string {
         return (string) $leagueStrict->convert($md)->getContent();
     };

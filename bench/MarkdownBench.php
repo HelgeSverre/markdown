@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace HelgeSverre\Markdown\Bench;
 
-use League\CommonMark\GithubFlavoredMarkdownConverter;
+use Generator;
 use HelgeSverre\Markdown\FfiParser;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 use PhpBench\Attributes as Bench;
 use Tempest\Markdown\Markdown as TempestMarkdown;
+
+use function basename;
+use function class_exists;
+use function dirname;
+use function file_get_contents;
+use function is_callable;
+use function is_file;
+use function method_exists;
 
 /**
  * phpbench case — matches the blog's stated methodology (reused parser
@@ -45,7 +54,7 @@ final class MarkdownBench
      */
     public function setUp(): void
     {
-        if (\class_exists(FfiParser::class)) {
+        if (class_exists(FfiParser::class)) {
             $this->ours = new FfiParser();
         }
         $this->tempest = new TempestMarkdown();
@@ -55,68 +64,70 @@ final class MarkdownBench
     /**
      * Param provider: yields the representative corpus document under the key
      * 'md'. Prefers a real corpus file; falls back to a baked GFM sample so the
-     * case runs even before the corpus agent has populated corpus/.
+     * case runs even when corpus/ hasn't been generated yet.
      *
      * @return \Generator<string, array{md:string, label:string}>
      */
-    public function provideDocument(): \Generator
+    public function provideDocument(): Generator
     {
         $candidates = [
-            \dirname(__DIR__) . '/corpus/tempest-docs.md',
-            \dirname(__DIR__) . '/corpus/synthetic/tempest-docs.md',
+            dirname(__DIR__) . '/corpus/tempest-docs.md',
+            dirname(__DIR__) . '/corpus/synthetic/tempest-docs.md',
         ];
         foreach ($candidates as $path) {
-            if (\is_file($path)) {
-                $md = \file_get_contents($path);
-                if ($md !== false && $md !== '') {
-                    yield 'tempest-docs' => ['md' => $md, 'label' => \basename($path)];
+            if (! is_file($path)) {
+                continue;
+            }
 
-                    return;
-                }
+            $md = file_get_contents($path);
+            if ($md !== false && $md !== '') {
+                yield 'tempest-docs' => ['md' => $md, 'label' => basename($path)];
+
+                return;
             }
         }
 
         // Fallback representative GFM document (always runnable).
         $md = <<<'MD'
-# helgesverre/markdown
+            # helgesverre/markdown
 
-A representative **GitHub Flavored** document used as a fallback when the
-corpus has not been generated yet.
+            A representative **GitHub Flavored** document used as a fallback when the
+            corpus has not been generated yet.
 
-## Lists
+            ## Lists
 
-A list:
+            A list:
 
-- one
-- two
-  - nested
-- [x] done
-- [ ] todo
+            - one
+            - two
+              - nested
+            - [x] done
+            - [ ] todo
 
-## Table
+            ## Table
 
-| Feature      | Supported |
-|--------------|:---------:|
-| autolinks    | yes       |
-| tables       | yes       |
-| strikethrough| ~~no~~ yes |
-| tasklists    | yes       |
+            | Feature      | Supported |
+            |--------------|:---------:|
+            | autolinks    | yes       |
+            | tables       | yes       |
+            | strikethrough| ~~no~~ yes |
+            | tasklists    | yes       |
 
-## Code
+            ## Code
 
-Inline `code` and a fenced block:
+            Inline `code` and a fenced block:
 
-```php
-echo "hello";
-```
+            ```php
+            echo "hello";
+            ```
 
-> A blockquote with a https://example.com autolink and **emphasis**.
+            > A blockquote with a https://example.com autolink and **emphasis**.
 
-Paragraph with _emphasis_, `inline code`, and ~~struck~~ text repeated a few
-times to give the parser real work to chew on. Paragraph with _emphasis_,
-`inline code`, and ~~struck~~ text. Paragraph with _emphasis_, `inline code`,
-and ~~struck~~ text.
-MD;
+            Paragraph with _emphasis_, `inline code`, and ~~struck~~ text repeated a few
+            times to give the parser real work to chew on. Paragraph with _emphasis_,
+            `inline code`, and ~~struck~~ text. Paragraph with _emphasis_, `inline code`,
+            and ~~struck~~ text.
+            MD;
 
         yield 'fallback-gfm' => ['md' => $md, 'label' => 'fallback-gfm'];
     }
@@ -153,19 +164,19 @@ MD;
     private function callOurs(string $md): string
     {
         $p = $this->ours;
-        if (\method_exists($p, 'parse')) {
+        if (method_exists($p, 'parse')) {
             return (string) $p->parse($md);
         }
-        if (\method_exists($p, 'toHtml')) {
+        if (method_exists($p, 'toHtml')) {
             return (string) $p->toHtml($md);
         }
-        if (\method_exists($p, 'convert')) {
+        if (method_exists($p, 'convert')) {
             return (string) $p->convert($md);
         }
-        if (\method_exists($p, 'render')) {
+        if (method_exists($p, 'render')) {
             return (string) $p->render($md);
         }
-        if (\is_callable($p)) {
+        if (is_callable($p)) {
             return (string) $p($md);
         }
 

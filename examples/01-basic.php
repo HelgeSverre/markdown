@@ -38,4 +38,4 @@ $markdown = <<<MD
     ```
     MD;
 
-echo (new FfiParser())->toHtml($markdown);
+echo new FfiParser()->toHtml($markdown);

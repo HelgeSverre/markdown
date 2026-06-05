@@ -34,7 +34,7 @@ $contenders = [
     'tempest/markdown' => static function () use ($tempest, $markdown): string {
         try {
             return $tempest->parse($markdown)->html;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return 'ERROR: ' . $e->getMessage();
         }
     },
@@ -56,10 +56,10 @@ foreach ($contenders as $name => $fn) {
     for ($i = 0; $i < $iters; $i++) {
         $out = $fn();
     }
-    $ms = (hrtime(true) - $t) / 1e6 / $iters;
+    $ms = ((hrtime(true) - $t) / 1e6) / $iters;
 
     $errored = str_starts_with($out, 'ERROR:');
-    $mbs = $errored ? 0.0 : $bytes / 1e6 / ($ms / 1000);
+    $mbs = $errored ? 0.0 : ($bytes / 1e6) / ($ms / 1000);
     printf("%-34s %12.3f %12.1f %12s\n", $name, $ms, $mbs, $errored ? 'errored' : (string) strlen($out));
 
     $baseline ??= $ms;

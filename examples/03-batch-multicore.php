@@ -27,9 +27,11 @@ if ($files === []) {
 // comments or chat messages), so seed from the small corpus tiers only.
 $seed = [];
 foreach ($files as $f) {
-    if (filesize($f) <= 32 * 1024) {
-        $seed[] = (string) file_get_contents($f);
+    if (filesize($f) > (32 * 1024)) {
+        continue;
     }
+
+    $seed[] = (string) file_get_contents($f);
 }
 if ($seed === []) {
     $seed[] = (string) file_get_contents($files[0]);
@@ -56,6 +58,6 @@ $out = $batch->toHtmlBatch($docs);
 $batchMs = (hrtime(true) - $t) / 1e6;
 
 printf("Batch of %d documents, %.1f MB total markdown\n\n", count($docs), $totalBytes / 1e6);
-printf("  %-26s %9.2f ms   %7.0f MB/s\n", 'sequential (per-doc FFI)', $seqMs, $totalBytes / 1e6 / ($seqMs / 1000));
-printf("  %-26s %9.2f ms   %7.0f MB/s   %.2fx\n", 'batch (pthread pool)', $batchMs, $totalBytes / 1e6 / ($batchMs / 1000), $seqMs / $batchMs);
+printf("  %-26s %9.2f ms   %7.0f MB/s\n", 'sequential (per-doc FFI)', $seqMs, ($totalBytes / 1e6) / ($seqMs / 1000));
+printf("  %-26s %9.2f ms   %7.0f MB/s   %.2fx\n", 'batch (pthread pool)', $batchMs, ($totalBytes / 1e6) / ($batchMs / 1000), $seqMs / $batchMs);
 printf("\nProduced %d HTML docs, %.1f MB of output.\n", count($out), array_sum(array_map('strlen', $out)) / 1e6);

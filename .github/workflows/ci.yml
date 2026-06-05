@@ -7,6 +7,35 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Code style — Mago formatter check + linter (the same toolchain Tempest uses).
+  style:
+    name: code style · mago
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # Mago downloads its prebuilt binary on first run; GITHUB_TOKEN avoids the
+      # anonymous rate limit that commonly blocks shared CI runners.
+      - name: Check formatting
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: composer format:check
+
+      - name: Lint
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: composer lint
+
   # Validate the PREBUILT libraries we ship — each on its real OS + architecture.
   shipped:
     name: shipped · ${{ matrix.label }}

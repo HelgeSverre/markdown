@@ -39,12 +39,12 @@ $root = dirname(__DIR__);
 // ---- Configuration ---------------------------------------------------------
 $parserIds = ['helgesverre/markdown', 'tempest', 'league-gfm', 'league-strict'];
 
-$manifestPath = $argv[1] ?? ($root . '/corpus/manifest.json');
-$onceScript   = $root . '/bench/once.php';
-$preload      = $root . '/bench/preload.php';
-$resultsDir   = $root . '/results';
-$resultsJson  = $resultsDir . '/results.json';
-$resultsMd    = $resultsDir . '/RESULTS.md';
+$manifestPath = $argv[1] ?? $root . '/corpus/manifest.json';
+$onceScript = $root . '/bench/once.php';
+$preload = $root . '/bench/preload.php';
+$resultsDir = $root . '/results';
+$resultsJson = $resultsDir . '/results.json';
+$resultsMd = $resultsDir . '/RESULTS.md';
 
 $phpBin = PHP_BINARY;
 
@@ -55,8 +55,8 @@ $childTimeoutSec = 120;
 
 // ---- Resolve the corpus file list from the manifest ------------------------
 /**
- * Accepts several manifest shapes so we are robust to whatever the corpus
- * agent produced:
+ * Accepts several manifest shapes so we are robust to whatever shape the
+ * manifest uses:
  *   - { "files": ["a.md", "b.md"] }
  *   - { "files": [ {"path":"a.md","label":"A"}, ... ] }
  *   - { "corpus": [ ... ] }   (same item shapes)
@@ -67,7 +67,7 @@ $childTimeoutSec = 120;
  */
 function load_corpus(string $manifestPath): array
 {
-    if (!is_file($manifestPath)) {
+    if (! is_file($manifestPath)) {
         fwrite(STDERR, "WARN: manifest not found at {$manifestPath}\n");
         return [];
     }
@@ -77,24 +77,24 @@ function load_corpus(string $manifestPath): array
         return [];
     }
     $data = json_decode($raw, true);
-    if (!is_array($data)) {
+    if (! is_array($data)) {
         fwrite(STDERR, "WARN: manifest is not valid JSON\n");
         return [];
     }
 
     $items = $data['files'] ?? $data['corpus'] ?? (array_is_list($data) ? $data : []);
-    if (!is_array($items)) {
+    if (! is_array($items)) {
         return [];
     }
 
     $base = dirname($manifestPath);
-    $out  = [];
+    $out = [];
     foreach ($items as $item) {
         if (is_string($item)) {
             $path = $item;
             $label = basename($item);
         } elseif (is_array($item)) {
-            $path  = (string) ($item['path'] ?? $item['file'] ?? $item['name'] ?? '');
+            $path = (string) ($item['path'] ?? $item['file'] ?? $item['name'] ?? '');
             $label = (string) ($item['label'] ?? $item['name'] ?? ($path !== '' ? basename($path) : ''));
         } else {
             continue;
@@ -103,14 +103,14 @@ function load_corpus(string $manifestPath): array
             continue;
         }
         // Resolve relative paths against the manifest directory.
-        if (!str_starts_with($path, '/')) {
+        if (! str_starts_with($path, '/')) {
             $resolved = $base . '/' . $path;
             $path = is_file($resolved) ? $resolved : $path;
         }
         // Skip absent corpus files instead of erroring. The large synthetic
         // tiers (doc-1mb, doc-8mb) aren't committed — run `composer corpus`
         // to regenerate them and they'll be picked up automatically.
-        if (!is_file($path)) {
+        if (! is_file($path)) {
             fwrite(STDERR, "skipping {$path} (not found; run `composer corpus` to regenerate)\n");
             continue;
         }
@@ -134,9 +134,9 @@ function run_combo(
     string $parserId,
     array $corpus,
     string $preload,
-    int $timeoutSec
+    int $timeoutSec,
 ): array {
-    $isFight = ($parserId === 'helgesverre/markdown');
+    $isFight = $parserId === 'helgesverre/markdown';
 
     $cmd = [$phpBin];
     // Everyone gets opcache+JIT for fairness.
@@ -164,20 +164,20 @@ function run_combo(
     ];
 
     $errBase = [
-        'parserId'    => $parserId,
-        'corpus'      => $corpus['label'],
+        'parserId' => $parserId,
+        'corpus' => $corpus['label'],
         'corpus_path' => $corpus['path'],
-        'bytes'       => is_file($corpus['path']) ? (int) filesize($corpus['path']) : 0,
-        'iters'       => 0,
+        'bytes' => is_file($corpus['path']) ? (int) filesize($corpus['path']) : 0,
+        'iters' => 0,
         'ops_per_sec' => 0.0,
-        'mb_per_sec'  => 0.0,
-        'mean_ms'     => 0.0,
-        'out_bytes'   => 0,
-        'peak_mb'     => 0.0,
+        'mb_per_sec' => 0.0,
+        'mean_ms' => 0.0,
+        'out_bytes' => 0,
+        'peak_mb' => 0.0,
     ];
 
     $proc = @proc_open($cmd, $descriptors, $pipes, dirname($onceScript, 2));
-    if (!is_resource($proc)) {
+    if (! is_resource($proc)) {
         return $errBase + ['error' => 'proc_open failed (could not spawn php child)'];
     }
 
@@ -200,7 +200,7 @@ function run_combo(
         if ($echunk !== false) {
             $stderr .= $echunk;
         }
-        if (!$status['running']) {
+        if (! $status['running']) {
             break;
         }
         if (microtime(true) > $deadline) {
@@ -227,8 +227,8 @@ function run_combo(
     $jsonLine = end($lines) ?: '';
     $row = json_decode($jsonLine, true);
 
-    if (!is_array($row)) {
-        $detail = $stderr !== '' ? trim($stderr) : ('non-JSON output: ' . substr($stdout, 0, 240));
+    if (! is_array($row)) {
+        $detail = $stderr !== '' ? trim($stderr) : 'non-JSON output: ' . substr($stdout, 0, 240);
         if ($exit !== 0 && $detail === '') {
             $detail = "child exited with code {$exit}";
         }
@@ -242,7 +242,7 @@ function run_combo(
 // ---- Formatting helpers ----------------------------------------------------
 function fmt_num($v, int $decimals = 0): string
 {
-    if (!is_numeric($v)) {
+    if (! is_numeric($v)) {
         return (string) $v;
     }
     return number_format((float) $v, $decimals);
@@ -260,7 +260,7 @@ function fmt_bytes(int $b): string
 }
 
 // ---- Main ------------------------------------------------------------------
-@mkdir($resultsDir, 0775, true);
+@mkdir($resultsDir, 0o775, true);
 
 $corpusFiles = load_corpus($manifestPath);
 if ($corpusFiles === []) {
@@ -274,9 +274,9 @@ if ($corpusFiles === []) {
 $all = [];
 foreach ($corpusFiles as $corpus) {
     foreach ($parserIds as $parserId) {
-        fwrite(STDERR, sprintf("running %-14s  %s ... ", $parserId, $corpus['label']));
+        fwrite(STDERR, sprintf('running %-14s  %s ... ', $parserId, $corpus['label']));
         $row = run_combo($phpBin, $onceScript, $parserId, $corpus, $preload, $childTimeoutSec);
-        if (!empty($row['error'])) {
+        if (! empty($row['error'])) {
             fwrite(STDERR, 'ERROR: ' . $row['error'] . "\n");
         } else {
             fwrite(STDERR, sprintf(
@@ -284,7 +284,7 @@ foreach ($corpusFiles as $corpus) {
                 fmt_num($row['ops_per_sec'], 0),
                 fmt_num($row['mb_per_sec'], 1),
                 fmt_num($row['mean_ms'], 3),
-                fmt_num($row['peak_mb'], 2)
+                fmt_num($row['peak_mb'], 2),
             ));
         }
         $all[] = $row;
@@ -327,8 +327,8 @@ $md[] = '';
 foreach ($byCorpus as $corpusLabel => $rows) {
     // Sort: winners (no error, higher ops/sec) first; errored rows sink.
     usort($rows, static function ($a, $b) {
-        $ae = !empty($a['error']);
-        $be = !empty($b['error']);
+        $ae = ! empty($a['error']);
+        $be = ! empty($b['error']);
         if ($ae !== $be) {
             return $ae <=> $be; // non-errored first
         }
@@ -337,10 +337,12 @@ foreach ($byCorpus as $corpusLabel => $rows) {
 
     $bytes = 0;
     foreach ($rows as $r) {
-        if (!empty($r['bytes'])) {
-            $bytes = (int) $r['bytes'];
-            break;
+        if (empty($r['bytes'])) {
+            continue;
         }
+
+        $bytes = (int) $r['bytes'];
+        break;
     }
 
     // Reference numbers for speedup columns.
@@ -362,9 +364,9 @@ foreach ($byCorpus as $corpusLabel => $rows) {
 
     foreach ($rows as $i => $r) {
         $name = $r['parserId'];
-        $marker = ($i === 0 && empty($r['error'])) ? ' 🏆' : '';
+        $marker = $i === 0 && empty($r['error']) ? ' 🏆' : '';
 
-        if (!empty($r['error'])) {
+        if (! empty($r['error'])) {
             $err = str_replace(['|', "\n"], [' ', ' '], (string) $r['error']);
             $err = substr($err, 0, 80);
             $md[] = "| **{$name}** | — | — | — | — | — | — | — |  ⚠️ {$err}";
@@ -372,13 +374,13 @@ foreach ($byCorpus as $corpusLabel => $rows) {
         }
 
         $ops = (float) $r['ops_per_sec'];
-        $vsTempest = ($tempestOps && $tempestOps > 0) ? number_format($ops / $tempestOps, 2) . '×' : '—';
-        $vsLeague  = ($leagueGfmOps && $leagueGfmOps > 0) ? number_format($ops / $leagueGfmOps, 2) . '×' : '—';
+        $vsTempest = $tempestOps && $tempestOps > 0 ? number_format($ops / $tempestOps, 2) . '×' : '—';
+        $vsLeague = $leagueGfmOps && $leagueGfmOps > 0 ? number_format($ops / $leagueGfmOps, 2) . '×' : '—';
 
-        // Only annotate speedup for helgesverre/markdown (per spec), dash for others to keep focus.
+        // Only annotate speedups for our parser; dash the contenders to keep the focus there.
         if ($name !== 'helgesverre/markdown') {
-            $vsTempest = ($name === 'tempest') ? '1.00×' : $vsTempest;
-            $vsLeague  = ($name === 'league-gfm') ? '1.00×' : $vsLeague;
+            $vsTempest = $name === 'tempest' ? '1.00×' : $vsTempest;
+            $vsLeague = $name === 'league-gfm' ? '1.00×' : $vsLeague;
         }
 
         $md[] = sprintf(
@@ -391,7 +393,7 @@ foreach ($byCorpus as $corpusLabel => $rows) {
             fmt_num($r['peak_mb'], 2),
             fmt_num($r['out_bytes'], 0),
             $vsTempest,
-            $vsLeague
+            $vsLeague,
         );
     }
     $md[] = '';
@@ -411,15 +413,17 @@ exit(0);
 function build_headline(array $byCorpus): string
 {
     $oursVsTempest = [];
-    $oursVsLeague  = [];
-    $winnerCounts   = [];
+    $oursVsLeague = [];
+    $winnerCounts = [];
 
     foreach ($byCorpus as $rows) {
         $ops = [];
         foreach ($rows as $r) {
-            if (empty($r['error']) && isset($r['ops_per_sec'])) {
-                $ops[$r['parserId']] = (float) $r['ops_per_sec'];
+            if (! (empty($r['error']) && isset($r['ops_per_sec']))) {
+                continue;
             }
+
+            $ops[$r['parserId']] = (float) $r['ops_per_sec'];
         }
         if ($ops === []) {
             continue;
