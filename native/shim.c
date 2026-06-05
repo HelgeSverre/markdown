@@ -81,13 +81,14 @@ static int nested_anchor_is_generated_autolink(const char* s, size_t n, size_t i
  * [text](url) link when that text is itself a bare URL, emitting invalid
  * <a href="OUTER"><a href="INNER">text</a></a>. CommonMark/GFM (and league)
  * never autolink inside link text. We fix it with a single in-place pass:
- * any <a ...> seen while already inside an anchor is dropped (along with its
- * matching </a>), keeping the outermost href and the visible text intact.
+ * nested anchors whose text still looks like a permissive autolink are dropped
+ * (along with their matching </a>), keeping the outermost href and the visible
+ * text intact.
  *
- * Safe because md4c only ever emits real anchor tags as literal "<a"/"</a>"
- * — any "<a" in document content is HTML-escaped (&lt;a) before it reaches us.
- * Output length is always <= input length (we only delete tags), so this is
- * done in place. Returns the new length.
+ * Raw HTML is allowed by default, so a user-supplied nested <a> must survive;
+ * the autolink-text guard keeps this pass scoped to md4c's generated bad shape.
+ * Output length is always <= input length (we only delete tags), so this is done
+ * in place. Returns the new length.
  */
 static size_t collapse_nested_anchors(char* s, size_t n) {
     size_t w = 0;          /* write cursor */
