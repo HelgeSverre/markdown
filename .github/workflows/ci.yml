@@ -48,7 +48,8 @@ jobs:
           - { os: ubuntu-latest,    label: linux-x86_64 }
           - { os: ubuntu-24.04-arm, label: linux-aarch64 }
           - { os: macos-latest,     label: darwin-arm64 }
-          - { os: macos-13,         label: darwin-x86_64 }
+          # Disabled: the Intel macOS (macos-13) runners are too slow in CI.
+          # - { os: macos-13,         label: darwin-x86_64 }
           - { os: windows-latest,   label: windows-x86_64, experimental: true }
 
     steps:
