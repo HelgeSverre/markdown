@@ -22,7 +22,7 @@ use Tempest\Markdown\Markdown as TempestMarkdown;
  * feeds a representative corpus document (tempest-docs.md if present, else a
  * baked-in GFM sample so the case is always runnable).
  *
- * Memory caveat (same as the wall-clock rig): the 'fight' parser renders onto
+ * Memory caveat (same as the wall-clock rig): our parser renders onto
  * the C heap (md4c malloc), which PHP's memory metrics do not count. Compare
  * memory across parsers with that asymmetry in mind.
  */
@@ -33,7 +33,7 @@ use Tempest\Markdown\Markdown as TempestMarkdown;
 #[Bench\RetryThreshold(2.0)]
 final class MarkdownBench
 {
-    private ?FfiParser $fight = null;
+    private ?FfiParser $ours = null;
 
     private TempestMarkdown $tempest;
 
@@ -46,7 +46,7 @@ final class MarkdownBench
     public function setUp(): void
     {
         if (\class_exists(FfiParser::class)) {
-            $this->fight = new FfiParser();
+            $this->ours = new FfiParser();
         }
         $this->tempest = new TempestMarkdown();
         $this->leagueGfm = new GithubFlavoredMarkdownConverter();
@@ -78,7 +78,7 @@ final class MarkdownBench
 
         // Fallback representative GFM document (always runnable).
         $md = <<<'MD'
-# Markdown Fight
+# helgesverre/markdown
 
 A representative **GitHub Flavored** document used as a fallback when the
 corpus has not been generated yet.
@@ -123,13 +123,13 @@ MD;
 
     #[Bench\Subject]
     #[Bench\ParamProviders('provideDocument')]
-    public function benchFight(array $params): void
+    public function benchHelgesverreMarkdown(array $params): void
     {
-        if ($this->fight === null) {
+        if ($this->ours === null) {
             // FfiParser not available — skip work but keep the subject valid.
             return;
         }
-        $this->callFight($params['md']);
+        $this->callOurs($params['md']);
     }
 
     #[Bench\Subject]
@@ -150,9 +150,9 @@ MD;
      * Probe FfiParser's public API once and dispatch. Kept tiny so the timed
      * path stays representative.
      */
-    private function callFight(string $md): string
+    private function callOurs(string $md): string
     {
-        $p = $this->fight;
+        $p = $this->ours;
         if (\method_exists($p, 'parse')) {
             return (string) $p->parse($md);
         }

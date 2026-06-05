@@ -10,7 +10,7 @@
  *   results/RESULTS.md    — grouped, sorted tables + headline
  *
  * Process flags:
- *   - 'fight' is launched WITH the warm-FFI flags so the FFI handle is
+ *   - 'helgesverre/markdown' is launched WITH the warm-FFI flags so the FFI handle is
  *     preloaded via opcache and the JIT is hot:
  *        -d opcache.enable_cli=1
  *        -d opcache.preload=<root>/bench/preload.php
@@ -27,7 +27,7 @@
  *   php bench/run.php                 # uses corpus/manifest.json
  *   php bench/run.php <manifest.json> # override manifest path
  *
- * MEMORY CAVEAT carried through to RESULTS.md: 'fight' renders onto the C heap
+ * MEMORY CAVEAT carried through to RESULTS.md: 'helgesverre/markdown' renders onto the C heap
  * (md4c malloc), invisible to PHP's peak_mb — its memory number is
  * real-RSS-favorable. See note printed in RESULTS.md.
  */
@@ -37,7 +37,7 @@ declare(strict_types=1);
 $root = dirname(__DIR__);
 
 // ---- Configuration ---------------------------------------------------------
-$parserIds = ['fight', 'tempest', 'league-gfm', 'league-strict'];
+$parserIds = ['helgesverre/markdown', 'tempest', 'league-gfm', 'league-strict'];
 
 $manifestPath = $argv[1] ?? ($root . '/corpus/manifest.json');
 $onceScript   = $root . '/bench/once.php';
@@ -129,7 +129,7 @@ function run_combo(
     string $preload,
     int $timeoutSec
 ): array {
-    $isFight = ($parserId === 'fight');
+    $isFight = ($parserId === 'helgesverre/markdown');
 
     $cmd = [$phpBin];
     // Everyone gets opcache+JIT for fairness.
@@ -260,7 +260,7 @@ if ($corpusFiles === []) {
     fwrite(STDERR, "No corpus files resolved from manifest ({$manifestPath}). Nothing to run.\n");
     // Still write empty result artifacts so downstream steps don't choke.
     file_put_contents($resultsJson, json_encode([], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
-    file_put_contents($resultsMd, "# Markdown Fight — Results\n\nNo corpus files were found in `{$manifestPath}`.\n");
+    file_put_contents($resultsMd, "# helgesverre/markdown — benchmark results\n\nNo corpus files were found in `{$manifestPath}`.\n");
     exit(0);
 }
 
@@ -295,13 +295,13 @@ foreach ($all as $row) {
 }
 
 $md = [];
-$md[] = '# Markdown Fight — Results';
+$md[] = '# helgesverre/markdown — benchmark results';
 $md[] = '';
 $md[] = '_Generated ' . date('Y-m-d H:i:s') . ' · PHP ' . PHP_VERSION . ' · ' . php_uname('s') . ' ' . php_uname('m') . '_';
 $md[] = '';
 
 // Headline: overall winner by aggregate (geomean-ish) MB/s across corpora,
-// plus 'fight' speedups vs the two contenders on the largest corpus.
+// plus 'helgesverre/markdown' speedups vs the two contenders on the largest corpus.
 $headline = build_headline($byCorpus);
 $md[] = '> ' . $headline;
 $md[] = '';
@@ -311,10 +311,10 @@ $md[] = '## Methodology';
 $md[] = '';
 $md[] = '- Each (parser × corpus) combo runs in its **own php process** for a clean per-parser `memory_get_peak_usage(true)`.';
 $md[] = '- Warmup: ≥5 iterations. Timed: fixed **~1.0s wall-clock budget** (min 20 iters), measured with `hrtime(true)`.';
-$md[] = '- `fight` is launched with warm-FFI flags: `opcache.enable_cli=1`, `opcache.preload=bench/preload.php`, `ffi.enable=1`. All parsers get `opcache.enable_cli=1` + tracing JIT for fairness.';
+$md[] = '- `helgesverre/markdown` is launched with warm-FFI flags: `opcache.enable_cli=1`, `opcache.preload=bench/preload.php`, `ffi.enable=1`. All parsers get `opcache.enable_cli=1` + tracing JIT for fairness.';
 $md[] = '- Parser/converter instances are constructed **once**, outside the timed loop (steady-state comparison).';
 $md[] = '';
-$md[] = '> **Memory caveat (honest):** `fight` renders its HTML onto the **C heap** (md4c `malloc`), which PHP\'s `peak_mb` does **not** count — so `fight`\'s memory number is real-RSS-favorable (it undercounts the transient, immediately-freed C output buffer). Pure-PHP parsers keep all work on the Zend heap, so their `peak_mb` is a complete accounting. Read the memory column with that asymmetry in mind.';
+$md[] = '> **Memory caveat (honest):** `helgesverre/markdown` renders its HTML onto the **C heap** (md4c `malloc`), which PHP\'s `peak_mb` does **not** count — so `helgesverre/markdown`\'s memory number is real-RSS-favorable (it undercounts the transient, immediately-freed C output buffer). Pure-PHP parsers keep all work on the Zend heap, so their `peak_mb` is a complete accounting. Read the memory column with that asymmetry in mind.';
 $md[] = '';
 
 foreach ($byCorpus as $corpusLabel => $rows) {
@@ -368,8 +368,8 @@ foreach ($byCorpus as $corpusLabel => $rows) {
         $vsTempest = ($tempestOps && $tempestOps > 0) ? number_format($ops / $tempestOps, 2) . '×' : '—';
         $vsLeague  = ($leagueGfmOps && $leagueGfmOps > 0) ? number_format($ops / $leagueGfmOps, 2) . '×' : '—';
 
-        // Only annotate speedup for fight (per spec), dash for others to keep focus.
-        if ($name !== 'fight') {
+        // Only annotate speedup for helgesverre/markdown (per spec), dash for others to keep focus.
+        if ($name !== 'helgesverre/markdown') {
             $vsTempest = ($name === 'tempest') ? '1.00×' : $vsTempest;
             $vsLeague  = ($name === 'league-gfm') ? '1.00×' : $vsLeague;
         }
@@ -396,15 +396,15 @@ fwrite(STDERR, "\nWrote:\n  {$resultsJson}\n  {$resultsMd}\n");
 exit(0);
 
 /**
- * Build the one-line headline. Picks 'fight's median speedup vs each contender
+ * Build the one-line headline. Picks 'helgesverre/markdown's median speedup vs each contender
  * across corpora (using ops/sec), and names the overall throughput winner.
  *
  * @param array<string, list<array<string,mixed>>> $byCorpus
  */
 function build_headline(array $byCorpus): string
 {
-    $fightVsTempest = [];
-    $fightVsLeague  = [];
+    $oursVsTempest = [];
+    $oursVsLeague  = [];
     $winnerCounts   = [];
 
     foreach ($byCorpus as $rows) {
@@ -421,11 +421,11 @@ function build_headline(array $byCorpus): string
         $winner = array_key_first($ops);
         $winnerCounts[$winner] = ($winnerCounts[$winner] ?? 0) + 1;
 
-        if (isset($ops['fight'], $ops['tempest']) && $ops['tempest'] > 0) {
-            $fightVsTempest[] = $ops['fight'] / $ops['tempest'];
+        if (isset($ops['helgesverre/markdown'], $ops['tempest']) && $ops['tempest'] > 0) {
+            $oursVsTempest[] = $ops['helgesverre/markdown'] / $ops['tempest'];
         }
-        if (isset($ops['fight'], $ops['league-gfm']) && $ops['league-gfm'] > 0) {
-            $fightVsLeague[] = $ops['fight'] / $ops['league-gfm'];
+        if (isset($ops['helgesverre/markdown'], $ops['league-gfm']) && $ops['league-gfm'] > 0) {
+            $oursVsLeague[] = $ops['helgesverre/markdown'] / $ops['league-gfm'];
         }
     }
 
@@ -446,13 +446,13 @@ function build_headline(array $byCorpus): string
     arsort($winnerCounts);
     $overallWinner = array_key_first($winnerCounts);
 
-    $vt = $median($fightVsTempest);
-    $vl = $median($fightVsLeague);
+    $vt = $median($oursVsTempest);
+    $vl = $median($oursVsLeague);
 
     $parts = [];
     $parts[] = '**' . $overallWinner . '** wins on throughput';
     if ($vt > 0) {
-        $parts[] = sprintf('fight is ~%.1f× faster than tempest', $vt);
+        $parts[] = sprintf('helgesverre/markdown is ~%.1f× faster than tempest', $vt);
     }
     if ($vl > 0) {
         $parts[] = sprintf('~%.1f× faster than league-gfm', $vl);

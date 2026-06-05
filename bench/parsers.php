@@ -8,15 +8,15 @@
  * object construction. Construct once, here, outside any timed loop.
  *
  * Parsers:
- *   'fight'         — our FFI -> md4c parser (HelgeSverre\Markdown\FfiParser), GFM on
+ *   'helgesverre/markdown'         — our FFI -> md4c parser (HelgeSverre\Markdown\FfiParser), GFM on
  *   'tempest'       — tempest/markdown
  *   'league-gfm'    — league/commonmark GitHub Flavored
  *   'league-strict' — league/commonmark strict CommonMark
  *
- * MEMORY CAVEAT (read this before trusting peak_mb for 'fight'):
+ * MEMORY CAVEAT (read this before trusting peak_mb for 'helgesverre/markdown'):
  *   Our FFI parser allocates its HTML output on the C heap (md4c's malloc),
  *   which PHP's memory_get_peak_usage(true) does NOT account for. PHP only
- *   sees the FFI::string() copy back into a PHP string. So 'fight's reported
+ *   sees the FFI::string() copy back into a PHP string. So 'helgesverre/markdown's reported
  *   peak_mb is real-RSS-favorable — it undercounts the transient C-heap
  *   buffer. We note this honestly rather than hide it; the C buffer is freed
  *   immediately after each parse (md2html_free), so steady-state RSS stays
@@ -32,31 +32,31 @@
 return (static function (): array {
     $registry = [];
 
-    // --- 'fight' : our FFI -> md4c parser ----------------------------------
+    // --- 'helgesverre/markdown' : our FFI -> md4c parser ----------------------------------
     // HelgeSverre\Markdown\FfiParser is written by the native agent. It exists at run
     // time. We construct exactly one instance and reuse it. We probe for the
     // method name so we are resilient to its exact public API (parse / toHtml
     // / convert / render / __invoke) without coupling tightly to one name.
     if (class_exists(\HelgeSverre\Markdown\FfiParser::class)) {
-        $fight = new \HelgeSverre\Markdown\FfiParser();
+        $ours = new \HelgeSverre\Markdown\FfiParser();
         $call = null;
         foreach (['parse', 'toHtml', 'convert', 'render', 'html'] as $m) {
-            if (method_exists($fight, $m)) {
+            if (method_exists($ours, $m)) {
                 $call = $m;
                 break;
             }
         }
         if ($call !== null) {
-            $registry['fight'] = static function (string $md) use ($fight, $call): string {
-                return (string) $fight->{$call}($md);
+            $registry['helgesverre/markdown'] = static function (string $md) use ($ours, $call): string {
+                return (string) $ours->{$call}($md);
             };
-        } elseif (is_callable($fight)) {
-            $registry['fight'] = static function (string $md) use ($fight): string {
-                return (string) $fight($md);
+        } elseif (is_callable($ours)) {
+            $registry['helgesverre/markdown'] = static function (string $md) use ($ours): string {
+                return (string) $ours($md);
             };
         } else {
             // Last resort: surface a clear error if the API is unexpected.
-            $registry['fight'] = static function (string $md): string {
+            $registry['helgesverre/markdown'] = static function (string $md): string {
                 throw new \RuntimeException(
                     'HelgeSverre\Markdown\FfiParser exists but exposes no known parse method '
                     . '(tried parse/toHtml/convert/render/html/__invoke).'
@@ -64,7 +64,7 @@ return (static function (): array {
             };
         }
     } else {
-        $registry['fight'] = static function (string $md): string {
+        $registry['helgesverre/markdown'] = static function (string $md): string {
             throw new \RuntimeException('HelgeSverre\Markdown\FfiParser class not found (native agent not done?).');
         };
     }

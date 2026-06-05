@@ -24,12 +24,12 @@ $bytes = strlen($markdown);
 // Construct each parser ONCE, outside the timed loop — same steady-state,
 // instance-reuse methodology as the real benchmark (bench/run.php). Building a
 // fresh parser every call would time construction, not parsing.
-$fight = new FfiParser();
+$ours = new FfiParser();
 $league = new GithubFlavoredMarkdownConverter();
 $tempest = new TempestMarkdown();
 
 $contenders = [
-    'helgesverre/markdown (FFI→md4c)' => static fn (): string => $fight->toHtml($markdown),
+    'helgesverre/markdown (FFI→md4c)' => static fn (): string => $ours->toHtml($markdown),
     'league/commonmark (GFM)' => static fn (): string => (string) $league->convert($markdown)->getContent(),
     'tempest/markdown' => static function () use ($tempest, $markdown): string {
         try {

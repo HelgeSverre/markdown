@@ -37,7 +37,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Which library resolves on this runner?
-        run: php -r "require 'vendor/autoload.php'; echo HelgeSverre\\Markdown\\FfiParser::libPath(), PHP_EOL;"
+        run: php bench/which-lib.php
 
       - name: Test suite (against the shipped binary)
         run: composer test

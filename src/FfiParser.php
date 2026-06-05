@@ -123,6 +123,6 @@ final class FfiParser implements MarkdownParser
 
     public function name(): string
     {
-        return 'markdown-fight (FFI->md4c)';
+        return 'helgesverre/markdown (FFI→md4c)';
     }
 }

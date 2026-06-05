@@ -5,7 +5,7 @@
  * Usage:
  *   php bench/once.php <parserId> <corpusFilePath>
  *
- * For the 'fight' parser the orchestrator launches php with the warm-FFI
+ * For the 'helgesverre/markdown' parser the orchestrator launches php with the warm-FFI
  * flags (opcache.enable_cli, opcache.preload=bench/preload.php, ffi.enable).
  * For every parser it keeps opcache.enable_cli=1 for fairness.
  *
@@ -23,9 +23,9 @@
  *
  * ----------------------------------------------------------------------------
  * MEMORY CAVEAT (honest disclosure, do not delete):
- *   Our FFI 'fight' parser allocates its rendered HTML on the C heap (md4c
+ *   Our FFI 'helgesverre/markdown' parser allocates its rendered HTML on the C heap (md4c
  *   malloc), which PHP's memory_get_peak_usage(true) does NOT count. PHP only
- *   sees the FFI::string() copy into a PHP string. So 'fight's peak_mb is
+ *   sees the FFI::string() copy into a PHP string. So 'helgesverre/markdown's peak_mb is
  *   real-RSS-favorable: it undercounts the transient C-heap output buffer
  *   (which is freed right after each parse). Pure-PHP parsers (tempest,
  *   league) keep ALL their work on the PHP/Zend heap, so their peak_mb is a

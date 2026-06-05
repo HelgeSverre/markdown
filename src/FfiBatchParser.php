@@ -134,7 +134,7 @@ final class FfiBatchParser implements MarkdownParser
 
     public function name(): string
     {
-        return 'markdown-fight (FFI->md4c, batch)';
+        return 'helgesverre/markdown (FFI→md4c, batch)';
     }
 
     /**

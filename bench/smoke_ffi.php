@@ -41,7 +41,7 @@ echo 'FFI::scope("MD4C") available: ' . ($scopeAvailable ? 'YES (preloaded fast 
 echo "[TASK 1] FfiParser correctness\n";
 $p = new FfiParser();
 
-$p->name() === 'markdown-fight (FFI->md4c)' || fail('name()');
+$p->name() === 'helgesverre/markdown (FFI→md4c)' || fail('name()');
 ok('name() = ' . $p->name());
 
 $html = $p->toHtml("# Hi\n\n- a\n- b");

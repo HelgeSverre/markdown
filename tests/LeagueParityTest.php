@@ -34,10 +34,10 @@ final class LeagueParityTest extends TestCase
     #[DataProvider('samples')]
     public function visible_text_matches_league_gfm(string $markdown): void
     {
-        $fight = (new FfiParser())->toHtml($markdown);
+        $ours = (new FfiParser())->toHtml($markdown);
         $league = (string) (new GithubFlavoredMarkdownConverter())->convert($markdown)->getContent();
 
-        $this->assertSame($this->visibleText($league), $this->visibleText($fight));
+        $this->assertSame($this->visibleText($league), $this->visibleText($ours));
     }
 
     #[Test]
@@ -46,10 +46,10 @@ final class LeagueParityTest extends TestCase
         $markdown = "[a](http://a.com) and [b](http://b.com), bare https://c.com, "
             . "and [https://d.com/x](https://d.com/x).\n";
 
-        $fight = (new FfiParser())->toHtml($markdown);
+        $ours = (new FfiParser())->toHtml($markdown);
         $league = (string) (new GithubFlavoredMarkdownConverter())->convert($markdown)->getContent();
 
-        $this->assertSame(substr_count($league, '<a '), substr_count($fight, '<a '));
+        $this->assertSame(substr_count($league, '<a '), substr_count($ours, '<a '));
     }
 
     private function visibleText(string $html): string
