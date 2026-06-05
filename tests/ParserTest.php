@@ -78,9 +78,17 @@ final class ParserTest extends TestCase
         // bare autolinkable URL. The C shim's collapse pass fixes that.
         $html = $this->parser->toHtml("[https://x.com/a](https://x.com/a)\n");
 
-        $this->assertSame(0, preg_match('#<a[^>]*>\s*<a #', $html), 'no nested anchors');
+        $this->assertSame("<p><a href=\"https://x.com/a\">https://x.com/a</a></p>\n", $html);
+        $this->assertStringNotContainsString('<a href="https://x.com/a"><a ', $html);
         $this->assertSame(1, substr_count($html, '<a '), 'exactly one anchor');
-        $this->assertStringContainsString('https://x.com/a', $html);
+    }
+
+    #[Test]
+    public function it_does_not_rewrite_user_supplied_raw_nested_anchors(): void
+    {
+        $html = $this->parser->toHtml("<a href=\"outer\"><a href=\"inner\">x</a></a>\n");
+
+        $this->assertSame("<p><a href=\"outer\"><a href=\"inner\">x</a></a></p>\n", $html);
     }
 
     #[Test]

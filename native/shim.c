@@ -43,6 +43,37 @@ static void membuf_append(const MD_CHAR* text, MD_SIZE size, void* userdata) {
     b->size += size;
 }
 
+static int starts_with(const char* s, size_t n, const char* prefix) {
+    size_t plen = strlen(prefix);
+    return n >= plen && memcmp(s, prefix, plen) == 0;
+}
+
+static int looks_like_autolink_text(const char* s, size_t n) {
+    while (n > 0 && (*s == ' ' || *s == '\t' || *s == '\n' || *s == '\r')) {
+        s++;
+        n--;
+    }
+    while (n > 0 && (s[n - 1] == ' ' || s[n - 1] == '\t' || s[n - 1] == '\n' || s[n - 1] == '\r')) {
+        n--;
+    }
+
+    return starts_with(s, n, "http://")
+        || starts_with(s, n, "https://")
+        || starts_with(s, n, "www.");
+}
+
+static int nested_anchor_is_generated_autolink(const char* s, size_t n, size_t inner_start) {
+    size_t close = inner_start;
+    while (close + 3 < n) {
+        if (s[close] == '<' && s[close + 1] == '/' && s[close + 2] == 'a' && s[close + 3] == '>') {
+            return looks_like_autolink_text(s + inner_start, close - inner_start);
+        }
+        close++;
+    }
+
+    return 0;
+}
+
 /*
  * Collapse anchors nested directly inside other anchors.
  *
@@ -61,41 +92,59 @@ static void membuf_append(const MD_CHAR* text, MD_SIZE size, void* userdata) {
 static size_t collapse_nested_anchors(char* s, size_t n) {
     size_t w = 0;          /* write cursor */
     size_t i = 0;          /* read cursor  */
-    int    depth = 0;      /* anchor depth in the OUTPUT (0 or 1) */
-    int    suppressed = 0; /* dropped inner opens whose </a> we must also drop */
+    int    depth = 0;      /* anchor depth in the OUTPUT */
+    int    suppressed = 0; /* dropped generated opens whose </a> we must also drop */
 
+    /* Until a tag is actually dropped, w == i and every "copy" would be a
+     * self-write, so we only move bytes once something has been deleted.
+     * Ordinary text — the vast majority, since nesting only happens for the
+     * GFM [url](url) case — is skipped in bulk with memchr, not byte by byte. */
     while (i < n) {
+        if (s[i] != '<') {
+            const char* lt = (const char*)memchr(s + i, '<', n - i);
+            size_t run = lt ? (size_t)(lt - (s + i)) : (n - i);
+            if (w != i) memmove(s + w, s + i, run);
+            w += run; i += run;
+            continue;
+        }
         /* closing </a> */
-        if (s[i] == '<' && i + 3 < n && s[i+1] == '/' && s[i+2] == 'a' && s[i+3] == '>') {
+        if (i + 3 < n && s[i+1] == '/' && s[i+2] == 'a' && s[i+3] == '>') {
             if (suppressed > 0) {            /* matches a dropped open: drop it too */
                 suppressed--;
-                i += 4;
             } else {
-                s[w++] = '<'; s[w++] = '/'; s[w++] = 'a'; s[w++] = '>';
+                if (w != i) memmove(s + w, s + i, 4);
+                w += 4;
                 if (depth > 0) depth--;
-                i += 4;
             }
+            i += 4;
             continue;
         }
         /* opening <a ...> (md4c emits <a href="...">) */
-        if (s[i] == '<' && i + 2 < n && s[i+1] == 'a' &&
+        if (i + 2 < n && s[i+1] == 'a' &&
             (s[i+2] == ' ' || s[i+2] == '>' || s[i+2] == '\t' || s[i+2] == '\n')) {
             size_t j = i + 2;
             while (j < n && s[j] != '>') j++;
             if (j >= n) {                    /* unterminated tag: copy the rest verbatim */
-                while (i < n) s[w++] = s[i++];
+                size_t run = n - i;
+                if (w != i) memmove(s + w, s + i, run);
+                w += run; i += run;
                 break;
             }
-            if (depth >= 1) {                /* nested open: drop it, remember its close */
+            if (depth >= 1 && nested_anchor_is_generated_autolink(s, n, j + 1)) {
+                /* Generated nested autolink: drop it, remember its close. */
                 suppressed++;
             } else {                         /* top-level open: keep it */
-                for (size_t k = i; k <= j; k++) s[w++] = s[k];
+                size_t run = j - i + 1;
+                if (w != i) memmove(s + w, s + i, run);
+                w += run;
                 depth++;
             }
             i = j + 1;
             continue;
         }
-        s[w++] = s[i++];
+        /* a '<' that is neither <a...> nor </a> (e.g. <p>, <code>): keep it */
+        if (w != i) s[w] = s[i];
+        w++; i++;
     }
     s[w] = '\0';
     return w;
@@ -110,6 +159,12 @@ static size_t collapse_nested_anchors(char* s, size_t n) {
 MDF_EXPORT char* md2html(const char* input, size_t input_len, size_t* out_len,
               unsigned int parser_flags, unsigned int renderer_flags) {
     membuf b = {0, 0, 0};
+    /* Seed the output buffer from the input size so the realloc-doubling in
+     * membuf_append rarely fires: GFM HTML output is a small multiple of the
+     * markdown, so one up-front malloc usually holds the whole render. */
+    size_t seed = input_len + (input_len >> 1) + 64;
+    b.data = (char*)malloc(seed);
+    if (b.data) b.cap = seed;
     int rc = md_html(input, (MD_SIZE)input_len, membuf_append, &b,
                      parser_flags, renderer_flags);
     if (rc != 0) {
@@ -329,6 +384,11 @@ MDF_EXPORT char* md2html_anchor(const char* html, size_t html_len, size_t* out_l
                                 char** toc_out, size_t* toc_len_out) {
     membuf out = {0, 0, 0};
     membuf toc = {0, 0, 0};
+    /* Anchoring only injects id="slug" into headings, so output tracks input
+     * size closely — seed it to avoid realloc churn on large documents. */
+    size_t out_seed = html_len + (html_len >> 4) + 64;
+    out.data = (char*)malloc(out_seed);
+    if (out.data) out.cap = out_seed;
     hashmap map;
     hm_init(&map);
 
@@ -424,6 +484,10 @@ static void batch_render_one(batch_ctx* c, size_t i) {
     b->data = NULL; b->size = 0; b->cap = 0;
     const char* doc = c->packed + c->in_offsets[i];
     size_t doc_len = c->in_offsets[i + 1] - c->in_offsets[i];
+    /* Seed per-doc output from the doc size (same rationale as md2html). */
+    size_t seed = doc_len + (doc_len >> 1) + 64;
+    b->data = (char*)malloc(seed);
+    if (b->data) b->cap = seed;
     int rc = md_html(doc, (MD_SIZE)doc_len, membuf_append, b,
                      c->parser_flags, c->renderer_flags);
     if (rc == 0 && b->size > 0) {
