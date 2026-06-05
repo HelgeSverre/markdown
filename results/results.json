@@ -5,10 +5,10 @@
             "parserId": "helgesverre/markdown",
             "corpus": "doc-2kb.md",
             "bytes": 3889,
-            "ops_per_sec": 46329.87597011804,
-            "mb_per_sec": 180.17688764778904,
-            "mean_ms": 0.0215843444227,
-            "peak_mb": 3.0443801879882812,
+            "ops_per_sec": 47448.81377965421,
+            "mb_per_sec": 184.52843678907522,
+            "mean_ms": 0.021075342465754,
+            "peak_mb": 3.222442626953125,
             "error": false
         },
         {
@@ -16,10 +16,10 @@
             "parserId": "helgesverre/markdown",
             "corpus": "doc-16kb.md",
             "bytes": 18527,
-            "ops_per_sec": 10411.212325571376,
-            "mb_per_sec": 192.8885307558609,
-            "mean_ms": 0.09605029354207499,
-            "peak_mb": 3.0443878173828125,
+            "ops_per_sec": 10448.337978175054,
+            "mb_per_sec": 193.57635772164923,
+            "mean_ms": 0.09570900195694701,
+            "peak_mb": 3.2224502563476562,
             "error": false
         },
         {
@@ -27,10 +27,10 @@
             "parserId": "helgesverre/markdown",
             "corpus": "doc-128kb.md",
             "bytes": 138308,
-            "ops_per_sec": 1411.582323011437,
-            "mb_per_sec": 195.23312793106584,
-            "mean_ms": 0.7084248532289801,
-            "peak_mb": 3.0443878173828125,
+            "ops_per_sec": 1416.0671243528443,
+            "mb_per_sec": 195.85341183499318,
+            "mean_ms": 0.70618121330725,
+            "peak_mb": 3.2224502563476562,
             "error": false
         },
         {
@@ -38,10 +38,10 @@
             "parserId": "helgesverre/markdown",
             "corpus": "commonmark-spec.md",
             "bytes": 169307,
-            "ops_per_sec": 1161.312960888978,
-            "mb_per_sec": 196.6184134692302,
-            "mean_ms": 0.86109432485323,
-            "peak_mb": 3.0443954467773438,
+            "ops_per_sec": 1157.925387457471,
+            "mb_per_sec": 196.04487357426206,
+            "mean_ms": 0.86361350293542,
+            "peak_mb": 3.2224578857421875,
             "error": false
         },
         {
@@ -49,10 +49,10 @@
             "parserId": "helgesverre/markdown",
             "corpus": "tempest-docs.md",
             "bytes": 258087,
-            "ops_per_sec": 1211.6668101223256,
-            "mb_per_sec": 312.71545202404064,
-            "mean_ms": 0.82530939334638,
-            "peak_mb": 3.0443878173828125,
+            "ops_per_sec": 1194.482565814023,
+            "mb_per_sec": 308.2804219632437,
+            "mean_ms": 0.8371825831702401,
+            "peak_mb": 3.2224502563476562,
             "error": false
         },
         {
@@ -60,10 +60,10 @@
             "parserId": "helgesverre/markdown (parse)",
             "corpus": "doc-2kb.md",
             "bytes": 3889,
-            "ops_per_sec": 16529.78110170509,
-            "mb_per_sec": 64.2843187045311,
-            "mean_ms": 0.06049686888454,
-            "peak_mb": 3.0443801879882812,
+            "ops_per_sec": 17580.678455927882,
+            "mb_per_sec": 68.37125851510353,
+            "mean_ms": 0.056880626223092,
+            "peak_mb": 3.222442626953125,
             "error": false
         },
         {
@@ -71,10 +71,10 @@
             "parserId": "helgesverre/markdown (parse)",
             "corpus": "doc-16kb.md",
             "bytes": 18527,
-            "ops_per_sec": 5109.698527786854,
-            "mb_per_sec": 94.66738462430705,
-            "mean_ms": 0.19570626223092,
-            "peak_mb": 3.0443878173828125,
+            "ops_per_sec": 5257.228689447872,
+            "mb_per_sec": 97.40067592940073,
+            "mean_ms": 0.19021428571429003,
+            "peak_mb": 3.2224502563476562,
             "error": false
         },
         {
@@ -82,10 +82,10 @@
             "parserId": "helgesverre/markdown (parse)",
             "corpus": "doc-128kb.md",
             "bytes": 138308,
-            "ops_per_sec": 916.9840520143628,
-            "mb_per_sec": 126.82623026600248,
-            "mean_ms": 1.0905315068493,
-            "peak_mb": 3.0443878173828125,
+            "ops_per_sec": 923.7479509426137,
+            "mb_per_sec": 127.76173159897101,
+            "mean_ms": 1.0825463796478,
+            "peak_mb": 3.2224502563476562,
             "error": false
         },
         {
@@ -93,10 +93,10 @@
             "parserId": "helgesverre/markdown (parse)",
             "corpus": "commonmark-spec.md",
             "bytes": 169307,
-            "ops_per_sec": 948.0229269419623,
-            "mb_per_sec": 160.50691769176282,
-            "mean_ms": 1.0548268101761,
-            "peak_mb": 3.0443954467773438,
+            "ops_per_sec": 760.7046477118507,
+            "mb_per_sec": 128.79262179015032,
+            "mean_ms": 1.3145706457926,
+            "peak_mb": 3.2224578857421875,
             "error": false
         },
         {
@@ -104,10 +104,10 @@
             "parserId": "helgesverre/markdown (parse)",
             "corpus": "tempest-docs.md",
             "bytes": 258087,
-            "ops_per_sec": 888.015509512395,
-            "mb_per_sec": 229.1852588035255,
-            "mean_ms": 1.1261064579256,
-            "peak_mb": 3.0443878173828125,
+            "ops_per_sec": 896.0505912618747,
+            "mb_per_sec": 231.25900894700348,
+            "mean_ms": 1.1160084148728,
+            "peak_mb": 3.2224502563476562,
             "error": false
         },
         {
@@ -115,10 +115,10 @@
             "parserId": "tempest",
             "corpus": "doc-2kb.md",
             "bytes": 3889,
-            "ops_per_sec": 569.1204594127367,
-            "mb_per_sec": 2.213309466656133,
-            "mean_ms": 1.757097260274,
-            "peak_mb": 3.0443344116210938,
+            "ops_per_sec": 586.2672125644183,
+            "mb_per_sec": 2.279993189663023,
+            "mean_ms": 1.7057068493151,
+            "peak_mb": 3.2223968505859375,
             "error": false
         },
         {
@@ -126,10 +126,10 @@
             "parserId": "tempest",
             "corpus": "doc-16kb.md",
             "bytes": 18527,
-            "ops_per_sec": 354.60850180474876,
-            "mb_per_sec": 6.56983171293658,
-            "mean_ms": 2.8200113502936,
-            "peak_mb": 3.044342041015625,
+            "ops_per_sec": 355.3649396255154,
+            "mb_per_sec": 6.583846236441923,
+            "mean_ms": 2.8140086105675,
+            "peak_mb": 3.2224044799804688,
             "error": false
         },
         {
@@ -137,10 +137,10 @@
             "parserId": "tempest",
             "corpus": "doc-128kb.md",
             "bytes": 138308,
-            "ops_per_sec": 92.76946611571849,
-            "mb_per_sec": 12.830759319532792,
-            "mean_ms": 10.779408806262,
-            "peak_mb": 3.044342041015625,
+            "ops_per_sec": 91.36807365632781,
+            "mb_per_sec": 12.636935531259388,
+            "mean_ms": 10.944742074364,
+            "peak_mb": 3.2224044799804688,
             "error": false
         },
         {
@@ -159,10 +159,10 @@
             "parserId": "tempest",
             "corpus": "tempest-docs.md",
             "bytes": 258087,
-            "ops_per_sec": 41.295947317555296,
-            "mb_per_sec": 10.657947155345893,
-            "mean_ms": 24.215451272015997,
-            "peak_mb": 3.5862655639648438,
+            "ops_per_sec": 23.67004425228255,
+            "mb_per_sec": 6.108930710938846,
+            "mean_ms": 42.247491780821996,
+            "peak_mb": 3.7588119506835938,
             "error": false
         },
         {
@@ -170,10 +170,10 @@
             "parserId": "league-gfm",
             "corpus": "doc-2kb.md",
             "bytes": 3889,
-            "ops_per_sec": 173.43738852574492,
-            "mb_per_sec": 0.674498003976622,
-            "mean_ms": 5.7657694716244,
-            "peak_mb": 3.4723587036132812,
+            "ops_per_sec": 186.6783140295993,
+            "mb_per_sec": 0.7259919632611117,
+            "mean_ms": 5.3568086105676,
+            "peak_mb": 3.68243408203125,
             "error": false
         },
         {
@@ -181,10 +181,10 @@
             "parserId": "league-gfm",
             "corpus": "doc-16kb.md",
             "bytes": 18527,
-            "ops_per_sec": 123.22997682287725,
-            "mb_per_sec": 2.283081780597447,
-            "mean_ms": 8.1149086105675,
-            "peak_mb": 8.267929077148438,
+            "ops_per_sec": 115.79968395070699,
+            "mb_per_sec": 2.145420744554748,
+            "mean_ms": 8.635602152642099,
+            "peak_mb": 8.426811218261719,
             "error": false
         },
         {
@@ -192,10 +192,10 @@
             "parserId": "league-gfm",
             "corpus": "doc-128kb.md",
             "bytes": 138308,
-            "ops_per_sec": 24.868428130362112,
-            "mb_per_sec": 3.439502557854123,
-            "mean_ms": 40.211628767123,
-            "peak_mb": 47.740234375,
+            "ops_per_sec": 23.732875534369306,
+            "mb_per_sec": 3.28244654940755,
+            "mean_ms": 42.135644227006,
+            "peak_mb": 47.916908264160156,
             "error": false
         },
         {
@@ -203,10 +203,10 @@
             "parserId": "league-gfm",
             "corpus": "commonmark-spec.md",
             "bytes": 169307,
-            "ops_per_sec": 36.056971341276544,
-            "mb_per_sec": 6.104697646877507,
-            "mean_ms": 27.733887866927997,
-            "peak_mb": 26.9342041015625,
+            "ops_per_sec": 34.74770784127219,
+            "mb_per_sec": 5.88303017148227,
+            "mean_ms": 28.778876712329,
+            "peak_mb": 27.110862731933594,
             "error": false
         },
         {
@@ -214,10 +214,10 @@
             "parserId": "league-gfm",
             "corpus": "tempest-docs.md",
             "bytes": 258087,
-            "ops_per_sec": 42.129821602464844,
-            "mb_per_sec": 10.873159267915344,
-            "mean_ms": 23.7361555773,
-            "peak_mb": 21.140731811523438,
+            "ops_per_sec": 38.115555593746016,
+            "mb_per_sec": 9.837129396523128,
+            "mean_ms": 26.236007436399,
+            "peak_mb": 21.340911865234375,
             "error": false
         },
         {
@@ -225,10 +225,10 @@
             "parserId": "league-strict",
             "corpus": "doc-2kb.md",
             "bytes": 3889,
-            "ops_per_sec": 202.65039752789704,
-            "mb_per_sec": 0.7881073959859916,
-            "mean_ms": 4.9346066536204996,
-            "peak_mb": 3.1824111938476562,
+            "ops_per_sec": 202.60608520041973,
+            "mb_per_sec": 0.7879350653444323,
+            "mean_ms": 4.9356859099804,
+            "peak_mb": 3.582855224609375,
             "error": false
         },
         {
@@ -236,10 +236,10 @@
             "parserId": "league-strict",
             "corpus": "doc-16kb.md",
             "bytes": 18527,
-            "ops_per_sec": 138.7268147041987,
-            "mb_per_sec": 2.5701916960246893,
-            "mean_ms": 7.2084117416828,
-            "peak_mb": 6.888153076171875,
+            "ops_per_sec": 138.79287463999424,
+            "mb_per_sec": 2.5714155884551735,
+            "mean_ms": 7.2049808219178,
+            "peak_mb": 7.076591491699219,
             "error": false
         },
         {
@@ -247,10 +247,10 @@
             "parserId": "league-strict",
             "corpus": "doc-128kb.md",
             "bytes": 138308,
-            "ops_per_sec": 27.32498395900379,
-            "mb_per_sec": 3.779263881401896,
-            "mean_ms": 36.596544814091004,
-            "peak_mb": 38.43449401855469,
+            "ops_per_sec": 29.208825738784615,
+            "mb_per_sec": 4.039814270279822,
+            "mean_ms": 34.236227397261,
+            "peak_mb": 38.611167907714844,
             "error": false
         },
         {
@@ -258,10 +258,10 @@
             "parserId": "league-strict",
             "corpus": "commonmark-spec.md",
             "bytes": 169307,
-            "ops_per_sec": 36.85618661168658,
-            "mb_per_sec": 6.24001038666482,
-            "mean_ms": 27.132486888454,
-            "peak_mb": 26.78058624267578,
+            "ops_per_sec": 37.86417622049838,
+            "mb_per_sec": 6.410670083363919,
+            "mean_ms": 26.410187671233,
+            "peak_mb": 26.957275390625,
             "error": false
         },
         {
@@ -269,10 +269,10 @@
             "parserId": "league-strict",
             "corpus": "tempest-docs.md",
             "bytes": 258087,
-            "ops_per_sec": 46.7761600457947,
-            "mb_per_sec": 12.072318817739015,
-            "mean_ms": 21.378411545988,
-            "peak_mb": 20.851959228515625,
+            "ops_per_sec": 47.46719594107539,
+            "mb_per_sec": 12.250666198844325,
+            "mean_ms": 21.067180821917002,
+            "peak_mb": 21.02863311767578,
             "error": false
         }
     ],
@@ -281,8 +281,8 @@
             "group": "frontmatter",
             "subject": "benchSymfonyYaml",
             "label": "symfony/yaml (floor)",
-            "mean_us": 334.66825831703,
-            "ops_per_sec": 2988.0335978941384,
+            "mean_us": 307.80598825831,
+            "ops_per_sec": 3248.799692489422,
             "rendersBody": false,
             "note": "raw YAML only \u2014 no Markdown involved"
         },
@@ -290,8 +290,8 @@
             "group": "frontmatter",
             "subject": "benchOursExtract",
             "label": "helgesverre/markdown (extract)",
-            "mean_us": 6.3886105675146,
-            "ops_per_sec": 156528.55803809562,
+            "mean_us": 8.8405479452057,
+            "ops_per_sec": 113115.16053055377,
             "rendersBody": false,
             "note": "dedicated extractor: regex split + libyaml FFI"
         },
@@ -299,8 +299,8 @@
             "group": "frontmatter",
             "subject": "benchLeagueFrontmatter",
             "label": "league/commonmark (frontmatter-only)",
-            "mean_us": 380.95624266145,
-            "ops_per_sec": 2624.9733906806846,
+            "mean_us": 344.32739726027,
+            "ops_per_sec": 2904.2126997641158,
             "rendersBody": false,
             "note": "FrontMatterParser \u2014 skips rendering the body"
         },
@@ -308,8 +308,8 @@
             "group": "frontmatter",
             "subject": "benchTempestFull",
             "label": "tempest/markdown (full parse)",
-            "mean_us": 1012.8667710372,
-            "ops_per_sec": 987.2966796768106,
+            "mean_us": 939.14418786694,
+            "ops_per_sec": 1064.799221375453,
             "rendersBody": true,
             "note": "no dedicated front-matter API; full parse is the idiomatic path"
         },
@@ -317,8 +317,8 @@
             "group": "frontmatter",
             "subject": "benchTempestLex",
             "label": "tempest/markdown (lex, no render)",
-            "mean_us": 455.10915851273,
-            "ops_per_sec": 2197.2750521390103,
+            "mean_us": 402.79001956947,
+            "ops_per_sec": 2482.683163472793,
             "rendersBody": false,
             "note": "no dedicated API; lex() tokenizes without rendering (FrontMatterToken->data)"
         },
@@ -326,8 +326,8 @@
             "group": "frontmatter",
             "subject": "benchOursFull",
             "label": "helgesverre/markdown (full parse)",
-            "mean_us": 32.041526418787,
-            "ops_per_sec": 31209.499414287176,
+            "mean_us": 31.855694716243,
+            "ops_per_sec": 31391.561505959147,
             "rendersBody": true,
             "note": "parse(): front matter + HTML + table of contents"
         }

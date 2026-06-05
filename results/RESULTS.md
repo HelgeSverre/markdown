@@ -1,6 +1,6 @@
 # helgesverre/markdown — benchmark results
 
-_Generated 2026-06-05 19:49:04 · PHP 8.5.5 · Darwin arm64 · measured with PHPBench_
+_Generated 2026-06-05 19:58:41 · PHP 8.5.5 · Darwin arm64 · measured with PHPBench_
 
 ## Methodology
 
@@ -17,60 +17,60 @@ _Generated 2026-06-05 19:49:04 · PHP 8.5.5 · Darwin arm64 · measured with PHP
 
 | Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
 |---|--:|--:|--:|--:|--:|--:|
-| **helgesverre/markdown** 🏆 | 46,330 | 180.18 | 0.0216 | 3.04 | 81.41× | 267.13× |
-| **helgesverre/markdown (parse)** | 16,530 | 64.28 | 0.0605 | 3.04 | 29.04× | 95.31× |
-| **tempest** | 569 | 2.21 | 1.7571 | 3.04 | 1.00× | 3.28× |
-| **league-strict** | 203 | 0.79 | 4.9346 | 3.18 | 0.36× | 1.17× |
-| **league-gfm** | 173 | 0.67 | 5.7658 | 3.47 | 0.30× | 1.00× |
+| **helgesverre/markdown** 🏆 | 47,449 | 184.53 | 0.0211 | 3.22 | 80.93× | 254.17× |
+| **helgesverre/markdown (parse)** | 17,581 | 68.37 | 0.0569 | 3.22 | 29.99× | 94.18× |
+| **tempest** | 586 | 2.28 | 1.7057 | 3.22 | 1.00× | 3.14× |
+| **league-strict** | 203 | 0.79 | 4.9357 | 3.58 | 0.35× | 1.09× |
+| **league-gfm** | 187 | 0.73 | 5.3568 | 3.68 | 0.32× | 1.00× |
 
 ### doc-16kb.md  (18.1 KB)
 
 | Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
 |---|--:|--:|--:|--:|--:|--:|
-| **helgesverre/markdown** 🏆 | 10,411 | 192.89 | 0.0961 | 3.04 | 29.36× | 84.49× |
-| **helgesverre/markdown (parse)** | 5,110 | 94.67 | 0.1957 | 3.04 | 14.41× | 41.46× |
-| **tempest** | 355 | 6.57 | 2.8200 | 3.04 | 1.00× | 2.88× |
-| **league-strict** | 139 | 2.57 | 7.2084 | 6.89 | 0.39× | 1.13× |
-| **league-gfm** | 123 | 2.28 | 8.1149 | 8.27 | 0.35× | 1.00× |
+| **helgesverre/markdown** 🏆 | 10,448 | 193.58 | 0.0957 | 3.22 | 29.40× | 90.23× |
+| **helgesverre/markdown (parse)** | 5,257 | 97.40 | 0.1902 | 3.22 | 14.79× | 45.40× |
+| **tempest** | 355 | 6.58 | 2.8140 | 3.22 | 1.00× | 3.07× |
+| **league-strict** | 139 | 2.57 | 7.2050 | 7.08 | 0.39× | 1.20× |
+| **league-gfm** | 116 | 2.15 | 8.6356 | 8.43 | 0.33× | 1.00× |
 
 ### doc-128kb.md  (135.1 KB)
 
 | Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
 |---|--:|--:|--:|--:|--:|--:|
-| **helgesverre/markdown** 🏆 | 1,412 | 195.23 | 0.7084 | 3.04 | 15.22× | 56.76× |
-| **helgesverre/markdown (parse)** | 917 | 126.83 | 1.0905 | 3.04 | 9.88× | 36.87× |
-| **tempest** | 93 | 12.83 | 10.7794 | 3.04 | 1.00× | 3.73× |
-| **league-strict** | 27 | 3.78 | 36.5965 | 38.43 | 0.29× | 1.10× |
-| **league-gfm** | 25 | 3.44 | 40.2116 | 47.74 | 0.27× | 1.00× |
+| **helgesverre/markdown** 🏆 | 1,416 | 195.85 | 0.7062 | 3.22 | 15.50× | 59.67× |
+| **helgesverre/markdown (parse)** | 924 | 127.76 | 1.0825 | 3.22 | 10.11× | 38.92× |
+| **tempest** | 91 | 12.64 | 10.9447 | 3.22 | 1.00× | 3.85× |
+| **league-strict** | 29 | 4.04 | 34.2362 | 38.61 | 0.32× | 1.23× |
+| **league-gfm** | 24 | 3.28 | 42.1356 | 47.92 | 0.26× | 1.00× |
 
 ### commonmark-spec.md  (165.3 KB)
 
 | Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
 |---|--:|--:|--:|--:|--:|--:|
-| **helgesverre/markdown** 🏆 | 1,161 | 196.62 | 0.8611 | 3.04 | — | 32.21× |
-| **helgesverre/markdown (parse)** | 948 | 160.51 | 1.0548 | 3.04 | — | 26.29× |
-| **league-strict** | 37 | 6.24 | 27.1325 | 26.78 | — | 1.02× |
-| **league-gfm** | 36 | 6.10 | 27.7339 | 26.93 | — | 1.00× |
+| **helgesverre/markdown** 🏆 | 1,158 | 196.04 | 0.8636 | 3.22 | — | 33.32× |
+| **helgesverre/markdown (parse)** | 761 | 128.79 | 1.3146 | 3.22 | — | 21.89× |
+| **league-strict** | 38 | 6.41 | 26.4102 | 26.96 | — | 1.09× |
+| **league-gfm** | 35 | 5.88 | 28.7789 | 27.11 | — | 1.00× |
 | **tempest** | — | — | — | — | — | — |  ⚠️ threw during parse
 
 ### tempest-docs.md  (252.0 KB)
 
 | Parser | ops/sec | MB/s | mean ms | peak MB | vs tempest | vs league-gfm |
 |---|--:|--:|--:|--:|--:|--:|
-| **helgesverre/markdown** 🏆 | 1,212 | 312.72 | 0.8253 | 3.04 | 29.34× | 28.76× |
-| **helgesverre/markdown (parse)** | 888 | 229.19 | 1.1261 | 3.04 | 21.50× | 21.08× |
-| **league-strict** | 47 | 12.07 | 21.3784 | 20.85 | 1.13× | 1.11× |
-| **league-gfm** | 42 | 10.87 | 23.7362 | 21.14 | 1.02× | 1.00× |
-| **tempest** | 41 | 10.66 | 24.2155 | 3.59 | 1.00× | 0.98× |
+| **helgesverre/markdown** 🏆 | 1,194 | 308.28 | 0.8372 | 3.22 | 50.46× | 31.34× |
+| **helgesverre/markdown (parse)** | 896 | 231.26 | 1.1160 | 3.22 | 37.86× | 23.51× |
+| **league-strict** | 47 | 12.25 | 21.0672 | 21.03 | 2.01× | 1.25× |
+| **league-gfm** | 38 | 9.84 | 26.2360 | 21.34 | 1.61× | 1.00× |
+| **tempest** | 24 | 6.11 | 42.2475 | 3.76 | 1.00× | 0.62× |
 
 ## Front-matter extraction
 
 | Approach | mean µs | ops/sec | renders body? | vs fastest |
 |---|--:|--:|:--:|--:|
-| helgesverre/markdown (extract) | 6.39 | 156,529 | no | 1.00× |
-| helgesverre/markdown (full parse) | 32.04 | 31,209 | yes | 0.20× |
-| symfony/yaml (floor) | 334.67 | 2,988 | no | 0.02× |
-| league/commonmark (frontmatter-only) | 380.96 | 2,625 | no | 0.02× |
-| tempest/markdown (lex, no render) | 455.11 | 2,197 | no | 0.01× |
-| tempest/markdown (full parse) | 1,012.87 | 987 | yes | 0.01× |
+| helgesverre/markdown (extract) | 8.84 | 113,115 | no | 1.00× |
+| helgesverre/markdown (full parse) | 31.86 | 31,392 | yes | 0.28× |
+| symfony/yaml (floor) | 307.81 | 3,249 | no | 0.03× |
+| league/commonmark (frontmatter-only) | 344.33 | 2,904 | no | 0.03× |
+| tempest/markdown (lex, no render) | 402.79 | 2,483 | no | 0.02× |
+| tempest/markdown (full parse) | 939.14 | 1,065 | yes | 0.01× |
 

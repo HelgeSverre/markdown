@@ -1,0 +1,39 @@
+name: Release
+
+# Auto-publish a GitHub release whenever a version tag is pushed. Packagist picks
+# up the new version from the tag via its webhook; this just creates the matching
+# GitHub release with auto-generated notes. The shipped native libraries already
+# live in the repo, so there are no build artifacts to attach.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write # required to create the release
+
+jobs:
+  release:
+    name: github release · ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # full history so release notes can diff against the previous tag
+
+      # Pre-release tags carry a semver suffix (e.g. v0.3.0-beta.1) — mark them as such.
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          case "${GITHUB_REF_NAME}" in
+            *-*) prerelease="--prerelease" ;;
+          esac
+
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            --verify-tag \
+            ${prerelease}

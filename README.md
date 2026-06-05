@@ -130,11 +130,11 @@ Fresh run from this checkout: PHP 8.5.5, Darwin arm64, PHPBench, opcache + traci
 
 | Corpus | helgesverre/markdown | league/commonmark GFM | tempest/markdown |
 | --- | ---: | ---: | ---: |
-| `doc-128kb.md` (135 KB) | **0.71 ms** / 195 MB/s | 40.21 ms / 3.4 MB/s | 10.78 ms / 12.8 MB/s |
-| `commonmark-spec.md` (165 KB) | **0.86 ms** / 197 MB/s | 27.73 ms / 6.1 MB/s | — (threw) |
-| `tempest-docs.md` (252 KB) | **0.83 ms** / 313 MB/s | 23.74 ms / 10.9 MB/s | 24.22 ms / 10.7 MB/s |
+| `doc-128kb.md` (135 KB) | **0.71 ms** / 196 MB/s | 42.14 ms / 3.3 MB/s | 10.94 ms / 12.6 MB/s |
+| `commonmark-spec.md` (165 KB) | **0.86 ms** / 196 MB/s | 28.78 ms / 5.9 MB/s | — (threw) |
+| `tempest-docs.md` (252 KB) | **0.84 ms** / 308 MB/s | 26.24 ms / 9.8 MB/s | 42.25 ms / 6.1 MB/s |
 
-On the 252 KB Tempest docs corpus, the render fast path measured about 29x faster than `league/commonmark` GFM and about 29x faster than `tempest/markdown`. The full `parse()` pipeline (front matter + render + heading anchors + TOC) is benchmarked too — on that corpus it runs in ~1.13 ms (229 MB/s), still ~21x faster than either.
+On the 252 KB Tempest docs corpus, the render fast path measured about 31x faster than `league/commonmark` GFM and about 50x faster than `tempest/markdown`. The full `parse()` pipeline (front matter + render + heading anchors + TOC) is benchmarked too — on that corpus it runs in ~1.12 ms (231 MB/s), still ~24x faster than `league/commonmark` GFM.
 
 ### Front Matter
 
@@ -142,14 +142,14 @@ On the 252 KB Tempest docs corpus, the render fast path measured about 29x faste
 
 | Approach | Mean | Renders body? |
 | --- | ---: | :---: |
-| `helgesverre/markdown` extract only | **6.39 us** | no |
-| `helgesverre/markdown` full parse | 32.04 us | yes |
-| `symfony/yaml` floor | 334.67 us | no |
-| `league/commonmark` front matter only | 380.96 us | no |
-| `tempest/markdown` lex (no render) | 455.11 us | no |
-| `tempest/markdown` full parse | 1,012.87 us | yes |
+| `helgesverre/markdown` extract only | **8.84 us** | no |
+| `helgesverre/markdown` full parse | 31.86 us | yes |
+| `symfony/yaml` floor | 307.81 us | no |
+| `league/commonmark` front matter only | 344.33 us | no |
+| `tempest/markdown` lex (no render) | 402.79 us | no |
+| `tempest/markdown` full parse | 939.14 us | yes |
 
-Front-matter extraction measured about 52x faster than the `symfony/yaml` floor and about 60x faster than `league/commonmark`'s dedicated front-matter parser. (`tempest/markdown` has no dedicated front-matter API — `lex()` is its cheapest path, full `parse()` its idiomatic one.)
+Front-matter extraction measured about 35x faster than the `symfony/yaml` floor and about 39x faster than `league/commonmark`'s dedicated front-matter parser. (`tempest/markdown` has no dedicated front-matter API — `lex()` is its cheapest path, full `parse()` its idiomatic one.)
 
 Memory numbers in the benchmark output need context: this parser renders into a short-lived C heap buffer before copying HTML back into PHP, so PHP's memory metrics undercount part of its transient native allocation. Pure-PHP parsers keep their work on the Zend heap.
 
